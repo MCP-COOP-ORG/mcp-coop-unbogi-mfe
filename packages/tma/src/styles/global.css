@@ -1,0 +1,26 @@
+@import 'tailwindcss';
+@import './theme.css';
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  background: linear-gradient(to bottom, var(--color-bg-start), var(--color-bg-mid), var(--color-bg-end));
+  color: var(--color-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Lock height to prevent virtual keyboard from squishing layout */
+#root {
+  height: var(--locked-app-height, 100vh);
+}

@@ -1,0 +1,37 @@
+:root {
+  /* ─── Brand Palette ─── */
+  --color-primary: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #5b21b6;
+
+  --color-accent: #f472b6;
+  --color-accent-light: #fbcfe8;
+
+  --color-bg-start: #11051c;
+  --color-bg-mid: #1b0a29;
+  --color-bg-end: #2c1338;
+
+  --color-text: #ffffff;
+  --color-text-muted: rgba(255, 255, 255, 0.5);
+  --color-text-dim: rgba(255, 255, 255, 0.3);
+
+  /* ─── Glass System ─── */
+  --glass-bg: rgba(255, 255, 255, 0.12);
+  --glass-bg-hover: rgba(255, 255, 255, 0.18);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: 12px;
+
+  /* ─── Spacing & Radius ─── */
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 26px;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ─── */
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.3);
+
+  /* ─── Animation ─── */
+  --transition-fast: 150ms ease;
+  --transition-normal: 250ms ease;
+}
