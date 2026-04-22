@@ -1,0 +1,25 @@
+{
+  "name": "@unbogi/firebase",
+  "private": true,
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "type": "commonjs",
+  "scripts": {
+    "build": "tsc",
+    "serve": "npm run build && firebase emulators:start --only functions",
+    "deploy": "firebase deploy --only functions"
+  },
+  "dependencies": {
+    "@unbogi/contracts": "workspace:*",
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0",
+    "resend": "^6.11.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "firebase-functions-test": "^3.2.0",
+    "typescript": "^5.0.0"
+  }
+}

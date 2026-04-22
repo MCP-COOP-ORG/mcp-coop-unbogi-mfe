@@ -1,0 +1,21 @@
+{
+  "name": "@unbogi/contracts",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./auth": "./src/domains/auth/index.ts",
+    "./gifts": "./src/domains/gifts/index.ts",
+    "./contacts": "./src/domains/contacts/index.ts",
+    "./holidays": "./src/domains/holidays/index.ts"
+  },
+  "dependencies": {
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.0"
+  }
+}

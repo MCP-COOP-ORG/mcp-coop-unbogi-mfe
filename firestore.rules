@@ -1,0 +1,55 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── users ────────────────────────────────────────────────────────────────
+    // Each user can only read and write their own profile.
+    // Cloud Functions write via Admin SDK (bypasses rules).
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      match /{document=**} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // ─── holidays ──────────────────────────────────────────────────────────────
+    // Public read-only catalog. Writes only via Admin SDK (seed / admin tools).
+    match /holidays/{holidayId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ─── invites ───────────────────────────────────────────────────────────────
+    // Invite tokens are private. The accept flow runs via Cloud Function
+    // (Admin SDK) which bypasses these rules.
+    // Writes are exclusively done by Cloud Functions via Admin SDK.
+    match /invites/{inviteId} {
+      allow read: if false;
+      allow write: if false;
+    }
+
+    // ─── contacts ──────────────────────────────────────────────────────────────
+    // Alice can only read her own contact list (ownerId == her uid).
+    // Writes are exclusively done by Cloud Functions via Admin SDK.
+    match /contacts/{contactId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.ownerId;
+      allow write: if false;
+    }
+
+    // ─── gifts ─────────────────────────────────────────────────────────────────
+    // Only the receiver can read their gift documents.
+    // Sender cannot read gift after sending (scratchCode is sensitive).
+    // All writes (create, scratch) are done exclusively via Cloud Functions.
+    match /gifts/{giftId} {
+      allow read: if request.auth != null && request.auth.uid == resource.data.receiverId;
+      allow write: if false;
+    }
+
+    // ─── catch-all: deny everything else ──────────────────────────────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

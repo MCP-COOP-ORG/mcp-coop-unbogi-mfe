@@ -1,0 +1,41 @@
+name: Deploy Firebase Backend
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy-functions:
+    name: Deploy to Firebase Functions
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write' # Required for Workload Identity Federation
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.11.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      # Build contracts and firebase before deploying
+      - name: Build Packages
+        run: |
+          pnpm --filter @unbogi/contracts run build || true
+          pnpm --filter @unbogi/firebase run build
+
+      - name: Deploy to Firebase
+        run: |
+          npm install -g firebase-tools
+          firebase deploy --only functions,firestore:rules,firestore:indexes --project ${{ secrets.UNBOGI_FIREBASE_PROJECT_ID }} --token ${{ secrets.FIREBASE_TOKEN }}
