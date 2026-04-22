@@ -31,6 +31,19 @@ const en = {
     sending: 'Sending...',
     errorSubmit: 'Failed to send gift. Try again.',
   },
+  collection: {
+    empty: 'Your collection is empty',
+  },
+  surprises: {
+    empty: 'No surprises yet',
+  },
+  giftBack: {
+    activationCode: 'Activation Code',
+    scanToActivate: 'Scan to activate',
+    tapToCopy: 'Tap to copy',
+    from: 'from',
+    flipCard: 'Flip card',
+  },
 } as const;
 
 export type Translations = typeof en;

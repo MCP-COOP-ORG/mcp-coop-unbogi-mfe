@@ -41,7 +41,7 @@ export function App() {
   if (isAuthed) {
     return (
       <div className="flex flex-col h-full relative">
-        <main className={`flex-1 ${isSendScreen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+        <main className={`flex-1 ${isSendScreen ? 'overflow-hidden' : 'overflow-y-auto pb-[78px]'}`}>
           <ActiveScreen screenId={activeScreen} />
         </main>
         {!isSendScreen && <BottomNav />}

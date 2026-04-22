@@ -14,6 +14,10 @@ export default defineConfig({
   build: {
     outDir: process.env.VITE_APP_OUTDIR || 'dist/unbogi',
   },
+  // Pre-bundle qrcode.react so Vite dev server can resolve its CJS exports
+  optimizeDeps: {
+    include: ['qrcode.react'],
+  },
   envPrefix: ['VITE_', 'UNBOGI_'],
   server: {
     port: 3090,
