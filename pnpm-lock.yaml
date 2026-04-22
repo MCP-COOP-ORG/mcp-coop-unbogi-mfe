@@ -28,7 +28,7 @@ importers:
   packages/firebase:
     dependencies:
       '@unbogi/contracts':
-        specifier: workspace:*
+        specifier: file:../contracts
         version: link:../contracts
       firebase-admin:
         specifier: ^12.0.0

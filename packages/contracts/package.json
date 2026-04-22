@@ -7,6 +7,9 @@
   "scripts": {
     "build": "tsc"
   },
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": "./dist/index.js",
     "./auth": "./dist/domains/auth/index.js",
