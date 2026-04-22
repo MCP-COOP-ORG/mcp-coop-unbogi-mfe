@@ -8,4 +8,4 @@ export * from './domains/holidays';
 export { app, auth, functions } from './firebase';
 
 // Constants
-export { CLOUD_FUNCTIONS, AUTH_STATUS, GIFT_CONFIG, type AuthStatus } from './constants';
+export { CLOUD_FUNCTIONS, AUTH_STATUS, OTP_CONFIG, GIFT_CONFIG, type AuthStatus } from './constants';

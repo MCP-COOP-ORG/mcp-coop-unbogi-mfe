@@ -43,6 +43,19 @@ class UserRepository {
     get collection() {
         return this.db.collection(contracts_1.COLLECTIONS.USERS);
     }
+    /**
+     * Ищет пользователя по telegramId.
+     * Используется в telegramAuth — только чтение, никаких записей.
+     */
+    async findByTelegramId(telegramId) {
+        const snap = await this.collection
+            .where('telegramId', '==', telegramId)
+            .limit(1)
+            .get();
+        if (snap.empty)
+            return null;
+        return snap.docs[0].data();
+    }
     async upsertUser(uid, data) {
         const userRef = this.collection.doc(uid);
         await userRef.set(data, { merge: true });

@@ -4,24 +4,42 @@ import { functions, auth } from '../../firebase';
 import { CLOUD_FUNCTIONS } from '../../constants';
 
 export const authApi = {
-  async authenticateTelegram(initData: string) {
-    const fn = httpsCallable<{ initData: string }, { token: string }>(
+  /**
+   * Telegram bootstrapping:
+   * - Валидирует initData на бэке (HMAC)
+   * - Если пользователь зарегистрирован (нашли по telegramId) → signInWithCustomToken, hasEmail: true
+   * - Если нет → hasEmail: false, Firebase сессия не открывается
+   */
+  async authenticateTelegram(initData: string): Promise<{ hasEmail: boolean }> {
+    const fn = httpsCallable<{ initData: string }, { token?: string; hasEmail: boolean }>(
       functions,
       CLOUD_FUNCTIONS.AUTH_TELEGRAM,
     );
     const { data } = await fn({ initData });
-    await signInWithCustomToken(auth, data.token);
+    if (data.token) {
+      await signInWithCustomToken(auth, data.token);
+    }
+    return { hasEmail: data.hasEmail };
   },
 
-  async sendEmailOtp(email: string) {
-    const fn = httpsCallable<{ email: string }, { success: boolean }>(
+  /**
+   * Отправляет OTP на email.
+   * initData нужен бэку для извлечения telegramId и nickname (сохранятся в OTP-запись).
+   * Идемпотентен: если активный OTP уже есть — сервер не высылает новый.
+   */
+  async sendEmailOtp(email: string, initData: string): Promise<void> {
+    const fn = httpsCallable<{ email: string; initData: string }, { success: boolean }>(
       functions,
       CLOUD_FUNCTIONS.AUTH_SEND_EMAIL_OTP,
     );
-    await fn({ email });
+    await fn({ email, initData });
   },
 
-  async verifyEmailOtp(email: string, code: string) {
+  /**
+   * Верифицирует OTP, создаёт/находит пользователя по email, привязывает telegramId.
+   * После успеха делает signInWithCustomToken.
+   */
+  async verifyEmailOtp(email: string, code: string): Promise<void> {
     const fn = httpsCallable<{ email: string; code: string }, { token: string }>(
       functions,
       CLOUD_FUNCTIONS.AUTH_VERIFY_EMAIL_OTP,

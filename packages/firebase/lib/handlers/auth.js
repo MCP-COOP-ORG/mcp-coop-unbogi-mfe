@@ -52,24 +52,29 @@ exports.telegramAuth = (0, https_1.onCall)({ secrets: [telegramBotToken], region
     try {
         botToken = telegramBotToken.value().trim();
     }
-    catch (e) {
+    catch {
         throw new https_1.HttpsError(contracts_1.ERROR_CODES.INTERNAL, contracts_1.ERROR_MESSAGES.BOT_TOKEN_CONFIG_ERROR);
     }
+    // Возвращает { token?, hasEmail } — token только если пользователь уже зарегистрирован
     return await authService.authenticateWithTelegram(parsed.data, botToken);
 });
-exports.sendEmailOtp = (0, https_1.onCall)({ secrets: [resendApiKey], region: contracts_1.FUNCTION_CONFIG.REGION }, async (request) => {
+exports.sendEmailOtp = (0, https_1.onCall)(
+// botToken нужен для валидации initData внутри sendEmailOtp
+{ secrets: [telegramBotToken, resendApiKey], region: contracts_1.FUNCTION_CONFIG.REGION }, async (request) => {
     const parsed = contracts_1.SendOtpSchema.safeParse(request.data);
     if (!parsed.success) {
         throw new https_1.HttpsError(contracts_1.ERROR_CODES.INVALID_ARGUMENT, contracts_1.ERROR_MESSAGES.INVALID_EMAIL_FORMAT);
     }
+    let botToken;
     let apiKey;
     try {
+        botToken = telegramBotToken.value().trim();
         apiKey = resendApiKey.value().trim();
     }
-    catch (e) {
-        throw new https_1.HttpsError(contracts_1.ERROR_CODES.INTERNAL, 'Server configuration error: Resend API Key not found');
+    catch {
+        throw new https_1.HttpsError(contracts_1.ERROR_CODES.INTERNAL, contracts_1.ERROR_MESSAGES.BOT_TOKEN_CONFIG_ERROR);
     }
-    await authService.sendEmailOtp(parsed.data, apiKey);
+    await authService.sendEmailOtp(parsed.data, botToken, apiKey);
     return { success: true };
 });
 exports.verifyEmailOtp = (0, https_1.onCall)({ region: contracts_1.FUNCTION_CONFIG.REGION }, async (request) => {

@@ -1,12 +1,12 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
 import * as functions from 'firebase-functions/v2';
-import { 
-  TelegramAuthSchema, 
-  SendOtpSchema, 
+import {
+  TelegramAuthSchema,
+  SendOtpSchema,
   VerifyOtpSchema,
   ERROR_CODES,
   ERROR_MESSAGES,
-  FUNCTION_CONFIG
+  FUNCTION_CONFIG,
 } from '@unbogi/contracts';
 import { AuthService } from '../services/auth';
 import { UserRepository } from '../repositories/user';
@@ -28,32 +28,36 @@ export const telegramAuth = onCall(
     let botToken: string;
     try {
       botToken = telegramBotToken.value().trim();
-    } catch (e) {
+    } catch {
       throw new HttpsError(ERROR_CODES.INTERNAL as any, ERROR_MESSAGES.BOT_TOKEN_CONFIG_ERROR);
     }
 
+    // Возвращает { token?, hasEmail } — token только если пользователь уже зарегистрирован
     return await authService.authenticateWithTelegram(parsed.data, botToken);
-  }
+  },
 );
 
 export const sendEmailOtp = onCall(
-  { secrets: [resendApiKey], region: FUNCTION_CONFIG.REGION },
+  // botToken нужен для валидации initData внутри sendEmailOtp
+  { secrets: [telegramBotToken, resendApiKey], region: FUNCTION_CONFIG.REGION },
   async (request) => {
     const parsed = SendOtpSchema.safeParse(request.data);
     if (!parsed.success) {
       throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as any, ERROR_MESSAGES.INVALID_EMAIL_FORMAT);
     }
 
+    let botToken: string;
     let apiKey: string;
     try {
+      botToken = telegramBotToken.value().trim();
       apiKey = resendApiKey.value().trim();
-    } catch (e) {
-      throw new HttpsError(ERROR_CODES.INTERNAL as any, 'Server configuration error: Resend API Key not found');
+    } catch {
+      throw new HttpsError(ERROR_CODES.INTERNAL as any, ERROR_MESSAGES.BOT_TOKEN_CONFIG_ERROR);
     }
 
-    await authService.sendEmailOtp(parsed.data, apiKey);
+    await authService.sendEmailOtp(parsed.data, botToken, apiKey);
     return { success: true };
-  }
+  },
 );
 
 export const verifyEmailOtp = onCall(
@@ -65,5 +69,5 @@ export const verifyEmailOtp = onCall(
     }
 
     return await authService.verifyEmailOtp(parsed.data);
-  }
+  },
 );

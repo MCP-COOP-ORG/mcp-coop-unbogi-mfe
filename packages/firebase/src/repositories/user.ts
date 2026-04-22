@@ -1,7 +1,7 @@
 import * as admin from 'firebase-admin';
 import { COLLECTIONS } from '@unbogi/contracts';
 
-interface UserData {
+export interface UserData {
   uid: string;
   telegramId?: number;
   email?: string;
@@ -17,6 +17,19 @@ export class UserRepository {
 
   private get collection() {
     return this.db.collection(COLLECTIONS.USERS);
+  }
+
+  /**
+   * Ищет пользователя по telegramId.
+   * Используется в telegramAuth — только чтение, никаких записей.
+   */
+  async findByTelegramId(telegramId: number): Promise<UserData | null> {
+    const snap = await this.collection
+      .where('telegramId', '==', telegramId)
+      .limit(1)
+      .get();
+    if (snap.empty) return null;
+    return snap.docs[0].data() as UserData;
   }
 
   async upsertUser(uid: string, data: Partial<UserData>): Promise<void> {

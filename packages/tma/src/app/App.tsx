@@ -7,6 +7,7 @@ import { CollectionScreen } from '@/screens/collection/CollectionScreen';
 import { SendScreen } from '@/screens/send/SendScreen';
 import { BottomNav } from '@/ui/bottom-nav';
 import { useNavigationStore, type ScreenId } from '@/app/navigation';
+import { tg } from '@/lib/telegram';
 
 function ActiveScreen({ screenId }: { screenId: ScreenId }) {
   switch (screenId) {
@@ -25,7 +26,8 @@ export function App() {
   const activeScreen = useNavigationStore((s) => s.activeScreen);
 
   useEffect(() => {
-    const unsubscribe = initAuth();
+    // Передаём tg.initData — store запустит telegramAuth и определит нужен ли OTP
+    const unsubscribe = initAuth(tg.initData);
     return () => unsubscribe();
   }, [initAuth]);
 
@@ -37,7 +39,8 @@ export function App() {
     );
   }
 
-  if (status === AUTH_STATUS.UNAUTHENTICATED) {
+  // Показываем LoginScreen как при email_required так и при unauthenticated
+  if (status === AUTH_STATUS.EMAIL_REQUIRED || status === AUTH_STATUS.UNAUTHENTICATED) {
     return <LoginScreen />;
   }
 

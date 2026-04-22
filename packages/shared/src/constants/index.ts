@@ -17,9 +17,22 @@ export const AUTH_STATUS = {
   LOADING: 'loading',
   AUTHENTICATED: 'authenticated',
   UNAUTHENTICATED: 'unauthenticated',
+  /**
+   * TG-идентификация прошла успешно, но пользователь не зарегистрирован.
+   * Нужно пройти OTP для привязки email.
+   */
+  EMAIL_REQUIRED: 'email_required',
 } as const;
 
 export type AuthStatus = (typeof AUTH_STATUS)[keyof typeof AUTH_STATUS];
+
+/**
+ * OTP конфигурация — единый источник правды между клиентом и бэком.
+ * Бэк использует CONFIG.OTP_LIFETIME_MS из @unbogi/contracts (то же значение).
+ */
+export const OTP_CONFIG = {
+  LIFETIME_MS: 10 * 60 * 1000, // 10 минут
+} as const;
 
 export const GIFT_CONFIG = {
   GREETING_MAX_LENGTH: 200,

@@ -25,6 +25,7 @@ export const ERROR_MESSAGES = {
   AUTH_SYSTEM_ERROR: "Auth system error",
   OTP_ATTEMPTS_EXCEEDED: "Too many failed attempts. Request a new code.",
   AUTHENTICATION_REQUIRED: "Authentication required.",
+  TG_AUTH_REQUIRED: "Telegram authentication is required to register.",
   BOT_TOKEN_CONFIG_ERROR: "Server configuration error: Bot Token not found",
   BOT_TOKEN_MISSING: "Missing bot token configuration",
 } as const;
