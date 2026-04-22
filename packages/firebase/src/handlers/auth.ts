@@ -1,5 +1,5 @@
 import { onCall, HttpsError } from 'firebase-functions/v2/https';
-import * as functions from 'firebase-functions/v2';
+import { defineSecret } from 'firebase-functions/params';
 import {
   TelegramAuthSchema,
   SendOtpSchema,
@@ -11,8 +11,8 @@ import {
 import { AuthService } from '../services/auth';
 import { UserRepository } from '../repositories/user';
 
-const telegramBotToken = functions.params.defineSecret('TELEGRAM_BOT_TOKEN');
-const resendApiKey = functions.params.defineSecret('RESEND_API_KEY');
+const telegramBotToken = defineSecret('TELEGRAM_BOT_TOKEN');
+const resendApiKey = defineSecret('RESEND_API_KEY');
 
 const userRepository = new UserRepository();
 const authService = new AuthService(userRepository);

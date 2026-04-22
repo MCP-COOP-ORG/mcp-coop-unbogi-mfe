@@ -29,7 +29,7 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile=false
 
-      # Build contracts and firebase before deploying
+      # Build firebase package (tsup bundles @unbogi/contracts inline, so contracts must be built first)
       - name: Build Packages
         run: |
           pnpm --filter @unbogi/contracts run build || true

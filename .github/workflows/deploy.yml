@@ -1,9 +1,6 @@
 name: Deploy to GCP VM
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 env:

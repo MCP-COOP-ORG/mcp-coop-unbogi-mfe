@@ -3,7 +3,9 @@ import { FieldValue } from "firebase-admin/firestore";
 import { COLLECTIONS, INVITE_STATUS } from "@unbogi/contracts";
 
 export class InviteRepository {
-  private db = admin.firestore();
+  private get db() {
+    return admin.firestore();
+  }
 
   /**
    * Creates a new pending invite document

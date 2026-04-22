@@ -3,8 +3,12 @@ import { logger } from "firebase-functions/v2";
 import { COLLECTIONS, FALLBACK_NAMES, PUSH_MESSAGES } from "@unbogi/contracts";
 
 export class NotificationService {
-  private db = admin.firestore();
-  private messaging = admin.messaging();
+  private get db() {
+    return admin.firestore();
+  }
+  private get messaging() {
+    return admin.messaging();
+  }
 
   /**
    * Sends a push notification to the receiver when a gift is created
