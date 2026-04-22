@@ -1,6 +1,6 @@
-import * as admin from "firebase-admin";
-import { logger } from "firebase-functions/v2";
-import { COLLECTIONS, FALLBACK_NAMES, PUSH_MESSAGES } from "@unbogi/contracts";
+import { COLLECTIONS, FALLBACK_NAMES, PUSH_MESSAGES } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
+import { logger } from 'firebase-functions/v2';
 
 export class NotificationService {
   private get db() {
@@ -31,9 +31,7 @@ export class NotificationService {
 
       // 2. Fetch sender name for notification body
       const senderDoc = await this.db.collection(COLLECTIONS.USERS).doc(senderId).get();
-      const senderName = senderDoc.data()?.displayName 
-        || senderDoc.data()?.nickname 
-        || FALLBACK_NAMES.UNKNOWN;
+      const senderName = senderDoc.data()?.displayName || senderDoc.data()?.nickname || FALLBACK_NAMES.UNKNOWN;
 
       // 3. Construct and send message
       const message = {

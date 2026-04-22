@@ -1,5 +1,5 @@
 import { Gift, LayoutGrid, Send } from 'lucide-react';
-import { useNavigationStore, SCREENS, type ScreenId } from '@/app/navigation';
+import { SCREENS, type ScreenId, useNavigationStore } from '@/app/navigation';
 import { tg } from '@/lib/telegram';
 
 const tabs = [

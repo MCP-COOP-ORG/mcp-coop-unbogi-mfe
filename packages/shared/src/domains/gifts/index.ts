@@ -1,4 +1,4 @@
 export { giftsApi } from './api';
 export { useGiftsStore } from './store';
-export { sendFormSchema, type SendFormData } from './validation';
-export type { GiftRecord, SendGiftPayload, ScratchCode, ScratchCodeFormat, GiftsState } from './types';
+export type { GiftRecord, GiftsState, ScratchCode, ScratchCodeFormat, SendGiftPayload } from './types';
+export { type SendFormData, sendFormSchema } from './validation';

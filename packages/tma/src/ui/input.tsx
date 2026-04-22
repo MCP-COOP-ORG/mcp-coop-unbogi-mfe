@@ -18,11 +18,7 @@ export function Input({ icon, className = '', ...props }: GlassInputProps) {
         className,
       ].join(' ')}
     >
-      {icon && (
-        <div className="w-10 flex items-center justify-center shrink-0 text-white/40">
-          {icon}
-        </div>
-      )}
+      {icon && <div className="w-10 flex items-center justify-center shrink-0 text-white/40">{icon}</div>}
       <input
         className={[
           'flex-1 h-full bg-transparent outline-none min-w-0',

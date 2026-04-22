@@ -1,6 +1,6 @@
 import { httpsCallable } from 'firebase/functions';
-import { functions } from '../../firebase';
 import { CLOUD_FUNCTIONS } from '../../constants';
+import { functions } from '../../firebase';
 import type { GiftRecord, SendGiftPayload } from './types';
 
 export const giftsApi = {
@@ -23,19 +23,13 @@ export const giftsApi = {
   },
 
   async send(payload: SendGiftPayload): Promise<{ giftId: string }> {
-    const fn = httpsCallable<SendGiftPayload, { giftId: string }>(
-      functions,
-      CLOUD_FUNCTIONS.GIFTS_SEND,
-    );
+    const fn = httpsCallable<SendGiftPayload, { giftId: string }>(functions, CLOUD_FUNCTIONS.GIFTS_SEND);
     const { data } = await fn(payload);
     return data;
   },
 
   async scratch(giftId: string): Promise<void> {
-    const fn = httpsCallable<{ giftId: string }, { success: boolean }>(
-      functions,
-      CLOUD_FUNCTIONS.GIFTS_SCRATCH,
-    );
+    const fn = httpsCallable<{ giftId: string }, { success: boolean }>(functions, CLOUD_FUNCTIONS.GIFTS_SCRATCH);
     await fn({ giftId });
   },
 };

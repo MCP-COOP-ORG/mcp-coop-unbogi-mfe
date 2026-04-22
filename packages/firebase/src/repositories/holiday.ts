@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import { COLLECTIONS } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
 
 export class HolidayRepository {
   private get db() {

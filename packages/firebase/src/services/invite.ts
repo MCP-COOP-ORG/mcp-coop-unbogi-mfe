@@ -1,5 +1,5 @@
-import { InviteRepository } from "../repositories/invite";
-import { CreateInvitePayload, AcceptInvitePayload } from "@unbogi/contracts";
+import type { AcceptInvitePayload, CreateInvitePayload } from '@unbogi/contracts';
+import { InviteRepository } from '../repositories/invite';
 
 export class InviteService {
   private repository = new InviteRepository();

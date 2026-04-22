@@ -1,12 +1,12 @@
-import type { User, Unsubscribe } from 'firebase/auth';
+import type { Unsubscribe, User } from 'firebase/auth';
 import type { AuthStatus } from '../../constants';
 
 export interface AuthState {
   user: User | null;
   status: AuthStatus;
-  /** Email после вызова sendEmailOtp — для дедупликации и отображения таймера */
+  /** Email after calling sendEmailOtp — used for deduplication and timer display */
   pendingEmail: string | null;
-  /** Unix timestamp (ms) момента отправки OTP — клиентский таймер обратного отсчёта */
+  /** Unix timestamp (ms) of OTP dispatch — used for the client countdown timer */
   otpSentAt: number | null;
   initialize: (initData: string) => Unsubscribe;
   setUser: (user: User | null) => void;

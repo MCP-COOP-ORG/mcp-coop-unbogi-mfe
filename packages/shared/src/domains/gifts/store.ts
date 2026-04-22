@@ -15,14 +15,9 @@ export const useGiftsStore = create<GiftsState>((set, get) => ({
     if (!hasData) set({ isLoading: true });
 
     try {
-      const [receivedGifts, openedGifts] = await Promise.all([
-        giftsApi.getReceived(),
-        giftsApi.getOpened(),
-      ]);
+      const [receivedGifts, openedGifts] = await Promise.all([giftsApi.getReceived(), giftsApi.getOpened()]);
 
-      receivedGifts.sort(
-        (a, b) => new Date(a.unpackDate).getTime() - new Date(b.unpackDate).getTime(),
-      );
+      receivedGifts.sort((a, b) => new Date(a.unpackDate).getTime() - new Date(b.unpackDate).getTime());
 
       set({ receivedGifts, openedGifts, isLoaded: true });
     } catch (error) {

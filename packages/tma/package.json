@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@twa-dev/sdk": "^8.0.2",
+    "@unbogi/contracts": "workspace:*",
     "@unbogi/shared": "workspace:*",
     "framer-motion": "^12.38.0",
     "lucide-react": "^1.8.0",

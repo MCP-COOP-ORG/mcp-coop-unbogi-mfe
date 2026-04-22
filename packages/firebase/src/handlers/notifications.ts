@@ -1,6 +1,6 @@
-import { onDocumentCreated } from "firebase-functions/v2/firestore";
-import { COLLECTIONS, FUNCTION_CONFIG } from "@unbogi/contracts";
-import { NotificationService } from "../services/notification";
+import { COLLECTIONS, FUNCTION_CONFIG } from '@unbogi/contracts';
+import { onDocumentCreated } from 'firebase-functions/v2/firestore';
+import { NotificationService } from '../services/notification';
 
 const notificationService = new NotificationService();
 
@@ -14,5 +14,5 @@ export const onGiftCreated = onDocumentCreated(
     const giftId = event.params.giftId;
 
     await notificationService.sendGiftReceivedPush(giftId, senderId, receiverId);
-  }
+  },
 );

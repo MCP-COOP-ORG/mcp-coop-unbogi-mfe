@@ -1,14 +1,14 @@
-import { httpsCallable } from 'firebase/functions';
 import { signInWithCustomToken } from 'firebase/auth';
-import { functions, auth } from '../../firebase';
+import { httpsCallable } from 'firebase/functions';
 import { CLOUD_FUNCTIONS } from '../../constants';
+import { auth, functions } from '../../firebase';
 
 export const authApi = {
   /**
    * Telegram bootstrapping:
-   * - Валидирует initData на бэке (HMAC)
-   * - Если пользователь зарегистрирован (нашли по telegramId) → signInWithCustomToken, hasEmail: true
-   * - Если нет → hasEmail: false, Firebase сессия не открывается
+   * - Validates initData on the backend (HMAC)
+   * - If the user is registered (found by telegramId) → signInWithCustomToken, hasEmail: true
+   * - If not → hasEmail: false, Firebase session is not created
    */
   async authenticateTelegram(initData: string): Promise<{ hasEmail: boolean }> {
     const fn = httpsCallable<{ initData: string }, { token?: string; hasEmail: boolean }>(
@@ -23,9 +23,9 @@ export const authApi = {
   },
 
   /**
-   * Отправляет OTP на email.
-   * initData нужен бэку для извлечения telegramId и nickname (сохранятся в OTP-запись).
-   * Идемпотентен: если активный OTP уже есть — сервер не высылает новый.
+   * Sends an OTP to the provided email.
+   * initData is required by the backend to extract telegramId and nickname (saved into the OTP record).
+   * Idempotent: if an active OTP already exists, the server won't send a new one.
    */
   async sendEmailOtp(email: string, initData: string): Promise<void> {
     const fn = httpsCallable<{ email: string; initData: string }, { success: boolean }>(
@@ -36,8 +36,8 @@ export const authApi = {
   },
 
   /**
-   * Верифицирует OTP, создаёт/находит пользователя по email, привязывает telegramId.
-   * После успеха делает signInWithCustomToken.
+   * Verifies the OTP, creates/finds the user by email, and links the telegramId.
+   * Performs signInWithCustomToken upon success.
    */
   async verifyEmailOtp(email: string, code: string): Promise<void> {
     const fn = httpsCallable<{ email: string; code: string }, { token: string }>(

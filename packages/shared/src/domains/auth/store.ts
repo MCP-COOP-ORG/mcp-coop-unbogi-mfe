@@ -1,7 +1,7 @@
-import { create } from 'zustand';
 import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from '../../firebase';
+import { create } from 'zustand';
 import { AUTH_STATUS } from '../../constants';
+import { auth } from '../../firebase';
 import { authApi } from './api';
 import type { AuthState } from './types';
 
@@ -11,44 +11,46 @@ export const useAuthStore = create<AuthState>((set, get) => ({
   pendingEmail: null,
   otpSentAt: null,
 
-  setUser: (user) =>
-    set({ user, status: user ? AUTH_STATUS.AUTHENTICATED : AUTH_STATUS.UNAUTHENTICATED }),
+  setUser: (user) => set({ user, status: user ? AUTH_STATUS.AUTHENTICATED : AUTH_STATUS.UNAUTHENTICATED }),
 
   setPendingOtp: (email, sentAt) => set({ pendingEmail: email, otpSentAt: sentAt }),
 
   clearPendingOtp: () => set({ pendingEmail: null, otpSentAt: null }),
 
   /**
-   * Инициализация авторизации при старте TMA.
-   * initData — tg.initData из Telegram WebApp SDK.
+   * Initializes authentication on TMA startup.
+   * initData — tg.initData from the Telegram WebApp SDK.
    *
-   * Алгоритм:
-   * 1. Всегда выполняем telegramAuth (чтение Firestore по telegramId)
-   * 2. Если hasEmail: true  → signInWithCustomToken уже вызван в api, onAuthStateChanged поставит AUTHENTICATED
-   * 3. Если hasEmail: false → ставим EMAIL_REQUIRED, показываем OTP форму
-   * 4. Ошибка telegramAuth → UNAUTHENTICATED
-   *
-   * onAuthStateChanged не перебивает EMAIL_REQUIRED (пользователь без email не должен
-   * попасть на главный экран пока не пройдёт OTP).
+   * Flow:
+   * 1. Always execute telegramAuth (verifies signature & checks Firestore by telegramId)
+   * 2. If hasEmail: true  → signInWithCustomToken is already called in api, state becomes AUTHENTICATED
+   * 3. If hasEmail: false → set EMAIL_REQUIRED, displaying the OTP form
+   * 4. If telegramAuth fails → UNAUTHENTICATED
    */
   initialize: (initData: string) => {
     set({ status: AUTH_STATUS.LOADING });
 
+    let isTelegramAuthResolved = false;
+
     if (!initData) {
-      // Не в Telegram — не обслуживаем
+      isTelegramAuthResolved = true;
       set({ status: AUTH_STATUS.UNAUTHENTICATED });
     } else {
-      authApi.authenticateTelegram(initData)
+      authApi
+        .authenticateTelegram(initData)
         .then(({ hasEmail }) => {
+          isTelegramAuthResolved = true;
           if (!hasEmail) {
-            // TG подпись валидна, но пользователь не зарегистрирован → нужен OTP
             set({ status: AUTH_STATUS.EMAIL_REQUIRED });
+          } else {
+            // If hasEmail === true, signInWithCustomToken has already been called,
+            // and auth.currentUser is populated.
+            set({ user: auth.currentUser, status: AUTH_STATUS.AUTHENTICATED });
           }
-          // hasEmail: true → signInWithCustomToken уже вызван в authApi
-          // onAuthStateChanged ниже поймает user и поставит AUTHENTICATED
         })
         .catch((err) => {
           console.error('[Auth] telegramAuth failed:', err);
+          isTelegramAuthResolved = true;
           set({ status: AUTH_STATUS.UNAUTHENTICATED });
         });
     }
@@ -56,15 +58,16 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     const unsubscribe = onAuthStateChanged(
       auth,
       (user) => {
+        // If telegramAuth hasn't finished yet, we IGNORE the cached user
+        // from Firebase Auth to prevent showing ActiveScreen prematurely and causing flickering.
+        if (!isTelegramAuthResolved) {
+          return;
+        }
+
         const currentStatus = get().status;
         if (user) {
-          // Пользователь вошёл → AUTHENTICATED в любом случае
           set({ user, status: AUTH_STATUS.AUTHENTICATED });
-        } else if (
-          currentStatus !== AUTH_STATUS.EMAIL_REQUIRED &&
-          currentStatus !== AUTH_STATUS.LOADING
-        ) {
-          // Не перебиваем EMAIL_REQUIRED — пользователь должен пройти OTP
+        } else if (currentStatus !== AUTH_STATUS.EMAIL_REQUIRED && currentStatus !== AUTH_STATUS.LOADING) {
           set({ user: null, status: AUTH_STATUS.UNAUTHENTICATED });
         }
       },

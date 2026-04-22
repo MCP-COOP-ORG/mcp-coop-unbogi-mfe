@@ -1,39 +1,42 @@
-import * as admin from 'firebase-admin';
-import { 
-  SendGiftRequest,
-  ScratchGiftRequest,
+import {
   ERROR_CODES,
+  ERROR_MESSAGES,
   GIFT_ERROR_MESSAGES,
-  ERROR_MESSAGES
+  type ScratchGiftRequest,
+  type SendGiftRequest,
 } from '@unbogi/contracts';
-import { HttpsError } from 'firebase-functions/v2/https';
-import { GiftRepository } from '../repositories/gift';
-import { ContactRepository } from '../repositories/contact';
-import { HolidayRepository } from '../repositories/holiday';
+import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
+import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https';
+import type { ContactRepository } from '../repositories/contact';
+import type { GiftRepository } from '../repositories/gift';
+import type { HolidayRepository } from '../repositories/holiday';
 
 export class GiftService {
   constructor(
     private giftRepo: GiftRepository,
     private contactRepo: ContactRepository,
-    private holidayRepo: HolidayRepository
+    private holidayRepo: HolidayRepository,
   ) {}
 
   async sendGift(payload: SendGiftRequest, senderId: string): Promise<{ giftId: string }> {
     const { idempotencyKey, receiverId, holidayId, greeting, unpackDate, scratchCode } = payload;
 
     if (senderId === receiverId) {
-      throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as any, GIFT_ERROR_MESSAGES.SELF_GIFT_FORBIDDEN);
+      throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, GIFT_ERROR_MESSAGES.SELF_GIFT_FORBIDDEN);
     }
 
     const areConnected = await this.contactRepo.areUsersConnected(senderId, receiverId);
     if (!areConnected) {
-      throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as any, GIFT_ERROR_MESSAGES.RECEIVER_NOT_IN_CONTACTS);
+      throw new HttpsError(
+        ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode,
+        GIFT_ERROR_MESSAGES.RECEIVER_NOT_IN_CONTACTS,
+      );
     }
 
     const holidaySnap = await this.holidayRepo.getHoliday(holidayId);
     if (!holidaySnap.exists) {
-      throw new HttpsError(ERROR_CODES.NOT_FOUND as any, GIFT_ERROR_MESSAGES.HOLIDAY_NOT_FOUND);
+      throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.HOLIDAY_NOT_FOUND);
     }
 
     const holiday = holidaySnap.data()!;
@@ -64,14 +67,18 @@ export class GiftService {
       await this.giftRepo.scratchGift(payload.giftId, callerId);
       logger.info(`Gift ${payload.giftId} scratched by ${callerId}`);
       return { success: true };
-    } catch (err: any) {
-      if (err.message === 'NOT_FOUND') {
-        throw new HttpsError(ERROR_CODES.NOT_FOUND as any, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (message === 'NOT_FOUND') {
+        throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND);
       }
-      if (err.message === 'PERMISSION_DENIED') {
-        throw new HttpsError(ERROR_CODES.PERMISSION_DENIED as any, GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED);
+      if (message === 'PERMISSION_DENIED') {
+        throw new HttpsError(
+          ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode,
+          GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED,
+        );
       }
-      throw new HttpsError(ERROR_CODES.INTERNAL as any, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
+      throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
     }
   }
 
@@ -86,7 +93,7 @@ export class GiftService {
   }
 
   private mapGiftDocs(docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]) {
-    return docs.map(doc => {
+    return docs.map((doc) => {
       const data = doc.data();
       return {
         id: doc.id,

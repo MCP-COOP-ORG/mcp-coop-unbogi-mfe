@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import { COLLECTIONS, FIREBASE_ERROR_CODES } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
 
 interface GiftData {
   senderId: string;
@@ -29,8 +29,8 @@ export class GiftRepository {
     try {
       await this.collection.doc(idempotencyKey).create(data);
       return true;
-    } catch (err: any) {
-      if (err.code === FIREBASE_ERROR_CODES.ALREADY_EXISTS) {
+    } catch (err: unknown) {
+      if (err && typeof err === 'object' && 'code' in err && err.code === FIREBASE_ERROR_CODES.ALREADY_EXISTS) {
         return false;
       }
       throw err;
@@ -68,18 +68,18 @@ export class GiftRepository {
 
   async getOpenedGifts(userId: string) {
     return await this.collection
-      .where("receiverId", "==", userId)
-      .where("scratchedAt", "!=", null)
-      .orderBy("scratchedAt", "desc")
+      .where('receiverId', '==', userId)
+      .where('scratchedAt', '!=', null)
+      .orderBy('scratchedAt', 'desc')
       .limit(50)
       .get();
   }
 
   async getReceivedGifts(userId: string) {
     return await this.collection
-      .where("receiverId", "==", userId)
-      .where("scratchedAt", "==", null)
-      .orderBy("createdAt", "desc")
+      .where('receiverId', '==', userId)
+      .where('scratchedAt', '==', null)
+      .orderBy('createdAt', 'desc')
       .limit(50)
       .get();
   }

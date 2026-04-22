@@ -1,11 +1,10 @@
 // Domains
-export * from './domains/auth';
-export * from './domains/gifts';
-export * from './domains/contacts';
-export * from './domains/holidays';
-
-// Firebase
-export { app, auth, functions } from './firebase';
 
 // Constants
-export { CLOUD_FUNCTIONS, AUTH_STATUS, OTP_CONFIG, GIFT_CONFIG, type AuthStatus } from './constants';
+export { AUTH_STATUS, type AuthStatus, CLOUD_FUNCTIONS, GIFT_CONFIG, OTP_CONFIG } from './constants';
+export * from './domains/auth';
+export * from './domains/contacts';
+export * from './domains/gifts';
+export * from './domains/holidays';
+// Firebase
+export { app, auth, functions } from './firebase';

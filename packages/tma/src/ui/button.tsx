@@ -10,13 +10,7 @@ interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   children: ReactNode;
 }
 
-export function IconButton({
-  className = '',
-  onClick,
-  children,
-  disabled,
-  ...props
-}: IconButtonProps) {
+export function IconButton({ className = '', onClick, children, disabled, ...props }: IconButtonProps) {
   const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     if (disabled) return;
     tg.haptic('light');

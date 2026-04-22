@@ -1,13 +1,9 @@
-import { z } from "zod";
-import { SCRATCH_CODE_FORMAT } from "../../constants/index.js";
+import { z } from 'zod';
+import { SCRATCH_CODE_FORMAT } from '../../constants/index.js';
 
 export const ScratchCodeSchema = z.object({
   value: z.string().min(1),
-  format: z.enum([
-    SCRATCH_CODE_FORMAT.TEXT,
-    SCRATCH_CODE_FORMAT.LINK,
-    SCRATCH_CODE_FORMAT.QR,
-  ]),
+  format: z.enum([SCRATCH_CODE_FORMAT.TEXT, SCRATCH_CODE_FORMAT.LINK, SCRATCH_CODE_FORMAT.QR]),
 });
 export type ScratchCode = z.infer<typeof ScratchCodeSchema>;
 

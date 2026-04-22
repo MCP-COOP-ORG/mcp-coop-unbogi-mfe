@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import { COLLECTIONS } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
 
 export class ContactRepository {
   private get db() {
@@ -7,20 +7,17 @@ export class ContactRepository {
   }
 
   async getContacts(ownerId: string) {
-    return await this.db
-      .collection(COLLECTIONS.CONTACTS)
-      .where("ownerId", "==", ownerId)
-      .get();
+    return await this.db.collection(COLLECTIONS.CONTACTS).where('ownerId', '==', ownerId).get();
   }
 
   async areUsersConnected(userId1: string, userId2: string): Promise<boolean> {
     const snap = await this.db
       .collection(COLLECTIONS.CONTACTS)
-      .where("ownerId", "==", userId1)
-      .where("userId", "==", userId2)
+      .where('ownerId', '==', userId1)
+      .where('userId', '==', userId2)
       .limit(1)
       .get();
-    
+
     return !snap.empty;
   }
 

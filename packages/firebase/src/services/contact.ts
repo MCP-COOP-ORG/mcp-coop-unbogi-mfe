@@ -1,12 +1,12 @@
-import { ContactRepository } from '../repositories/contact';
 import { FALLBACK_NAMES } from '@unbogi/contracts';
+import type { ContactRepository } from '../repositories/contact';
 
 export class ContactService {
   constructor(private contactRepo: ContactRepository) {}
 
   async listContacts(ownerId: string) {
     const contactsSnap = await this.contactRepo.getContacts(ownerId);
-    
+
     if (contactsSnap.empty) {
       return { contacts: [] };
     }

@@ -1,4 +1,4 @@
-import { HolidayRepository } from '../repositories/holiday';
+import type { HolidayRepository } from '../repositories/holiday';
 
 export class HolidayService {
   constructor(private holidayRepo: HolidayRepository) {}

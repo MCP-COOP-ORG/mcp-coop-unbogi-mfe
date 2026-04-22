@@ -1,47 +1,47 @@
 export const COLLECTIONS = {
-  USERS: "users",
-  SYSTEM_OTP: "system_otp",
-  INVITES: "invites",
-  CONTACTS: "contacts",
-  HOLIDAYS: "holidays",
-  GIFTS: "gifts",
+  USERS: 'users',
+  SYSTEM_OTP: 'system_otp',
+  INVITES: 'invites',
+  CONTACTS: 'contacts',
+  HOLIDAYS: 'holidays',
+  GIFTS: 'gifts',
 } as const;
 
 export const PROVIDERS = {
-  TELEGRAM: "telegram",
-  EMAIL: "email",
-  GOOGLE: "google",
+  TELEGRAM: 'telegram',
+  EMAIL: 'email',
+  GOOGLE: 'google',
 } as const;
 
 export const ERROR_MESSAGES = {
-  INVALID_PAYLOAD: "Invalid payload",
-  INVALID_TG_SIGNATURE: "Invalid Telegram signature",
-  TG_USER_NOT_FOUND: "User data not found in initData",
-  INVALID_EMAIL_FORMAT: "Invalid email format",
-  FAILED_TO_SEND_EMAIL: "Failed to send email",
-  NO_PENDING_OTP: "No pending OTP for this email",
-  INVALID_OTP: "Invalid OTP code",
-  EXPIRED_OTP: "OTP has expired",
-  AUTH_SYSTEM_ERROR: "Auth system error",
-  OTP_ATTEMPTS_EXCEEDED: "Too many failed attempts. Request a new code.",
-  AUTHENTICATION_REQUIRED: "Authentication required.",
-  TG_AUTH_REQUIRED: "Telegram authentication is required to register.",
-  BOT_TOKEN_CONFIG_ERROR: "Server configuration error: Bot Token not found",
-  BOT_TOKEN_MISSING: "Missing bot token configuration",
+  INVALID_PAYLOAD: 'Invalid payload',
+  INVALID_TG_SIGNATURE: 'Invalid Telegram signature',
+  TG_USER_NOT_FOUND: 'User data not found in initData',
+  INVALID_EMAIL_FORMAT: 'Invalid email format',
+  FAILED_TO_SEND_EMAIL: 'Failed to send email',
+  NO_PENDING_OTP: 'No pending OTP for this email',
+  INVALID_OTP: 'Invalid OTP code',
+  EXPIRED_OTP: 'OTP has expired',
+  AUTH_SYSTEM_ERROR: 'Auth system error',
+  OTP_ATTEMPTS_EXCEEDED: 'Too many failed attempts. Request a new code.',
+  AUTHENTICATION_REQUIRED: 'Authentication required.',
+  TG_AUTH_REQUIRED: 'Telegram authentication is required to register.',
+  BOT_TOKEN_CONFIG_ERROR: 'Server configuration error: Bot Token not found',
+  BOT_TOKEN_MISSING: 'Missing bot token configuration',
 } as const;
 
 export const ERROR_CODES = {
-  INVALID_ARGUMENT: "invalid-argument",
-  UNAUTHENTICATED: "unauthenticated",
-  PERMISSION_DENIED: "permission-denied",
-  NOT_FOUND: "not-found",
-  INTERNAL: "internal",
+  INVALID_ARGUMENT: 'invalid-argument',
+  UNAUTHENTICATED: 'unauthenticated',
+  PERMISSION_DENIED: 'permission-denied',
+  NOT_FOUND: 'not-found',
+  INTERNAL: 'internal',
 } as const;
 
 export const CONFIG = {
   OTP_LIFETIME_MS: 10 * 60 * 1000,
   MAX_OTP_ATTEMPTS: 5,
-  TG_HMAC_CONSTANT: "WebAppData",
+  TG_HMAC_CONSTANT: 'WebAppData',
 } as const;
 
 export const EMAILS = {
@@ -94,16 +94,16 @@ export const FIREBASE_ERROR_CODES = {
 } as const;
 
 export const FALLBACK_NAMES = {
-  UNKNOWN: "Unknown",
+  UNKNOWN: 'Unknown',
 } as const;
 
 export const PUSH_MESSAGES = {
-  GIFT_RECEIVED_TITLE: "🎁 New Gift!",
+  GIFT_RECEIVED_TITLE: '🎁 New Gift!',
   giftReceivedBody: (senderName: string) => `${senderName} sent you a surprise!`,
 } as const;
 
 export const FUNCTION_CONFIG = {
-  REGION: "europe-west1",
-  MEMORY: "256MiB",
+  REGION: 'europe-west1',
+  MEMORY: '256MiB',
   TIMEOUT_SECONDS: 60,
 } as const;

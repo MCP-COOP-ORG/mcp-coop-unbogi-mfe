@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
-import { Timer } from 'lucide-react';
 import { OTP_CONFIG } from '@unbogi/shared';
+import { Timer } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface OtpTimerProps {
   sentAt: number;
@@ -8,14 +8,12 @@ interface OtpTimerProps {
 }
 
 /**
- * Иконка таймера с обратным отсчётом.
- * Используется как icon-prop для Input компонента вместо иконки письма.
- * При истечении показывает сообщение и вызывает onExpired.
+ * Countdown timer icon.
+ * Used as an icon-prop for the Input component instead of the mail icon.
+ * Calls onExpired when the timer reaches zero.
  */
 export function OtpTimer({ sentAt, onExpired }: OtpTimerProps) {
-  const [remainingMs, setRemainingMs] = useState(() =>
-    Math.max(0, sentAt + OTP_CONFIG.LIFETIME_MS - Date.now()),
-  );
+  const [remainingMs, setRemainingMs] = useState(() => Math.max(0, sentAt + OTP_CONFIG.LIFETIME_MS - Date.now()));
 
   useEffect(() => {
     const interval = setInterval(() => {

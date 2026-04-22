@@ -77,6 +77,9 @@ importers:
       '@twa-dev/sdk':
         specifier: ^8.0.2
         version: 8.0.2(react@19.2.5)
+      '@unbogi/contracts':
+        specifier: workspace:*
+        version: link:../contracts
       '@unbogi/shared':
         specifier: workspace:*
         version: link:../shared

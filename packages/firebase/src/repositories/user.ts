@@ -1,5 +1,5 @@
-import * as admin from 'firebase-admin';
 import { COLLECTIONS } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
 
 export interface UserData {
   uid: string;
@@ -24,10 +24,7 @@ export class UserRepository {
    * Используется в telegramAuth — только чтение, никаких записей.
    */
   async findByTelegramId(telegramId: number): Promise<UserData | null> {
-    const snap = await this.collection
-      .where('telegramId', '==', telegramId)
-      .limit(1)
-      .get();
+    const snap = await this.collection.where('telegramId', '==', telegramId).limit(1).get();
     if (snap.empty) return null;
     return snap.docs[0].data() as UserData;
   }
@@ -40,7 +37,7 @@ export class UserRepository {
     const snap = await userRef.get();
     if (!snap.data()?.createdAt) {
       await userRef.update({
-        createdAt: admin.firestore.FieldValue.serverTimestamp()
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
       });
     }
   }

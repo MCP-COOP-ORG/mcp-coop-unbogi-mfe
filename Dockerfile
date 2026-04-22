@@ -2,14 +2,16 @@ FROM node:22-alpine AS base
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@10.11.0 --activate
 
-# Copy workspace root + shared + tma package files for install
+# Copy workspace root + shared + tma + contracts package files for install
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml tsconfig.base.json ./
 COPY packages/shared/package.json ./packages/shared/
+COPY packages/contracts/package.json ./packages/contracts/
 COPY packages/tma/package.json ./packages/tma/
 RUN pnpm install --frozen-lockfile
 
 # Copy source
 COPY packages/shared/ ./packages/shared/
+COPY packages/contracts/ ./packages/contracts/
 COPY packages/tma/ ./packages/tma/
 
 # Build args for Firebase env
@@ -26,6 +28,7 @@ ENV UNBOGI_FIREBASE_STORAGE_BUCKET=$UNBOGI_FIREBASE_STORAGE_BUCKET
 ENV UNBOGI_FIREBASE_MESSAGING_SENDER_ID=$UNBOGI_FIREBASE_MESSAGING_SENDER_ID
 ENV UNBOGI_FIREBASE_APP_ID=$UNBOGI_FIREBASE_APP_ID
 
+RUN pnpm --filter @unbogi/contracts build
 RUN pnpm --filter @unbogi/tma build
 
 # Production

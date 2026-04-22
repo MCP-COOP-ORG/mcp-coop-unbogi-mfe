@@ -1,6 +1,6 @@
-import * as admin from "firebase-admin";
-import { FieldValue } from "firebase-admin/firestore";
-import { COLLECTIONS, INVITE_STATUS } from "@unbogi/contracts";
+import { COLLECTIONS, INVITE_STATUS } from '@unbogi/contracts';
+import * as admin from 'firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
 export class InviteRepository {
   private get db() {
@@ -36,7 +36,7 @@ export class InviteRepository {
       const inviteSnap = await tx.get(inviteRef);
 
       if (!inviteSnap.exists) {
-        throw new Error("NOT_FOUND");
+        throw new Error('NOT_FOUND');
       }
 
       const invite = inviteSnap.data()!;
@@ -47,12 +47,12 @@ export class InviteRepository {
       }
 
       if (invite.status !== INVITE_STATUS.PENDING) {
-        throw new Error("NOT_FOUND");
+        throw new Error('NOT_FOUND');
       }
 
       // Prevent self-invite
       if (invite.senderId === acceptorId) {
-        throw new Error("INVALID_ARGUMENT");
+        throw new Error('INVALID_ARGUMENT');
       }
 
       // Deterministic contact ID: sender_acceptor
