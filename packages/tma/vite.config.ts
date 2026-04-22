@@ -10,12 +10,13 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
-  base: process.env.VITE_APP_BASE || '/',
+  base: process.env.VITE_APP_BASE || '/unbogi/',
   build: {
-    outDir: 'dist',
+    outDir: process.env.VITE_APP_OUTDIR || 'dist/unbogi',
   },
   envPrefix: ['VITE_', 'UNBOGI_'],
   server: {
+    port: 3090,
     allowedHosts: true,
   },
 });

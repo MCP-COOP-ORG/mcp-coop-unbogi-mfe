@@ -3,13 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      args:
-        UNBOGI_FIREBASE_API_KEY: ${UNBOGI_FIREBASE_API_KEY}
-        UNBOGI_FIREBASE_AUTH_DOMAIN: ${UNBOGI_FIREBASE_AUTH_DOMAIN}
-        UNBOGI_FIREBASE_PROJECT_ID: ${UNBOGI_FIREBASE_PROJECT_ID}
-        UNBOGI_FIREBASE_STORAGE_BUCKET: ${UNBOGI_FIREBASE_STORAGE_BUCKET}
-        UNBOGI_FIREBASE_MESSAGING_SENDER_ID: ${UNBOGI_FIREBASE_MESSAGING_SENDER_ID}
-        UNBOGI_FIREBASE_APP_ID: ${UNBOGI_FIREBASE_APP_ID}
+      target: base
+    command: pnpm --filter @unbogi/tma dev --host 0.0.0.0
+    environment:
+      VITE_APP_BASE: "/"
+      UNBOGI_FIREBASE_API_KEY: ${UNBOGI_FIREBASE_API_KEY}
+      UNBOGI_FIREBASE_AUTH_DOMAIN: ${UNBOGI_FIREBASE_AUTH_DOMAIN}
+      UNBOGI_FIREBASE_PROJECT_ID: ${UNBOGI_FIREBASE_PROJECT_ID}
+      UNBOGI_FIREBASE_STORAGE_BUCKET: ${UNBOGI_FIREBASE_STORAGE_BUCKET}
+      UNBOGI_FIREBASE_MESSAGING_SENDER_ID: ${UNBOGI_FIREBASE_MESSAGING_SENDER_ID}
+      UNBOGI_FIREBASE_APP_ID: ${UNBOGI_FIREBASE_APP_ID}
     ports:
-      - "3090:80"
+      - "3090:3090"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/packages/shared/node_modules
+      - /app/packages/tma/node_modules
     restart: unless-stopped

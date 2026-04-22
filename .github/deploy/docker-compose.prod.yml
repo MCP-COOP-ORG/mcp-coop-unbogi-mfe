@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  unbogi-mfe:
+    image: ${IMAGE_URI}:latest
+    container_name: unbogi-mfe
+    restart: unless-stopped
+    # Порт наружу не пробрасываем, так как Nginx платформы стучится напрямую по имени контейнера в этой сети
+    env_file:
+      - ~/.env
+    networks:
+      - mcp-network
+
+networks:
+  mcp-network:
+    name: ${MCP_COOP_NETWORK:-mcp-network}
+    external: true

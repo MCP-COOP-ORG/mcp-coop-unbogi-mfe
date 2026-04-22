@@ -1,5 +1,7 @@
 import { useEffect } from 'react';
+import { Loader2 } from 'lucide-react';
 import { useAuthStore, AUTH_STATUS } from '@unbogi/shared';
+import { LoginScreen } from '@/screens/login/LoginScreen';
 import { SurprisesScreen } from '@/screens/surprises/SurprisesScreen';
 import { CollectionScreen } from '@/screens/collection/CollectionScreen';
 import { SendScreen } from '@/screens/send/SendScreen';
@@ -30,17 +32,13 @@ export function App() {
   if (status === AUTH_STATUS.IDLE || status === AUTH_STATUS.LOADING) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="text-white/50 text-sm">Loading...</div>
+        <Loader2 className="w-10 h-10 animate-spin text-purple-400/60" />
       </div>
     );
   }
 
   if (status === AUTH_STATUS.UNAUTHENTICATED) {
-    return (
-      <div className="flex items-center justify-center h-full">
-        <div className="text-white/50 text-sm">Authentication required</div>
-      </div>
-    );
+    return <LoginScreen />;
   }
 
   return (

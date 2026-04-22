@@ -1,22 +1,35 @@
-import type { InputHTMLAttributes } from 'react';
+import type { InputHTMLAttributes, ReactNode } from 'react';
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
-  label?: string;
+interface GlassInputProps extends InputHTMLAttributes<HTMLInputElement> {
+  icon?: ReactNode;
 }
 
-export function Input({ label, className = '', id, ...props }: InputProps) {
-  const inputId = id || label?.toLowerCase().replace(/\s+/g, '-');
-
+export function Input({ icon, className = '', ...props }: GlassInputProps) {
   return (
-    <div className="flex flex-col gap-1.5">
-      {label && (
-        <label htmlFor={inputId} className="text-sm text-white/60 font-medium">
-          {label}
-        </label>
+    <div
+      className={[
+        'flex items-center h-[38px] rounded-full overflow-hidden',
+        'bg-white/[0.08]',
+        'backdrop-blur-[40px] backdrop-saturate-[180%]',
+        'border-[0.5px] border-white/[0.18]',
+        'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
+        'focus-within:border-white/30 focus-within:bg-white/[0.12]',
+        'transition-all duration-150',
+        className,
+      ].join(' ')}
+    >
+      {icon && (
+        <div className="w-10 flex items-center justify-center shrink-0 text-white/40">
+          {icon}
+        </div>
       )}
       <input
-        id={inputId}
-        className={`w-full px-4 py-3 rounded-2xl bg-white/10 border border-white/15 text-white placeholder:text-white/30 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)] transition-all text-[15px] backdrop-blur-md ${className}`}
+        className={[
+          'flex-1 h-full bg-transparent outline-none min-w-0',
+          'text-white/90 text-[14px] font-normal',
+          'placeholder:text-white/25',
+          icon ? 'pr-5' : 'px-5',
+        ].join(' ')}
         {...props}
       />
     </div>
