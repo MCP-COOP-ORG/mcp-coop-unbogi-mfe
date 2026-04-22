@@ -1,11 +1,12 @@
-import { Gift, LayoutGrid, Send } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Gift, LayoutGrid, Send, UserPlus } from 'lucide-react';
+import { IconButton } from '@/ui';
 import { SCREENS, type ScreenId, useNavigationStore } from '@/app/navigation';
 import { tg } from '@/lib/telegram';
 
 const tabs = [
-  { id: SCREENS.COLLECTION, Icon: LayoutGrid, label: 'Collection' },
   { id: SCREENS.SURPRISES, Icon: Gift, label: 'Surprises' },
-  { id: SCREENS.SEND, Icon: Send, label: 'Send' },
+  { id: SCREENS.COLLECTION, Icon: LayoutGrid, label: 'Collection' },
 ] as const;
 
 export function BottomNav() {
@@ -17,24 +18,58 @@ export function BottomNav() {
     setScreen(id);
   };
 
+  const handleUserAction = () => {
+    tg.haptic('light');
+    // Placeholder for User profile / Add friend
+  };
+
   return (
-    <nav className="flex items-center justify-around py-3 px-4 border-t border-white/10 bg-black/20 backdrop-blur-md">
-      {tabs.map(({ id, Icon, label }) => {
-        const isActive = activeScreen === id;
-        return (
-          <button
-            key={id}
-            type="button"
-            onClick={() => handleTap(id)}
-            className={`flex flex-col items-center gap-1 transition-all ${
-              isActive ? 'text-white scale-105' : 'text-white/40'
-            }`}
-          >
-            <Icon size={22} strokeWidth={isActive ? 2.5 : 1.5} />
-            <span className="text-[10px] font-medium">{label}</span>
-          </button>
-        );
-      })}
-    </nav>
+    <div
+      style={{ padding: '20px 40px' }}
+      className="absolute bottom-0 left-0 w-full z-50 flex items-center justify-between pointer-events-none box-border"
+    >
+      {/* Left Action Button */}
+      <div className="pointer-events-auto">
+        <IconButton onClick={handleUserAction} aria-label="Profile or Invite">
+          <UserPlus size={16} strokeWidth={2.5} />
+        </IconButton>
+      </div>
+
+      {/* Center Sliding Tabbar */}
+      <div className="pointer-events-auto flex items-center h-[38px] bg-black/20 backdrop-blur-[40px] backdrop-saturate-[180%] rounded-full p-1 border-[0.5px] border-white/[0.18] shadow-[0_8px_32px_rgba(0,0,0,0.12)] relative overflow-hidden">
+        {tabs.map(({ id, Icon }) => {
+          const isActive = activeScreen === id;
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => handleTap(id)}
+              className="relative w-16 h-full flex items-center justify-center rounded-full transition-colors z-10 outline-none"
+              aria-label={id}
+            >
+              {isActive && (
+                <motion.div
+                  layoutId="bottom-nav-pill"
+                  className="absolute inset-0 bg-white/15 rounded-full"
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                />
+              )}
+              <Icon
+                size={16}
+                strokeWidth={2.5}
+                className={`relative z-20 transition-colors ${isActive ? 'text-white' : 'text-white/40'}`}
+              />
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Right Action Button */}
+      <div className="pointer-events-auto">
+        <IconButton onClick={() => handleTap(SCREENS.SEND)} aria-label="Send Gift">
+          <Send size={16} strokeWidth={2.5} />
+        </IconButton>
+      </div>
+    </div>
   );
 }
