@@ -1,6 +1,6 @@
 export interface Contact {
   id: string;
-  nickname: string;
+  displayName: string;
   telegramId?: number;
 }
 

@@ -57,6 +57,21 @@ export const tg = {
     };
   },
 
+  scanQr(promptText: string): Promise<string | null> {
+    return new Promise((resolve) => {
+      const wa = getWebApp();
+      if (typeof wa?.showScanQrPopup !== 'function') {
+        resolve(null);
+        return;
+      }
+      wa.showScanQrPopup({ text: promptText }, (result: string) => {
+        wa.closeScanQrPopup();
+        resolve(result);
+        return true;
+      });
+    });
+  },
+
   close() {
     getWebApp()?.close?.();
   },

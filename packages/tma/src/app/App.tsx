@@ -1,12 +1,15 @@
 import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { useEffect } from 'react';
-import { type ScreenId, useNavigationStore } from '@/app/navigation';
+import { SCREENS, type ScreenId, useNavigationStore } from '@/app/navigation';
 import { tg } from '@/lib/telegram';
 import { CollectionScreen } from '@/screens/collection/CollectionScreen';
 import { LoginScreen } from '@/screens/login/LoginScreen';
 import { SendScreen } from '@/screens/send/SendScreen';
 import { SurprisesScreen } from '@/screens/surprises/SurprisesScreen';
 import { BottomNav } from '@/ui/bottom-nav';
+
+// ⚡ Feature flag: set to `true` to bypass auth locally
+const SKIP_AUTH = true;
 
 function ActiveScreen({ screenId }: { screenId: ScreenId }) {
   switch (screenId) {
@@ -27,17 +30,21 @@ export function App() {
   const activeScreen = useNavigationStore((s) => s.activeScreen);
 
   useEffect(() => {
+    if (SKIP_AUTH) return;
     const unsubscribe = initAuth(tg.initData);
     return () => unsubscribe();
   }, [initAuth]);
 
-  if (status === AUTH_STATUS.AUTHENTICATED) {
+  const isAuthed = SKIP_AUTH || status === AUTH_STATUS.AUTHENTICATED;
+  const isSendScreen = activeScreen === SCREENS.SEND;
+
+  if (isAuthed) {
     return (
       <div className="flex flex-col h-full relative">
-        <main className="flex-1 overflow-y-auto">
+        <main className={`flex-1 ${isSendScreen ? 'overflow-hidden' : 'overflow-y-auto'}`}>
           <ActiveScreen screenId={activeScreen} />
         </main>
-        <BottomNav />
+        {!isSendScreen && <BottomNav />}
       </div>
     );
   }

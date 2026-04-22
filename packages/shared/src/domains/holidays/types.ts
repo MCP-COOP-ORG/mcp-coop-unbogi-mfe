@@ -1,8 +1,8 @@
 export interface Holiday {
   id: string;
   name: string;
-  date: string;
   imageUrl?: string;
+  defaultGreeting?: string;
 }
 
 export interface HolidaysState {

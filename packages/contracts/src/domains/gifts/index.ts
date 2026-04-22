@@ -11,7 +11,7 @@ export const SendGiftSchema = z.object({
   idempotencyKey: z.string().min(1),
   receiverId: z.string().min(1),
   holidayId: z.string().min(1),
-  greeting: z.string().min(1).max(200),
+  greeting: z.string().min(1).max(250),
   unpackDate: z.string().datetime(),
   scratchCode: ScratchCodeSchema,
 });

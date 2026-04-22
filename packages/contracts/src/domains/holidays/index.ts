@@ -5,6 +5,7 @@ export const HolidaySchema = z.object({
   name: z.string(),
   imageUrl: z.string().url().or(z.string()), // sometimes they might be relative
   date: z.string().optional(),
+  defaultGreeting: z.string().optional(),
 });
 export type Holiday = z.infer<typeof HolidaySchema>;
 

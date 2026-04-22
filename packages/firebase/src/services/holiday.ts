@@ -12,7 +12,7 @@ export class HolidayService {
         id: doc.id,
         name: data.name,
         imageUrl: data.imageUrl,
-        date: data.date,
+        defaultGreeting: data.defaultGreeting ?? '',
       };
     });
 
