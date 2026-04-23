@@ -2,17 +2,19 @@ import { COLLECTIONS, FUNCTION_CONFIG } from '@unbogi/contracts';
 import { defineSecret } from 'firebase-functions/params';
 import { onDocumentCreated } from 'firebase-functions/v2/firestore';
 import { onTaskDispatched } from 'firebase-functions/v2/tasks';
-import { NotificationService } from '../services/notification';
+import { UserRepository } from '../repositories';
+import { NotificationService } from '../services';
 
 const telegramBotToken = defineSecret('TELEGRAM_BOT_TOKEN');
 const telegramBotUsername = defineSecret('TELEGRAM_BOT_USERNAME');
 
-const notificationService = new NotificationService();
+// Dependencies composed at module level (singleton per cold-start)
+const notificationService = new NotificationService(new UserRepository());
 
 /**
- * Triggered when a gift document is created in Firestore.
- * 1. Sends "someone sent you a surprise" notification immediately.
- * 2. Schedules a Cloud Task to send "ready to open" at unpackDate.
+ * Triggered when a gift document is created.
+ * 1. Immediately notifies the receiver: "someone sent you a surprise".
+ * 2. Schedules a Cloud Task to send "gift ready to open" at `unpackDate`.
  */
 export const onGiftCreated = onDocumentCreated(
   {
@@ -29,10 +31,10 @@ export const onGiftCreated = onDocumentCreated(
     const botUsername = telegramBotUsername.value().trim();
     const giftId = event.params.giftId;
 
-    // 1. Immediate notification: "someone sent you a surprise"
+    // Step 1: immediate surprise notification
     await notificationService.sendGiftReceivedTelegram(botToken, botUsername, receiverId);
 
-    // 2. Schedule "ready to open" notification at unpackDate
+    // Step 2: schedule "ready to open" notification for unpackDate
     if (unpackDate) {
       const unpackDateObj = unpackDate.toDate ? unpackDate.toDate() : new Date(unpackDate);
       await notificationService.scheduleGiftReadyTask(giftId, receiverId, unpackDateObj);
@@ -41,8 +43,8 @@ export const onGiftCreated = onDocumentCreated(
 );
 
 /**
- * Cloud Task handler: sends "gift ready to open" notification.
- * Dispatched at the gift's unpackDate.
+ * Cloud Task handler: sends the "gift is ready to open" notification.
+ * Dispatched at the gift's `unpackDate` by `onGiftCreated`.
  */
 export const onGiftReadyTask = onTaskDispatched(
   {

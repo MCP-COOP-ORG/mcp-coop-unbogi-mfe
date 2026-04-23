@@ -1,4 +1,3 @@
-import { INVITE_PREFIX } from '@unbogi/contracts';
 import { onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { create } from 'zustand';
 import { AUTH_STATUS } from '../../constants';

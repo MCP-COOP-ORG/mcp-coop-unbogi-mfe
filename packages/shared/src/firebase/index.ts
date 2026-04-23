@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 import { connectFunctionsEmulator, getFunctions } from 'firebase/functions';
 
 const firebaseConfig = {
@@ -14,6 +15,16 @@ const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const functions = getFunctions(app, 'europe-west1');
+
+// App Check with reCAPTCHA v3 — only active in production.
+// The emulator accepts unauthenticated requests in DEV mode automatically.
+// Site key is public (safe to commit — analogous to a Google Maps key).
+if (!import.meta.env.DEV) {
+  initializeAppCheck(app, {
+    provider: new ReCaptchaV3Provider('6LfUvMYsAAAAABJPBuDVHG7UbMgZAnnTLGpm-gUI'),
+    isTokenAutoRefreshEnabled: true,
+  });
+}
 
 // Emulator support for local development
 if (import.meta.env.DEV && import.meta.env.UNBOGI_USE_FIREBASE_EMULATOR === 'true') {

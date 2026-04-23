@@ -11,15 +11,21 @@ import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https
 import type { ContactRepository } from '../repositories/contact';
 import type { GiftRepository } from '../repositories/gift';
 import type { HolidayRepository } from '../repositories/holiday';
-import { resolveStorageUrl } from '../utils/storage';
+import { AppError } from '../utils/errors';
+import { mapTimestamp, resolveStorageUrl } from '../utils/storage';
 
 export class GiftService {
   constructor(
-    private giftRepo: GiftRepository,
-    private contactRepo: ContactRepository,
-    private holidayRepo: HolidayRepository,
+    private readonly giftRepo: GiftRepository,
+    private readonly contactRepo: ContactRepository,
+    private readonly holidayRepo: HolidayRepository,
   ) {}
 
+  /**
+   * Sends a gift from `senderId` to `receiverId`.
+   * Validates: no self-gift, receiver is a contact, holiday exists.
+   * Idempotent via `idempotencyKey`.
+   */
   async sendGift(payload: SendGiftRequest, senderId: string): Promise<{ giftId: string }> {
     const { idempotencyKey, receiverId, holidayId, greeting, unpackDate, scratchCode } = payload;
 
@@ -42,7 +48,7 @@ export class GiftService {
 
     const holiday = holidaySnap.data()!;
 
-    const success = await this.giftRepo.createGift(idempotencyKey, {
+    const created = await this.giftRepo.createGift(idempotencyKey, {
       senderId,
       receiverId,
       holidayId,
@@ -54,62 +60,66 @@ export class GiftService {
       createdAt: admin.firestore.FieldValue.serverTimestamp(),
     });
 
-    if (!success) {
-      logger.info(`Duplicate gift request for key ${idempotencyKey}, returning existing id.`);
+    if (created) {
+      logger.info(`[GiftService] Gift ${idempotencyKey} sent from ${senderId} to ${receiverId}`);
     } else {
-      logger.info(`Gift ${idempotencyKey} sent from ${senderId} to ${receiverId}`);
+      logger.info(`[GiftService] Duplicate request for key ${idempotencyKey}, returning existing id`);
     }
 
     return { giftId: idempotencyKey };
   }
 
+  /** Scratches (opens) a gift. Only the receiver may do so. */
   async scratchGift(payload: ScratchGiftRequest, callerId: string): Promise<{ success: boolean }> {
     try {
       await this.giftRepo.scratchGift(payload.giftId, callerId);
-      logger.info(`Gift ${payload.giftId} scratched by ${callerId}`);
+      logger.info(`[GiftService] Gift ${payload.giftId} scratched by ${callerId}`);
       return { success: true };
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      if (message === 'NOT_FOUND') {
-        throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND);
-      }
-      if (message === 'PERMISSION_DENIED') {
-        throw new HttpsError(
-          ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode,
-          GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED,
-        );
+      if (err instanceof HttpsError) throw err;
+      // Type-safe error routing via AppError.code — avoids fragile string comparison
+      if (err instanceof AppError) {
+        if (err.code === 'not-found') {
+          throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND);
+        }
+        if (err.code === 'permission-denied') {
+          throw new HttpsError(ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED);
+        }
       }
       throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
     }
   }
 
+  /** Returns all scratched gifts for a user. */
   async getOpenedGifts(userId: string) {
     const snap = await this.giftRepo.getOpenedGifts(userId);
-    return await this.mapGiftDocs(snap.docs);
+    return this.mapGiftDocs(snap.docs);
   }
 
+  /** Returns all unscratched (received but not opened) gifts for a user. */
   async getReceivedGifts(userId: string) {
     const snap = await this.giftRepo.getReceivedGifts(userId);
-    return await this.mapGiftDocs(snap.docs);
+    return this.mapGiftDocs(snap.docs);
   }
 
+  // ─── Private Helpers ────────────────────────────────────────────────────────
+
+  /** Maps Firestore gift documents to a serialisable response shape. */
   private async mapGiftDocs(docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]) {
     return Promise.all(
       docs.map(async (doc) => {
         const data = doc.data();
-        const resolvedImageUrl = await resolveStorageUrl(data.imageUrl);
-
         return {
           id: doc.id,
           senderId: data.senderId,
           receiverId: data.receiverId,
           holidayId: data.holidayId,
-          imageUrl: resolvedImageUrl,
+          imageUrl: await resolveStorageUrl(data.imageUrl),
           greeting: data.greeting,
-          unpackDate: data.unpackDate?.toDate()?.toISOString(),
+          unpackDate: mapTimestamp(data.unpackDate),
           scratchCode: data.scratchCode,
-          scratchedAt: data.scratchedAt?.toDate()?.toISOString(),
-          createdAt: data.createdAt?.toDate()?.toISOString(),
+          scratchedAt: mapTimestamp(data.scratchedAt),
+          createdAt: mapTimestamp(data.createdAt),
         };
       }),
     );

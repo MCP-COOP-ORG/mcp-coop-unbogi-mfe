@@ -1,58 +1,50 @@
-import { COLLECTIONS, TG_MESSAGES } from '@unbogi/contracts';
-import * as admin from 'firebase-admin';
+import { TELEGRAM_BOT_API_URL, TG_MESSAGES } from '@unbogi/contracts';
 import { getFunctions } from 'firebase-admin/functions';
 import { logger } from 'firebase-functions/v2';
-
-const TG_API = 'https://api.telegram.org/bot';
+import type { UserRepository } from '../repositories/user';
 
 export class NotificationService {
-  private get db() {
-    return admin.firestore();
-  }
+  constructor(private readonly userRepository: UserRepository) {}
 
   /**
-   * Sends a Telegram message to the gift receiver via Bot API.
-   * Message intentionally hides sender name for surprise effect.
+   * Sends an immediate "someone sent you a surprise" Telegram notification to the receiver.
+   * Sender identity is intentionally hidden for the surprise effect.
    */
   async sendGiftReceivedTelegram(botToken: string, botUsername: string, receiverId: string): Promise<void> {
     await this.sendTelegramNotification(botToken, botUsername, receiverId, TG_MESSAGES.GIFT_RECEIVED);
   }
 
-  /**
-   * Sends a "gift ready to open" notification via Telegram Bot API.
-   */
+  /** Sends a "your gift is ready to open" Telegram notification to the receiver. */
   async sendGiftReadyTelegram(botToken: string, botUsername: string, receiverId: string): Promise<void> {
     await this.sendTelegramNotification(botToken, botUsername, receiverId, TG_MESSAGES.GIFT_READY);
   }
 
   /**
-   * Schedules a Cloud Task to send "gift ready" notification at unpackDate.
+   * Schedules a Cloud Task to deliver the "gift ready" notification at `unpackDate`.
+   * Skips scheduling when `unpackDate` is in the past.
    */
   async scheduleGiftReadyTask(giftId: string, receiverId: string, unpackDate: Date): Promise<void> {
-    const now = Date.now();
-    const unpackTime = unpackDate.getTime();
-    const delaySeconds = Math.max(0, Math.floor((unpackTime - now) / 1000));
+    const delaySeconds = Math.max(0, Math.floor((unpackDate.getTime() - Date.now()) / 1000));
 
-    // If unpackDate is in the past or now, skip scheduling
     if (delaySeconds <= 0) {
-      logger.info(`Gift ${giftId} unpackDate is in the past. Skipping ready task.`);
+      logger.info(`[NotificationService] Gift ${giftId} unpackDate is in the past — skipping task`);
       return;
     }
 
     try {
       const queue = getFunctions().taskQueue('notifications-onGiftReadyTask');
-      await queue.enqueue(
-        { giftId, receiverId },
-        { scheduleDelaySeconds: delaySeconds, dispatchDeadlineSeconds: 300 },
-      );
-      logger.info(`Scheduled gift-ready task for ${giftId} in ${delaySeconds}s`);
+      await queue.enqueue({ giftId, receiverId }, { scheduleDelaySeconds: delaySeconds, dispatchDeadlineSeconds: 300 });
+      logger.info(`[NotificationService] Scheduled gift-ready task for ${giftId} in ${delaySeconds}s`);
     } catch (err) {
-      logger.error(`Failed to schedule gift-ready task for ${giftId}:`, err);
+      logger.error(`[NotificationService] Failed to schedule task for ${giftId}:`, err);
     }
   }
 
+  // ─── Private Helpers ────────────────────────────────────────────────────────
+
   /**
-   * Shared method: sends a Telegram message with inline keyboard.
+   * Looks up the receiver's `telegramId` via `UserRepository` and sends a Telegram message
+   * with an inline keyboard. Silently skips if the user or `telegramId` is not found.
    */
   private async sendTelegramNotification(
     botToken: string,
@@ -61,30 +53,29 @@ export class NotificationService {
     messageText: string,
   ): Promise<void> {
     try {
-      const receiverDoc = await this.db.collection(COLLECTIONS.USERS).doc(receiverId).get();
+      const user = await this.userRepository.findById(receiverId);
 
-      if (!receiverDoc.exists) {
-        logger.warn(`Receiver ${receiverId} not found. Skipping TG notification.`);
+      if (!user) {
+        logger.warn(`[NotificationService] Receiver ${receiverId} not found — skipping TG notification`);
         return;
       }
 
-      const telegramId = receiverDoc.data()?.telegramId;
-      if (!telegramId) {
-        logger.info(`User ${receiverId} has no telegramId. Skipping.`);
+      if (!user.telegramId) {
+        logger.info(`[NotificationService] User ${receiverId} has no telegramId — skipping`);
         return;
       }
 
-      const miniAppLink = `https://t.me/${botUsername}/unbogi`;
+      const miniAppUrl = `https://t.me/${botUsername}/unbogi`;
       const payload = {
-        chat_id: telegramId,
+        chat_id: user.telegramId,
         text: messageText,
         parse_mode: 'MarkdownV2',
         reply_markup: {
-          inline_keyboard: [[{ text: TG_MESSAGES.GIFT_BUTTON_TEXT, url: miniAppLink }]],
+          inline_keyboard: [[{ text: TG_MESSAGES.GIFT_BUTTON_TEXT, url: miniAppUrl }]],
         },
       };
 
-      const response = await fetch(`${TG_API}${botToken}/sendMessage`, {
+      const response = await fetch(`${TELEGRAM_BOT_API_URL}${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -93,12 +84,12 @@ export class NotificationService {
       const result = (await response.json()) as { ok: boolean; description?: string };
 
       if (!result.ok) {
-        logger.error(`Telegram API error for ${receiverId}:`, result);
+        logger.error(`[NotificationService] Telegram API error for ${receiverId}:`, result);
       } else {
-        logger.info(`TG notification sent to user ${receiverId} (tgId: ${telegramId})`);
+        logger.info(`[NotificationService] TG notification sent to ${receiverId} (tgId: ${user.telegramId})`);
       }
     } catch (err) {
-      logger.error(`Failed to send TG notification to ${receiverId}:`, err);
+      logger.error(`[NotificationService] Failed to send TG notification to ${receiverId}:`, err);
     }
   }
 }

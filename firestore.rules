@@ -3,6 +3,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ─── system_otp ────────────────────────────────────────────────────────────
+    // OTP codes are server-only. No client may ever read or write this collection.
+    // Admin SDK (used exclusively by AuthService) bypasses this rule by design.
+    match /system_otp/{email} {
+      allow read, write: if false;
+    }
+
     // ─── users ────────────────────────────────────────────────────────────────
     // Each user can only read and write their own profile.
     // Cloud Functions write via Admin SDK (bypasses rules).

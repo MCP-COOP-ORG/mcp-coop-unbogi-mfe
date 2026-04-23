@@ -10,15 +10,21 @@ import {
 import { defineSecret } from 'firebase-functions/params';
 import { logger } from 'firebase-functions/v2';
 import { type FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
-import { InviteService } from '../services/invite';
+import { InviteRepository, OtpRepository, UserRepository } from '../repositories';
+import { AuthService, InviteService } from '../services';
+import { errorToHttpsError } from '../utils';
 
 const telegramBotToken = defineSecret('TELEGRAM_BOT_TOKEN');
 const telegramBotUsername = defineSecret('TELEGRAM_BOT_USERNAME');
 const resendApiKey = defineSecret('RESEND_API_KEY');
 
-const inviteService = new InviteService();
+// Dependencies composed at module level (singleton per cold-start)
+const userRepository = new UserRepository();
+const authService = new AuthService(userRepository, new OtpRepository());
+const inviteService = new InviteService(new InviteRepository(), userRepository, authService);
 
-export const create = onCall({ region: FUNCTION_CONFIG.REGION }, async (request) => {
+/** Creates an invite link for the authenticated user. */
+export const create = onCall({ region: FUNCTION_CONFIG.REGION, enforceAppCheck: true }, async (request) => {
   if (!request.auth) {
     throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
   }
@@ -31,10 +37,11 @@ export const create = onCall({ region: FUNCTION_CONFIG.REGION }, async (request)
   const senderId = request.auth.uid;
   const result = await inviteService.createInvite(senderId, parsed.data);
 
-  logger.info(`Invite created by ${senderId}, token: ${result.token}`);
+  logger.info(`[invites.create] Invite created by ${senderId}, token: ${result.token}`);
   return result;
 });
 
+/** Accepts a link-based invite and creates bidirectional contacts. */
 export const accept = onCall({ region: FUNCTION_CONFIG.REGION }, async (request) => {
   if (!request.auth) {
     throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
@@ -49,20 +56,17 @@ export const accept = onCall({ region: FUNCTION_CONFIG.REGION }, async (request)
 
   try {
     const result = await inviteService.acceptInvite(acceptorId, parsed.data);
-    logger.info(`Invite ${parsed.data.token} accepted by ${acceptorId}`);
+    logger.info(`[invites.accept] Invite ${parsed.data.token} accepted by ${acceptorId}`);
     return result;
-  } catch (error: unknown) {
-    logger.error(`Failed to accept invite:`, error);
-    // Convert ApplicationError to HttpsError
-    const code =
-      error && typeof error === 'object' && 'code' in error ? String(error.code) : String(ERROR_CODES.INTERNAL);
-    const message = error instanceof Error ? error.message : String(error);
-    throw new HttpsError(code as FunctionsErrorCode, message);
+  } catch (err) {
+    logger.error('[invites.accept] Failed to accept invite:', err);
+    throw errorToHttpsError(err);
   }
 });
 
+/** Sends an email invite on behalf of the authenticated user. */
 export const sendEmailInvite = onCall(
-  { secrets: [telegramBotUsername, resendApiKey], region: FUNCTION_CONFIG.REGION },
+  { secrets: [telegramBotUsername, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: true },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
@@ -85,20 +89,18 @@ export const sendEmailInvite = onCall(
 
     try {
       const result = await inviteService.sendEmailInvite(senderId, parsed.data, botUsername, apiKey);
-      logger.info(`Email invite sent by ${senderId} to ${parsed.data.targetEmail}`);
+      logger.info(`[invites.sendEmailInvite] Email sent by ${senderId} to ${parsed.data.targetEmail}`);
       return result;
-    } catch (error: unknown) {
-      logger.error(`Failed to send email invite:`, error);
-      const code =
-        error && typeof error === 'object' && 'code' in error ? String(error.code) : String(ERROR_CODES.INTERNAL);
-      const message = error instanceof Error ? error.message : String(error);
-      throw new HttpsError(code as FunctionsErrorCode, message);
+    } catch (err) {
+      logger.error('[invites.sendEmailInvite] Failed to send email invite:', err);
+      throw errorToHttpsError(err);
     }
   },
 );
 
+/** Redeems an email invite token via Telegram initData and returns a Firebase Custom Token. */
 export const redeemEmailInvite = onCall(
-  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION },
+  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION, enforceAppCheck: true },
   async (request) => {
     const parsed = RedeemEmailInviteSchema.safeParse(request.data);
     if (!parsed.success) {
@@ -114,14 +116,11 @@ export const redeemEmailInvite = onCall(
 
     try {
       const result = await inviteService.redeemEmailInvite(parsed.data, botToken);
-      logger.info(`Email invite ${parsed.data.inviteToken} redeemed`);
+      logger.info(`[invites.redeemEmailInvite] Invite ${parsed.data.inviteToken} redeemed`);
       return result;
-    } catch (error: unknown) {
-      logger.error(`Failed to redeem email invite:`, error);
-      const code =
-        error && typeof error === 'object' && 'code' in error ? String(error.code) : String(ERROR_CODES.INTERNAL);
-      const message = error instanceof Error ? error.message : String(error);
-      throw new HttpsError(code as FunctionsErrorCode, message);
+    } catch (err) {
+      logger.error('[invites.redeemEmailInvite] Failed to redeem invite:', err);
+      throw errorToHttpsError(err);
     }
   },
 );

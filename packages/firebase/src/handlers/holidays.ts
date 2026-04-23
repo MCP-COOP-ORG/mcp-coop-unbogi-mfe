@@ -1,11 +1,10 @@
 import { FUNCTION_CONFIG } from '@unbogi/contracts';
 import { onCall } from 'firebase-functions/v2/https';
-import { HolidayRepository } from '../repositories/holiday';
-import { HolidayService } from '../services/holiday';
+import { HolidayRepository } from '../repositories';
+import { HolidayService } from '../services';
 
-const holidayRepo = new HolidayRepository();
-const holidayService = new HolidayService(holidayRepo);
+// Dependencies composed at module level (singleton per cold-start)
+const holidayService = new HolidayService(new HolidayRepository());
 
-export const list = onCall({ region: FUNCTION_CONFIG.REGION }, async () => {
-  return await holidayService.listHolidays();
-});
+/** Returns all available holidays with resolved Storage image URLs. */
+export const list = onCall({ region: FUNCTION_CONFIG.REGION }, async () => holidayService.listHolidays());

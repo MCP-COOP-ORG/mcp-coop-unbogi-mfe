@@ -116,3 +116,7 @@ export const FUNCTION_CONFIG = {
   MEMORY: '256MiB',
   TIMEOUT_SECONDS: 60,
 } as const;
+
+/** Base URL for the Telegram Bot HTTP API. Append `<token>/methodName` to form a full URL. */
+export const TELEGRAM_BOT_API_URL = 'https://api.telegram.org/bot';
+

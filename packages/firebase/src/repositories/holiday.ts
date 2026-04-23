@@ -6,11 +6,17 @@ export class HolidayRepository {
     return admin.firestore();
   }
 
-  async getAllHolidays() {
-    return await this.db.collection(COLLECTIONS.HOLIDAYS).get();
+  private get collection() {
+    return this.db.collection(COLLECTIONS.HOLIDAYS);
   }
 
+  /** Returns all holiday documents. */
+  async getAllHolidays() {
+    return this.collection.get();
+  }
+
+  /** Returns a single holiday document by its ID. */
   async getHoliday(holidayId: string) {
-    return await this.db.collection(COLLECTIONS.HOLIDAYS).doc(holidayId).get();
+    return this.collection.doc(holidayId).get();
   }
 }

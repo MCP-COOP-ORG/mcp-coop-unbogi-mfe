@@ -1,12 +1,10 @@
 import * as crypto from 'node:crypto';
 import {
   type AuthResponse,
-  COLLECTIONS,
   CONFIG,
   EMAILS,
   ERROR_CODES,
   ERROR_MESSAGES,
-  FIREBASE_ERRORS,
   PROVIDERS,
   type SendOtpRequest,
   TELEGRAM_CONSTANTS,
@@ -18,8 +16,11 @@ import * as admin from 'firebase-admin';
 import * as logger from 'firebase-functions/logger';
 import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https';
 import { Resend } from 'resend';
+import type { OtpRepository } from '../repositories/otp';
 import type { UserRepository } from '../repositories/user';
-import { isFirebaseError } from '../utils/errors';
+import { getOrCreateFirebaseUser } from '../utils/firebase-auth';
+
+// ─── Internal Types ───────────────────────────────────────────────────────────
 
 interface TgUser {
   id: number;
@@ -28,12 +29,17 @@ interface TgUser {
   last_name?: string;
 }
 
+// ─── Service ──────────────────────────────────────────────────────────────────
+
 export class AuthService {
-  constructor(private userRepository: UserRepository) {}
+  constructor(
+    private readonly userRepository: UserRepository,
+    private readonly otpRepository: OtpRepository,
+  ) {}
 
   /**
-   * Общая логика валидации Telegram initData и извлечения TgUser.
-   * Переиспользуется в telegramAuth, sendEmailOtp и redeemEmailInvite.
+   * Validates a Telegram `initData` HMAC signature and extracts the embedded user object.
+   * Reused by `authenticateWithTelegram`, `sendEmailOtp`, and `InviteService.redeemEmailInvite`.
    */
   public validateAndExtractUser(initData: string, botToken: string): TgUser {
     const urlParams = new URLSearchParams(initData);
@@ -74,15 +80,13 @@ export class AuthService {
   }
 
   /**
-   * Telegram auth bootstrapping:
-   * - Валидирует HMAC подпись
-   * - Ищет пользователя по telegramId (ТОЛЬКО ЧТЕНИЕ — в базу не пишем без email)
-   * - Если найден: выдаёт custom token
-   * - Если не найден: возвращает { hasEmail: false } без токена
+   * Telegram login:
+   * - Validates HMAC signature.
+   * - Looks up the user by `telegramId` (read-only — no writes without an email).
+   * - Returns a custom token if the user exists, or `{ hasEmail: false }` to trigger OTP registration.
    */
   async authenticateWithTelegram(payload: TelegramAuthRequest, botToken: string): Promise<TelegramAuthResponse> {
     const tgUser = this.validateAndExtractUser(payload.initData, botToken);
-
     const existingUser = await this.userRepository.findByTelegramId(tgUser.id);
 
     if (existingUser) {
@@ -90,49 +94,34 @@ export class AuthService {
       return { token: customToken, hasEmail: true };
     }
 
-    // Пользователь не найден — OTP регистрация нужна
-    // В базу ничего не пишем
+    // User not found — OTP registration required; nothing written to DB
     return { hasEmail: false };
   }
 
   /**
-   * Отправляет OTP на email:
-   * - Валидирует initData (HMAC) — для извлечения telegramId и nickname
-   * - Если активный OTP для этого email уже существует — не высылаем новый (идемпотентность)
-   * - Сохраняет telegramId + nickname в OTP-запись для последующей связки
+   * Sends an OTP to the provided email address:
+   * - Validates Telegram `initData` to bind the `telegramId` to the OTP record.
+   * - Idempotent: skips resend if an active OTP already exists for this email.
+   * - Compensating write: OTP is persisted ONLY after the email is confirmed delivered.
    */
   async sendEmailOtp(payload: SendOtpRequest, botToken: string, resendApiKey: string): Promise<void> {
     const { email, initData } = payload;
 
-    // Валидируем Telegram подпись и извлекаем пользователя
     const tgUser = this.validateAndExtractUser(initData, botToken);
     const nickname = tgUser.username || tgUser.first_name || TELEGRAM_CONSTANTS.DEFAULT_NICKNAME;
 
-    const db = admin.firestore();
-    const otpRef = db.doc(`${COLLECTIONS.SYSTEM_OTP}/${email}`);
-
-    // Идемпотентность: если OTP для этого email ещё активен — не высылаем новый
-    const existing = await otpRef.get();
-    if (existing.exists) {
-      const data = existing.data();
-      if (data?.expiresAt?.toDate() > new Date()) {
-        // OTP ещё жив — клиент переключит UI по своему otpSentAt без нового запроса
-        logger.info('[sendEmailOtp] Active OTP already exists for email, skipping resend');
-        return;
-      }
+    // Skip resend if a non-expired OTP already exists for this email
+    const existing = await this.otpRepository.getOtp(email);
+    const existingExpiry = existing?.expiresAt?.toDate();
+    if (existingExpiry && existingExpiry > new Date()) {
+      logger.info('[AuthService.sendEmailOtp] Active OTP already exists, skipping resend');
+      return;
     }
 
     const otpCode = crypto.randomInt(100_000, 999_999).toString();
-    const expiresAt = new Date(Date.now() + CONFIG.OTP_LIFETIME_MS);
+    const newExpiresAt = new Date(Date.now() + CONFIG.OTP_LIFETIME_MS);
 
-    await otpRef.set({
-      code: otpCode,
-      attempts: 0,
-      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
-      telegramId: tgUser.id,
-      nickname,
-    });
-
+    // ── Compensating write: send email FIRST, persist OTP only on success ────
     const resend = new Resend(resendApiKey);
     const { error } = await resend.emails.send({
       from: EMAILS.SENDER,
@@ -142,85 +131,66 @@ export class AuthService {
     });
 
     if (error) {
-      logger.error('Resend API Error:', error);
+      // No OTP written — user can retry immediately without waiting for expiry
+      logger.error('[AuthService.sendEmailOtp] Resend API error — OTP not persisted:', error);
       throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.FAILED_TO_SEND_EMAIL);
     }
+
+    await this.otpRepository.setOtp(email, {
+      code: otpCode,
+      attempts: 0,
+      expiresAt: admin.firestore.Timestamp.fromDate(newExpiresAt),
+      telegramId: tgUser.id,
+      nickname,
+    });
   }
 
   /**
-   * Верифицирует OTP и завершает регистрацию:
-   * - Читает telegramId + nickname из OTP-записи
-   * - Создаёт или находит Firebase Auth user по email
-   * - Записывает полный профиль в Firestore users/{uid} (email + telegramId + nickname)
-   * - Выдаёт custom token для signInWithCustomToken
+   * Verifies the OTP and completes registration:
+   * - Reads `telegramId` + `nickname` stored in the OTP record (set during `sendEmailOtp`).
+   * - Gets or creates a Firebase Auth user.
+   * - Upserts the full profile in Firestore.
+   * - Returns a Firebase Custom Token.
    */
   async verifyEmailOtp(payload: VerifyOtpRequest): Promise<AuthResponse> {
     const { email, code } = payload;
-    const db = admin.firestore();
 
-    const otpRef = db.doc(`${COLLECTIONS.SYSTEM_OTP}/${email}`);
-    const otpDoc = await otpRef.get();
+    const data = await this.otpRepository.getOtp(email);
 
-    if (!otpDoc.exists) {
+    if (!data) {
       throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, ERROR_MESSAGES.NO_PENDING_OTP);
     }
 
-    const data = otpDoc.data();
-
-    if (!data || (data.attempts || 0) >= CONFIG.MAX_OTP_ATTEMPTS) {
-      await otpRef.delete();
+    if ((data.attempts || 0) >= CONFIG.MAX_OTP_ATTEMPTS) {
+      await this.otpRepository.deleteOtp(email);
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.OTP_ATTEMPTS_EXCEEDED);
     }
 
     if (data.code !== code) {
-      await otpRef.update({ attempts: admin.firestore.FieldValue.increment(1) });
+      await this.otpRepository.incrementAttempts(email);
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.INVALID_OTP);
     }
 
     if (data.expiresAt.toDate() < new Date()) {
-      await otpRef.delete();
+      await this.otpRepository.deleteOtp(email);
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.EXPIRED_OTP);
     }
 
-    // Извлекаем telegramId и nickname из OTP-записи (сохранены при sendEmailOtp)
-    const { telegramId, nickname } = data as { telegramId: number; nickname: string };
-
-    await otpRef.delete();
+    const { telegramId, nickname } = data;
+    await this.otpRepository.deleteOtp(email);
 
     try {
-      let userRecord: admin.auth.UserRecord;
-      try {
-        userRecord = await admin.auth().getUserByEmail(email);
-      } catch (err: unknown) {
-        if (isFirebaseError(err) && err.code === FIREBASE_ERRORS.USER_NOT_FOUND) {
-          try {
-            userRecord = await admin.auth().createUser({ email });
-          } catch (createErr) {
-            logger.error('[verifyEmailOtp] Error creating user:', createErr);
-            throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
-          }
-        } else {
-          logger.error('[verifyEmailOtp] Error getting user by email:', err);
-          throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
-        }
-      }
-
+      // Shared utility: get existing Firebase Auth user or create one
+      const userRecord = await getOrCreateFirebaseUser(email);
       const uid = userRecord.uid;
 
-      // Полный профиль: email (primary key) + telegramId (связка) + nickname (из TG)
-      await this.userRepository.upsertUser(uid, {
-        uid,
-        email,
-        telegramId,
-        nickname,
-        provider: PROVIDERS.EMAIL,
-      });
+      await this.userRepository.upsertUser(uid, { uid, email, telegramId, nickname, provider: PROVIDERS.EMAIL });
 
       const customToken = await admin.auth().createCustomToken(uid);
       return { token: customToken };
     } catch (err: unknown) {
       if (err instanceof HttpsError) throw err;
-      logger.error('[verifyEmailOtp] Unhandled error after OTP match:', err);
+      logger.error('[AuthService.verifyEmailOtp] Unhandled error after OTP match:', err);
       throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);
     }
   }

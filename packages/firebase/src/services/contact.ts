@@ -2,14 +2,13 @@ import { FALLBACK_NAMES } from '@unbogi/contracts';
 import type { ContactRepository } from '../repositories/contact';
 
 export class ContactService {
-  constructor(private contactRepo: ContactRepository) {}
+  constructor(private readonly contactRepo: ContactRepository) {}
 
+  /** Returns the caller's contact list with resolved display names. */
   async listContacts(ownerId: string) {
     const contactsSnap = await this.contactRepo.getContacts(ownerId);
 
-    if (contactsSnap.empty) {
-      return { contacts: [] };
-    }
+    if (contactsSnap.empty) return { contacts: [] };
 
     const userIds = contactsSnap.docs.map((doc) => doc.data().userId as string);
     const userSnaps = await this.contactRepo.getUsersByIds(userIds);
