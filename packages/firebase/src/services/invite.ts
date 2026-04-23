@@ -86,8 +86,12 @@ export class InviteService {
     const nickname = tgUser.username || tgUser.first_name || 'User';
 
     try {
-      // 2. Redeem invite in DB (validates expiry and idempotency)
-      const targetEmail = await this.repository.runRedeemEmailInviteTransaction(inviteToken, String(tgUser.id));
+      // 2. Fetch invite to get the email BEFORE transaction
+      const inviteData = await this.repository.getInvite(inviteToken);
+      if (!inviteData) {
+        throw new Error('NOT_FOUND');
+      }
+      const targetEmail = inviteData.targetEmail;
 
       // 3. Get or create Firebase User
       let userRecord: admin.auth.UserRecord;
@@ -118,7 +122,10 @@ export class InviteService {
         provider: PROVIDERS.EMAIL,
       });
 
-      // 5. Generate Custom Token
+      // 5. Redeem invite in DB (validates expiry and idempotency)
+      await this.repository.runRedeemEmailInviteTransaction(inviteToken, uid);
+
+      // 6. Generate Custom Token
       const customToken = await admin.auth().createCustomToken(uid);
       return { token: customToken };
     } catch (err: unknown) {

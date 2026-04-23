@@ -77,13 +77,22 @@ export class InviteRepository {
         throw new Error('INVALID_ARGUMENT');
       }
 
-      // Deterministic contact ID: sender_acceptor
-      const contactId = `${invite.senderId}_${acceptorId}`;
-      const contactRef = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId);
+      // Create bidirectional contacts
+      const contactId1 = `${invite.senderId}_${acceptorId}`;
+      const contactRef1 = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId1);
 
-      tx.set(contactRef, {
+      tx.set(contactRef1, {
         ownerId: invite.senderId,
         userId: acceptorId,
+        addedAt: FieldValue.serverTimestamp(),
+      });
+
+      const contactId2 = `${acceptorId}_${invite.senderId}`;
+      const contactRef2 = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId2);
+
+      tx.set(contactRef2, {
+        ownerId: acceptorId,
+        userId: invite.senderId,
         addedAt: FieldValue.serverTimestamp(),
       });
 
@@ -94,11 +103,17 @@ export class InviteRepository {
     });
   }
 
+  async getInvite(token: string) {
+    const inviteRef = this.db.collection(COLLECTIONS.INVITES).doc(token);
+    const snap = await inviteRef.get();
+    if (!snap.exists) return null;
+    return snap.data();
+  }
+
   /**
    * Redeems an email invite and creates a contact. Validates expiry.
-   * Returns the targetEmail associated with the invite.
    */
-  async runRedeemEmailInviteTransaction(token: string, acceptorId: string): Promise<string> {
+  async runRedeemEmailInviteTransaction(token: string, acceptorId: string): Promise<void> {
     const inviteRef = this.db.collection(COLLECTIONS.INVITES).doc(token);
 
     return this.db.runTransaction(async (tx) => {
@@ -110,9 +125,9 @@ export class InviteRepository {
 
       const invite = inviteSnap.data()!;
 
-      // Idempotent: if already accepted by this user, just return email
+      // Idempotent: if already accepted by this user, just return silently
       if (invite.status === INVITE_STATUS.ACCEPTED && invite.acceptedBy === acceptorId) {
-        return invite.targetEmail;
+        return;
       }
 
       if (invite.status !== INVITE_STATUS.PENDING) {
@@ -129,13 +144,22 @@ export class InviteRepository {
         throw new Error('INVALID_ARGUMENT');
       }
 
-      // Deterministic contact ID: sender_acceptor
-      const contactId = `${invite.senderId}_${acceptorId}`;
-      const contactRef = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId);
+      // Create bidirectional contacts
+      const contactId1 = `${invite.senderId}_${acceptorId}`;
+      const contactRef1 = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId1);
 
-      tx.set(contactRef, {
+      tx.set(contactRef1, {
         ownerId: invite.senderId,
         userId: acceptorId,
+        addedAt: FieldValue.serverTimestamp(),
+      });
+
+      const contactId2 = `${acceptorId}_${invite.senderId}`;
+      const contactRef2 = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId2);
+
+      tx.set(contactRef2, {
+        ownerId: acceptorId,
+        userId: invite.senderId,
         addedAt: FieldValue.serverTimestamp(),
       });
 
@@ -143,8 +167,6 @@ export class InviteRepository {
         status: INVITE_STATUS.ACCEPTED,
         acceptedBy: acceptorId,
       });
-
-      return invite.targetEmail;
     });
   }
 }
