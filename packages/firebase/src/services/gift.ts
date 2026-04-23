@@ -11,6 +11,7 @@ import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https
 import type { ContactRepository } from '../repositories/contact';
 import type { GiftRepository } from '../repositories/gift';
 import type { HolidayRepository } from '../repositories/holiday';
+import { resolveStorageUrl } from '../utils/storage';
 
 export class GiftService {
   constructor(
@@ -84,29 +85,33 @@ export class GiftService {
 
   async getOpenedGifts(userId: string) {
     const snap = await this.giftRepo.getOpenedGifts(userId);
-    return this.mapGiftDocs(snap.docs);
+    return await this.mapGiftDocs(snap.docs);
   }
 
   async getReceivedGifts(userId: string) {
     const snap = await this.giftRepo.getReceivedGifts(userId);
-    return this.mapGiftDocs(snap.docs);
+    return await this.mapGiftDocs(snap.docs);
   }
 
-  private mapGiftDocs(docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]) {
-    return docs.map((doc) => {
-      const data = doc.data();
-      return {
-        id: doc.id,
-        senderId: data.senderId,
-        receiverId: data.receiverId,
-        holidayId: data.holidayId,
-        imageUrl: data.imageUrl,
-        greeting: data.greeting,
-        unpackDate: data.unpackDate?.toDate()?.toISOString(),
-        scratchCode: data.scratchCode,
-        scratchedAt: data.scratchedAt?.toDate()?.toISOString(),
-        createdAt: data.createdAt?.toDate()?.toISOString(),
-      };
-    });
+  private async mapGiftDocs(docs: FirebaseFirestore.QueryDocumentSnapshot<FirebaseFirestore.DocumentData>[]) {
+    return Promise.all(
+      docs.map(async (doc) => {
+        const data = doc.data();
+        const resolvedImageUrl = await resolveStorageUrl(data.imageUrl);
+
+        return {
+          id: doc.id,
+          senderId: data.senderId,
+          receiverId: data.receiverId,
+          holidayId: data.holidayId,
+          imageUrl: resolvedImageUrl,
+          greeting: data.greeting,
+          unpackDate: data.unpackDate?.toDate()?.toISOString(),
+          scratchCode: data.scratchCode,
+          scratchedAt: data.scratchedAt?.toDate()?.toISOString(),
+          createdAt: data.createdAt?.toDate()?.toISOString(),
+        };
+      }),
+    );
   }
 }
