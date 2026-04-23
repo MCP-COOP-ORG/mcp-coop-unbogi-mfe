@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Lock } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 
 export interface LockOverlayProps {

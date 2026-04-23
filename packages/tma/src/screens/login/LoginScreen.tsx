@@ -164,13 +164,15 @@ export function LoginScreen() {
             className="text-xs text-white/40 text-center mt-2 flex items-center justify-center gap-1"
           >
             <button
+              type="button"
               onClick={form.handleBack}
               disabled={form.isLoading}
               className="hover:text-white transition-colors cursor-pointer flex items-center gap-1 opacity-80 hover:opacity-100"
               aria-label="Go back and change email"
             >
               <ArrowLeft size={12} />
-              {t.auth.codeSent} <span className="text-white/80 underline decoration-white/30 underline-offset-2">{form.email}</span>
+              {t.auth.codeSent}{' '}
+              <span className="text-white/80 underline decoration-white/30 underline-offset-2">{form.email}</span>
             </button>
           </motion.p>
         )}

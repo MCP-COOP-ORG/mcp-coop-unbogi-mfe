@@ -93,9 +93,7 @@ export function SurprisesScreen() {
           return (
             <div className="relative w-full h-full rounded-[inherit]">
               {/* Layer 2: Timer Lock (Topmost) */}
-              {!isUnlocked && (
-                <LockOverlay lockedUntil={lockedUntil} senderName={gift.senderName} />
-              )}
+              {!isUnlocked && <LockOverlay lockedUntil={lockedUntil} senderName={gift.senderName} />}
 
               {/* Layer 1: Scratch Foil (Middle) */}
               <div className="absolute inset-0 z-10 pointer-events-none rounded-[inherit] overflow-hidden">

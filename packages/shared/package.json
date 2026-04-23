@@ -10,6 +10,7 @@
     "./domains/*": "./src/domains/*/index.ts"
   },
   "dependencies": {
+    "@unbogi/contracts": "workspace:*",
     "firebase": "^12.12.0",
     "zustand": "^5.0.12",
     "zod": "^4.3.6"

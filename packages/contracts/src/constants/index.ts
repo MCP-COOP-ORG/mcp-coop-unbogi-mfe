@@ -28,6 +28,8 @@ export const ERROR_MESSAGES = {
   TG_AUTH_REQUIRED: 'Telegram authentication is required to register.',
   BOT_TOKEN_CONFIG_ERROR: 'Server configuration error: Bot Token not found',
   BOT_TOKEN_MISSING: 'Missing bot token configuration',
+  INVITE_EXPIRED: 'This invite link has expired.',
+  INVITE_ALREADY_USED: 'This invite link has already been used.',
 } as const;
 
 export const ERROR_CODES = {
@@ -40,6 +42,7 @@ export const ERROR_CODES = {
 
 export const CONFIG = {
   OTP_LIFETIME_MS: 10 * 60 * 1000,
+  INVITE_LIFETIME_MS: 48 * 60 * 60 * 1000, // 48 hours
   MAX_OTP_ATTEMPTS: 5,
   TG_HMAC_CONSTANT: 'WebAppData',
 } as const;
@@ -48,6 +51,9 @@ export const EMAILS = {
   SENDER: 'UnBoGi Auth <auth@mcpcoop.org>',
   SUBJECT_OTP: 'Ваш код для входа',
   TEMPLATE_OTP: (code: string) => `<h1>${code}</h1><p>Код активен в течение 10 минут.</p>`,
+  SUBJECT_INVITE: 'Вас пригласили в UnBoGi!',
+  TEMPLATE_INVITE: (senderName: string, botUsername: string, token: string) =>
+    `<h1>Привет!</h1><p>${senderName} приглашает вас присоединиться к UnBoGi.</p><p><a href="https://t.me/${botUsername}/unbogi?startapp=${token}">Нажмите здесь, чтобы открыть Telegram Mini App</a></p><p>Ссылка действительна 48 часов.</p>`,
 } as const;
 
 export const TELEGRAM_CONSTANTS = {
@@ -77,6 +83,8 @@ export const INVITE_STATUS = {
   PENDING: 'pending',
   ACCEPTED: 'accepted',
 } as const;
+
+export const INVITE_PREFIX = 'inv_';
 
 export const GIFT_ERROR_MESSAGES = {
   RECEIVER_NOT_IN_CONTACTS: 'Receiver is not in your contacts',

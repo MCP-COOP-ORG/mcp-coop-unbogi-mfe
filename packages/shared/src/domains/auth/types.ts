@@ -8,7 +8,7 @@ export interface AuthState {
   pendingEmail: string | null;
   /** Unix timestamp (ms) of OTP dispatch — used for the client countdown timer */
   otpSentAt: number | null;
-  initialize: (initData: string) => Unsubscribe;
+  initialize: (initData: string, startParam?: string) => Unsubscribe;
   setUser: (user: User | null) => void;
   setPendingOtp: (email: string, sentAt: number) => void;
   clearPendingOtp: () => void;

@@ -1,7 +1,9 @@
-import { onAuthStateChanged } from 'firebase/auth';
+import { INVITE_PREFIX } from '@unbogi/contracts';
+import { onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { create } from 'zustand';
 import { AUTH_STATUS } from '../../constants';
 import { auth } from '../../firebase';
+import { invitesApi } from '../invites/api';
 import { authApi } from './api';
 import type { AuthState } from './types';
 
@@ -27,15 +29,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
    * 3. If hasEmail: false → set EMAIL_REQUIRED, displaying the OTP form
    * 4. If telegramAuth fails → UNAUTHENTICATED
    */
-  initialize: (initData: string) => {
+  initialize: (initData: string, startParam?: string) => {
     set({ status: AUTH_STATUS.LOADING });
 
     let isTelegramAuthResolved = false;
 
-    if (!initData) {
-      isTelegramAuthResolved = true;
-      set({ status: AUTH_STATUS.UNAUTHENTICATED });
-    } else {
+    const performNormalAuth = () => {
       authApi
         .authenticateTelegram(initData)
         .then(({ hasEmail }) => {
@@ -43,8 +42,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           if (!hasEmail) {
             set({ status: AUTH_STATUS.EMAIL_REQUIRED });
           } else {
-            // If hasEmail === true, signInWithCustomToken has already been called,
-            // and auth.currentUser is populated.
+            // If hasEmail === true, signInWithCustomToken has already been called
             set({ user: auth.currentUser, status: AUTH_STATUS.AUTHENTICATED });
           }
         })
@@ -53,6 +51,26 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           isTelegramAuthResolved = true;
           set({ status: AUTH_STATUS.UNAUTHENTICATED });
         });
+    };
+
+    if (!initData) {
+      isTelegramAuthResolved = true;
+      set({ status: AUTH_STATUS.UNAUTHENTICATED });
+    } else if (startParam && startParam.startsWith(INVITE_PREFIX)) {
+      invitesApi
+        .redeemEmailInvite(startParam, initData)
+        .then(({ token }) => signInWithCustomToken(auth, token))
+        .then(() => {
+          isTelegramAuthResolved = true;
+          set({ user: auth.currentUser, status: AUTH_STATUS.AUTHENTICATED });
+        })
+        .catch((err) => {
+          console.error('[Auth] redeemEmailInvite failed:', err);
+          // Fallback to normal auth if invite redeem fails (e.g. expired or already used)
+          performNormalAuth();
+        });
+    } else {
+      performNormalAuth();
     }
 
     const unsubscribe = onAuthStateChanged(

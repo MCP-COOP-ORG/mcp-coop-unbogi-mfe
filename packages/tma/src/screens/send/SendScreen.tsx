@@ -1,26 +1,13 @@
-import { useReducer, useState, useEffect, useCallback, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronLeft, Search, Camera, ScanLine, Gift } from 'lucide-react';
-import {
-  GIFT_CONFIG,
-  useContactsStore,
-  useHolidaysStore,
-  useGiftsStore,
-  sendFormSchema,
-} from '@unbogi/shared';
+import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Camera, ChevronLeft, Gift, ScanLine, Search } from 'lucide-react';
+import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { SCREENS, useNavigationStore } from '@/app/navigation';
 import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
-import {
-  IconButton,
-  Input,
-  GlassSelect,
-  GlassDateInput,
-  GlassTextarea,
-  type SelectOption,
-} from '@/ui';
-import { formReducer, initialState, type PayloadType } from './send-form-model';
+import { GlassDateInput, GlassSelect, GlassTextarea, IconButton, Input, type SelectOption } from '@/ui';
+import { formReducer, initialState } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */
 
@@ -59,11 +46,7 @@ export function SendScreen() {
   const [showDropdown, setShowDropdown] = useState(false);
 
   const isFormValid = Boolean(
-    state.receiverId &&
-    state.holidayId &&
-    state.greeting.trim() &&
-    state.unpackDate &&
-    state.payloadContent.trim(),
+    state.receiverId && state.holidayId && state.greeting.trim() && state.unpackDate && state.payloadContent.trim(),
   );
 
   /* ── bootstrap ── */
@@ -196,7 +179,6 @@ export function SendScreen() {
     >
       {/* ── Scrollable fields ── */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '20px 20px 0' }}>
-
         {/* ── Back + Title ── */}
         <div className="relative flex items-center justify-center">
           <div className="absolute left-0">
@@ -314,11 +296,7 @@ export function SendScreen() {
 
         {/* ── Submit Error ── */}
         {errors.submit && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-red-400 text-[13px] text-center"
-          >
+          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-400 text-[13px] text-center">
             {errors.submit}
           </motion.p>
         )}

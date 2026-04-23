@@ -5,12 +5,7 @@ interface GlassTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
   currentLength?: number;
 }
 
-export function GlassTextarea({
-  className = '',
-  maxChars,
-  currentLength = 0,
-  ...props
-}: GlassTextareaProps) {
+export function GlassTextarea({ className = '', maxChars, currentLength = 0, ...props }: GlassTextareaProps) {
   return (
     <div className="relative">
       <textarea

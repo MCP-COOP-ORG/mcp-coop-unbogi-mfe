@@ -33,9 +33,9 @@ export class AuthService {
 
   /**
    * Общая логика валидации Telegram initData и извлечения TgUser.
-   * Переиспользуется в telegramAuth и sendEmailOtp.
+   * Переиспользуется в telegramAuth, sendEmailOtp и redeemEmailInvite.
    */
-  private validateAndExtractUser(initData: string, botToken: string): TgUser {
+  public validateAndExtractUser(initData: string, botToken: string): TgUser {
     const urlParams = new URLSearchParams(initData);
     const hash = urlParams.get(TELEGRAM_CONSTANTS.HASH_PARAM);
 

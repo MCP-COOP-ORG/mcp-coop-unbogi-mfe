@@ -1,8 +1,9 @@
 import { motion } from 'framer-motion';
 import { Gift, LayoutGrid, Send, UserPlus } from 'lucide-react';
-import { IconButton } from '@/ui';
+import { useInviteModalStore } from '@/app/inviteModalStore';
 import { SCREENS, type ScreenId, useNavigationStore } from '@/app/navigation';
 import { tg } from '@/lib/telegram';
+import { IconButton } from '@/ui';
 
 const tabs = [
   { id: SCREENS.SURPRISES, Icon: Gift, label: 'Surprises' },
@@ -12,6 +13,7 @@ const tabs = [
 export function BottomNav() {
   const activeScreen = useNavigationStore((s) => s.activeScreen);
   const setScreen = useNavigationStore((s) => s.setScreen);
+  const openInviteModal = useInviteModalStore((s) => s.openInviteModal);
 
   const handleTap = (id: ScreenId) => {
     tg.haptic('light');
@@ -20,7 +22,7 @@ export function BottomNav() {
 
   const handleUserAction = () => {
     tg.haptic('light');
-    // Placeholder for User profile / Add friend
+    openInviteModal();
   };
 
   return (

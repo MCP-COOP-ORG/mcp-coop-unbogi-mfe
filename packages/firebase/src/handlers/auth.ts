@@ -7,7 +7,7 @@ import {
   VerifyOtpSchema,
 } from '@unbogi/contracts';
 import { defineSecret } from 'firebase-functions/params';
-import { FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
+import { type FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { UserRepository } from '../repositories/user';
 import { AuthService } from '../services/auth';
 

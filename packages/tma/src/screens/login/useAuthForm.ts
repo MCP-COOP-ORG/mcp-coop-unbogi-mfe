@@ -43,7 +43,8 @@ export function useAuthForm() {
   const isCodeValid = useMemo(() => VerifyOtpSchema.shape.code.safeParse(state.code).success, [state.code]);
 
   const emailError = state.isEmailTouched && state.isEmailDirty && !isEmailValid ? t.auth.invalidEmail : null;
-  const codeError = state.isCodeTouched && state.isCodeDirty && !isCodeValid && state.code.length > 0 ? t.auth.invalidCode : null;
+  const codeError =
+    state.isCodeTouched && state.isCodeDirty && !isCodeValid && state.code.length > 0 ? t.auth.invalidCode : null;
 
   // Use useCallback for stable handler references
   const handleEmailChange = useCallback((value: string) => {

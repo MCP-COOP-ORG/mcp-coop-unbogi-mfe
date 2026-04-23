@@ -7,6 +7,7 @@ import { LoginScreen } from '@/screens/login/LoginScreen';
 import { SendScreen } from '@/screens/send/SendScreen';
 import { SurprisesScreen } from '@/screens/surprises/SurprisesScreen';
 import { BottomNav } from '@/ui/bottom-nav';
+import { InviteModal } from '@/ui/invite-modal';
 
 // ⚡ Feature flag: set to `true` to bypass auth locally
 const SKIP_AUTH = false;
@@ -31,7 +32,7 @@ export function App() {
 
   useEffect(() => {
     if (SKIP_AUTH) return;
-    const unsubscribe = initAuth(tg.initData);
+    const unsubscribe = initAuth(tg.initData, tg.startParam);
     return () => unsubscribe();
   }, [initAuth]);
 
@@ -48,6 +49,7 @@ export function App() {
           <ActiveScreen screenId={activeScreen} />
         </main>
         {!isSendScreen && <BottomNav />}
+        <InviteModal />
       </div>
     );
   }

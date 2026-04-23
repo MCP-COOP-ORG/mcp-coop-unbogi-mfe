@@ -5,6 +5,8 @@ export const CLOUD_FUNCTIONS = {
   HOLIDAYS_LIST: 'holidays-list',
   INVITES_CREATE: 'invites-create',
   INVITES_ACCEPT: 'invites-accept',
+  INVITES_SEND_EMAIL: 'invites-sendEmailInvite',
+  INVITES_REDEEM_EMAIL: 'invites-redeemEmailInvite',
   CONTACTS_LIST: 'contacts-list',
   GIFTS_SEND: 'gifts-send',
   GIFTS_GET_RECEIVED: 'gifts-getReceived',

@@ -41,4 +41,10 @@ export class UserRepository {
       });
     }
   }
+
+  async findById(uid: string): Promise<UserData | null> {
+    const snap = await this.collection.doc(uid).get();
+    if (!snap.exists) return null;
+    return snap.data() as UserData;
+  }
 }

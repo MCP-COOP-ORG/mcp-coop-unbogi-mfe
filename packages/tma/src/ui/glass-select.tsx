@@ -1,6 +1,6 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 export interface SelectOption {
   value: string;
@@ -16,14 +16,7 @@ interface GlassSelectProps {
   className?: string;
 }
 
-export function GlassSelect({
-  options,
-  value,
-  onChange,
-  placeholder = '',
-  icon,
-  className = '',
-}: GlassSelectProps) {
+export function GlassSelect({ options, value, onChange, placeholder = '', icon, className = '' }: GlassSelectProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -65,10 +58,12 @@ export function GlassSelect({
         >
           {selected?.label || placeholder}
         </span>
-        <div className={[
-          'w-10 flex items-center justify-center shrink-0 text-white/40 transition-transform duration-200',
-          open ? 'rotate-180' : '',
-        ].join(' ')}>
+        <div
+          className={[
+            'w-10 flex items-center justify-center shrink-0 text-white/40 transition-transform duration-200',
+            open ? 'rotate-180' : '',
+          ].join(' ')}
+        >
           <ChevronDown size={14} strokeWidth={2} />
         </div>
       </button>

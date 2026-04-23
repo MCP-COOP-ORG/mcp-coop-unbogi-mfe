@@ -10,6 +10,10 @@ export const tg = {
     return getWebApp()?.initData ?? '';
   },
 
+  get startParam(): string | undefined {
+    return getWebApp()?.initDataUnsafe?.start_param;
+  },
+
   get isTelegram(): boolean {
     return (getWebApp()?.initData?.length ?? 0) > 0;
   },

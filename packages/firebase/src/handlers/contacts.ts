@@ -1,5 +1,5 @@
 import { ERROR_CODES, ERROR_MESSAGES, FUNCTION_CONFIG } from '@unbogi/contracts';
-import { FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
+import { type FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { ContactRepository } from '../repositories/contact';
 import { ContactService } from '../services/contact';
 

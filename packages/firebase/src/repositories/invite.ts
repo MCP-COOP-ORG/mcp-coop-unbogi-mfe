@@ -26,6 +26,28 @@ export class InviteRepository {
   }
 
   /**
+   * Creates a new pending email invite document with expiration
+   */
+  async createEmailInvite(senderId: string, targetEmail: string, expiresInMs: number): Promise<string> {
+    const inviteRef = this.db.collection(COLLECTIONS.INVITES).doc();
+    const token = inviteRef.id;
+    const expiresAt = new Date(Date.now() + expiresInMs);
+
+    await inviteRef.set({
+      senderId,
+      targetEmail,
+      token,
+      status: INVITE_STATUS.PENDING,
+      type: 'email',
+      acceptedBy: null,
+      createdAt: FieldValue.serverTimestamp(),
+      expiresAt: admin.firestore.Timestamp.fromDate(expiresAt),
+    });
+
+    return token;
+  }
+
+  /**
    * Runs the acceptance transaction: marks invite as ACCEPTED and creates a deterministic contact entry.
    * Deterministic contact ID prevents duplicate contacts between the same users.
    */
@@ -69,6 +91,60 @@ export class InviteRepository {
         status: INVITE_STATUS.ACCEPTED,
         acceptedBy: acceptorId,
       });
+    });
+  }
+
+  /**
+   * Redeems an email invite and creates a contact. Validates expiry.
+   * Returns the targetEmail associated with the invite.
+   */
+  async runRedeemEmailInviteTransaction(token: string, acceptorId: string): Promise<string> {
+    const inviteRef = this.db.collection(COLLECTIONS.INVITES).doc(token);
+
+    return this.db.runTransaction(async (tx) => {
+      const inviteSnap = await tx.get(inviteRef);
+
+      if (!inviteSnap.exists) {
+        throw new Error('NOT_FOUND');
+      }
+
+      const invite = inviteSnap.data()!;
+
+      // Idempotent: if already accepted by this user, just return email
+      if (invite.status === INVITE_STATUS.ACCEPTED && invite.acceptedBy === acceptorId) {
+        return invite.targetEmail;
+      }
+
+      if (invite.status !== INVITE_STATUS.PENDING) {
+        throw new Error('INVITE_ALREADY_USED');
+      }
+
+      // Check expiry
+      if (invite.expiresAt && invite.expiresAt.toDate() < new Date()) {
+        throw new Error('INVITE_EXPIRED');
+      }
+
+      // Prevent self-invite
+      if (invite.senderId === acceptorId) {
+        throw new Error('INVALID_ARGUMENT');
+      }
+
+      // Deterministic contact ID: sender_acceptor
+      const contactId = `${invite.senderId}_${acceptorId}`;
+      const contactRef = this.db.collection(COLLECTIONS.CONTACTS).doc(contactId);
+
+      tx.set(contactRef, {
+        ownerId: invite.senderId,
+        userId: acceptorId,
+        addedAt: FieldValue.serverTimestamp(),
+      });
+
+      tx.update(inviteRef, {
+        status: INVITE_STATUS.ACCEPTED,
+        acceptedBy: acceptorId,
+      });
+
+      return invite.targetEmail;
     });
   }
 }
