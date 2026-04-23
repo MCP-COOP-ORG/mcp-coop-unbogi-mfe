@@ -1,5 +1,6 @@
 import { COLLECTIONS, TG_MESSAGES } from '@unbogi/contracts';
 import * as admin from 'firebase-admin';
+import { getFunctions } from 'firebase-admin/functions';
 import { logger } from 'firebase-functions/v2';
 
 const TG_API = 'https://api.telegram.org/bot';
@@ -14,8 +15,52 @@ export class NotificationService {
    * Message intentionally hides sender name for surprise effect.
    */
   async sendGiftReceivedTelegram(botToken: string, botUsername: string, receiverId: string): Promise<void> {
+    await this.sendTelegramNotification(botToken, botUsername, receiverId, TG_MESSAGES.GIFT_RECEIVED);
+  }
+
+  /**
+   * Sends a "gift ready to open" notification via Telegram Bot API.
+   */
+  async sendGiftReadyTelegram(botToken: string, botUsername: string, receiverId: string): Promise<void> {
+    await this.sendTelegramNotification(botToken, botUsername, receiverId, TG_MESSAGES.GIFT_READY);
+  }
+
+  /**
+   * Schedules a Cloud Task to send "gift ready" notification at unpackDate.
+   */
+  async scheduleGiftReadyTask(giftId: string, receiverId: string, unpackDate: Date): Promise<void> {
+    const now = Date.now();
+    const unpackTime = unpackDate.getTime();
+    const delaySeconds = Math.max(0, Math.floor((unpackTime - now) / 1000));
+
+    // If unpackDate is in the past or now, skip scheduling
+    if (delaySeconds <= 0) {
+      logger.info(`Gift ${giftId} unpackDate is in the past. Skipping ready task.`);
+      return;
+    }
+
     try {
-      // 1. Get receiver's telegramId
+      const queue = getFunctions().taskQueue('notifications-onGiftReadyTask');
+      await queue.enqueue(
+        { giftId, receiverId },
+        { scheduleDelaySeconds: delaySeconds, dispatchDeadlineSeconds: 300 },
+      );
+      logger.info(`Scheduled gift-ready task for ${giftId} in ${delaySeconds}s`);
+    } catch (err) {
+      logger.error(`Failed to schedule gift-ready task for ${giftId}:`, err);
+    }
+  }
+
+  /**
+   * Shared method: sends a Telegram message with inline keyboard.
+   */
+  private async sendTelegramNotification(
+    botToken: string,
+    botUsername: string,
+    receiverId: string,
+    messageText: string,
+  ): Promise<void> {
+    try {
       const receiverDoc = await this.db.collection(COLLECTIONS.USERS).doc(receiverId).get();
 
       if (!receiverDoc.exists) {
@@ -29,18 +74,16 @@ export class NotificationService {
         return;
       }
 
-      // 2. Build inline keyboard with deep link to Mini App
       const miniAppLink = `https://t.me/${botUsername}/unbogi`;
       const payload = {
         chat_id: telegramId,
-        text: TG_MESSAGES.GIFT_RECEIVED,
+        text: messageText,
         parse_mode: 'MarkdownV2',
         reply_markup: {
           inline_keyboard: [[{ text: TG_MESSAGES.GIFT_BUTTON_TEXT, url: miniAppLink }]],
         },
       };
 
-      // 3. Call Telegram Bot API
       const response = await fetch(`${TG_API}${botToken}/sendMessage`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

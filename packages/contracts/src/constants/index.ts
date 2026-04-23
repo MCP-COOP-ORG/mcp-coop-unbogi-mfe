@@ -107,6 +107,7 @@ export const FALLBACK_NAMES = {
 
 export const TG_MESSAGES = {
   GIFT_RECEIVED: '🎁 Someone sent you a surprise\\!',
+  GIFT_READY: '🎉 Your surprise is ready to be opened\\!',
   GIFT_BUTTON_TEXT: '✨ Open UnBoGi',
 } as const;
 
