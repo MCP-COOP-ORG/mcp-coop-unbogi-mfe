@@ -105,9 +105,9 @@ export const FALLBACK_NAMES = {
   UNKNOWN: 'Unknown',
 } as const;
 
-export const PUSH_MESSAGES = {
-  GIFT_RECEIVED_TITLE: '🎁 New Gift!',
-  giftReceivedBody: (senderName: string) => `${senderName} sent you a surprise!`,
+export const TG_MESSAGES = {
+  GIFT_RECEIVED: '🎁 Someone sent you a surprise\\!',
+  GIFT_BUTTON_TEXT: '✨ Open UnBoGi',
 } as const;
 
 export const FUNCTION_CONFIG = {
