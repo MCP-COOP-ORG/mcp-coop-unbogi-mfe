@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ChevronDown } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 export interface SelectOption {
@@ -22,14 +22,18 @@ export function GlassSelect({ options, value, onChange, placeholder = '', icon, 
 
   const selected = options.find((o) => o.value === value);
 
-  /* close on outside click */
+  /* close on outside click — touchstart needed for iOS Safari */
   useEffect(() => {
     if (!open) return;
-    const handler = (e: MouseEvent) => {
+    const handler = (e: MouseEvent | TouchEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler as EventListener);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler as EventListener);
+    };
   }, [open]);
 
   return (
@@ -68,7 +72,12 @@ export function GlassSelect({ options, value, onChange, placeholder = '', icon, 
         </div>
       </button>
 
-      {/* ── dropdown ── */}
+      {/*
+        ── dropdown ──
+        Solid bg instead of backdrop-filter: backdrop-filter silently fails on
+        position:absolute children inside overflow:auto parents on iOS Safari/WebKit.
+        Using opaque bg + strong shadow gives the same premium feel without the bug.
+      */}
       <AnimatePresence>
         {open && (
           <motion.ul
@@ -78,17 +87,15 @@ export function GlassSelect({ options, value, onChange, placeholder = '', icon, 
             transition={{ duration: 0.15, ease: 'easeOut' }}
             className={[
               'absolute left-0 right-0 top-[calc(100%+6px)] z-50',
-              'max-h-[200px] overflow-y-auto',
-              'rounded-2xl p-[10px]',
-              'bg-[rgba(18,8,32,0.92)]',
-              'backdrop-blur-[40px] backdrop-saturate-[180%]',
-              'border-[0.5px] border-white/[0.15]',
-              'shadow-[0_16px_48px_rgba(0,0,0,0.6)]',
+              'max-h-[220px] overflow-y-auto',
+              'rounded-2xl p-[6px]',
+              'bg-[#1a0a2e]',
+              'border-[0.5px] border-white/[0.18]',
+              'shadow-[0_16px_48px_rgba(0,0,0,0.7)]',
             ].join(' ')}
           >
-            {options.map((opt, idx) => {
+            {options.map((opt) => {
               const isActive = opt.value === value;
-              const isLast = idx === options.length - 1;
               return (
                 <li key={opt.value}>
                   <button
@@ -98,15 +105,15 @@ export function GlassSelect({ options, value, onChange, placeholder = '', icon, 
                       setOpen(false);
                     }}
                     className={[
-                      'w-full text-left px-5 py-3 text-[14px] cursor-pointer',
-                      'transition-colors duration-100',
+                      'w-full flex items-center gap-3 text-left px-4 py-[10px] text-[14px] cursor-pointer',
+                      'rounded-xl transition-colors duration-100',
                       isActive
-                        ? 'text-white/95 bg-white/[0.08]'
-                        : 'text-white/60 hover:text-white/80 hover:bg-white/[0.05]',
-                      !isLast ? 'border-b border-white/[0.08]' : '',
+                        ? 'text-white/95 bg-white/[0.1]'
+                        : 'text-white/65 hover:text-white/85 hover:bg-white/[0.06] active:bg-white/[0.08]',
                     ].join(' ')}
                   >
-                    {opt.label}
+                    <span className="flex-1">{opt.label}</span>
+                    {isActive && <Check size={13} strokeWidth={2.5} className="shrink-0 text-violet-400" />}
                   </button>
                 </li>
               );

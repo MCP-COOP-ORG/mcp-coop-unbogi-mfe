@@ -78,13 +78,28 @@ export function SendScreen() {
     dispatch({ type: 'SET_FIELD', field: 'greeting', value: selected.defaultGreeting });
   }, [state.holidayId, holidays]);
 
-  /* ── contact search ── */
-  const filteredContacts =
-    state.searchQuery.trim().length >= GIFT_CONFIG.CONTACT_SEARCH_MIN_CHARS
-      ? contacts
-          .filter((c) => c.displayName.toLowerCase().includes(state.searchQuery.trim().toLowerCase()))
-          .slice(0, GIFT_CONFIG.CONTACT_SEARCH_MAX_RESULTS)
-      : [];
+  /* ── contact search ──
+   * On focus (empty query): show all contacts sorted by 2nd letter, sliced to MAX_RESULTS.
+   * On type (>= MIN_CHARS): filter by query, same sort + slice.
+   */
+  const CONTACT_ITEM_HEIGHT = 44; // px — py-3 (24px) + 14px font + 6px gap ≈ 44
+
+  const filteredContacts = useMemo(() => {
+    const query = state.searchQuery.trim();
+    const source =
+      query.length >= GIFT_CONFIG.CONTACT_SEARCH_MIN_CHARS
+        ? contacts.filter((c) => c.displayName.toLowerCase().includes(query.toLowerCase()))
+        : contacts; // show all on focus before typing
+
+    return source
+      .slice() // avoid mutating store array
+      .sort((a, b) => {
+        // Sort by 2nd character of displayName (locale-aware)
+        const key = (name: string) => name.slice(1).toLowerCase();
+        return key(a.displayName).localeCompare(key(b.displayName));
+      })
+      .slice(0, GIFT_CONFIG.CONTACT_SEARCH_MAX_RESULTS);
+  }, [contacts, state.searchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'SET_FIELD', field: 'searchQuery', value: e.target.value });
@@ -206,13 +221,19 @@ export function SendScreen() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
+                /*
+                 * Solid bg instead of backdrop-filter — backdrop-filter silently fails
+                 * on position:absolute children inside overflow:auto on iOS Safari/WebKit.
+                 * maxHeight + overflow-y-auto = scroll when contacts > VISIBLE_ROWS.
+                 */
                 className={[
                   'absolute left-0 right-0 top-[calc(100%+4px)] z-50',
-                  'rounded-[var(--radius-lg)] overflow-hidden',
-                  'bg-black/80 backdrop-blur-[40px] backdrop-saturate-[180%]',
+                  'rounded-2xl p-[6px] overflow-y-auto',
+                  'bg-[#1a0a2e]',
                   'border-[0.5px] border-white/[0.18]',
-                  'shadow-[0_12px_40px_rgba(0,0,0,0.5)]',
+                  'shadow-[0_12px_40px_rgba(0,0,0,0.6)]',
                 ].join(' ')}
+                style={{ maxHeight: GIFT_CONFIG.CONTACT_DROPDOWN_VISIBLE_ROWS * CONTACT_ITEM_HEIGHT }}
               >
                 {filteredContacts.map((c) => (
                   <li key={c.id}>
@@ -220,7 +241,11 @@ export function SendScreen() {
                       type="button"
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => handleSelectContact(c.id, c.displayName)}
-                      className="w-full text-left px-5 py-3 text-[14px] text-white/80 hover:bg-white/[0.06] transition-colors cursor-pointer"
+                      className={[
+                        'w-full text-left px-4 py-[10px] text-[14px] cursor-pointer',
+                        'rounded-xl transition-colors duration-100',
+                        'text-white/80 hover:text-white/95 hover:bg-white/[0.06] active:bg-white/[0.08]',
+                      ].join(' ')}
                     >
                       {c.displayName}
                     </button>

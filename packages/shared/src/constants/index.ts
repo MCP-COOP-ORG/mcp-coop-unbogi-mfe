@@ -41,5 +41,8 @@ export const GIFT_CONFIG = {
   CODE_MIN_LENGTH: 4,
   CODE_MAX_LENGTH: 30,
   CONTACT_SEARCH_MIN_CHARS: 2,
-  CONTACT_SEARCH_MAX_RESULTS: 3,
+  /** Maximum contacts returned in dropdown (change here to reconfigure) */
+  CONTACT_SEARCH_MAX_RESULTS: 5,
+  /** Visible rows before scroll kicks in (change here to reconfigure) */
+  CONTACT_DROPDOWN_VISIBLE_ROWS: 5,
 } as const;

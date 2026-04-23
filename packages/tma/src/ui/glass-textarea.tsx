@@ -5,7 +5,18 @@ interface GlassTextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement>
   currentLength?: number;
 }
 
-export function GlassTextarea({ className = '', maxChars, currentLength = 0, ...props }: GlassTextareaProps) {
+export function GlassTextarea({ className = '', maxChars, currentLength = 0, onFocus, ...props }: GlassTextareaProps) {
+  const handleFocus = (e: React.FocusEvent<HTMLTextAreaElement>) => {
+    /*
+     * Wait for iOS keyboard to finish animating (~300ms) before scrolling,
+     * otherwise the scroll target position is calculated before viewport shrinks.
+     */
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+    onFocus?.(e);
+  };
+
   return (
     <div className="relative">
       <textarea
@@ -23,6 +34,7 @@ export function GlassTextarea({ className = '', maxChars, currentLength = 0, ...
           className,
         ].join(' ')}
         style={{ padding: '12px 20px' }}
+        onFocus={handleFocus}
         {...props}
       />
       {maxChars !== undefined && (

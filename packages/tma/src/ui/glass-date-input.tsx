@@ -1,5 +1,4 @@
 import { Calendar } from 'lucide-react';
-import { useRef } from 'react';
 
 interface GlassDateInputProps {
   value: string;
@@ -14,9 +13,7 @@ export function GlassDateInput({
   placeholder = 'Choose a date',
   className = '',
 }: GlassDateInputProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  /* format for display */
+  /* format for display — preserves date + time */
   const formatted = value
     ? new Date(value).toLocaleDateString('en-GB', {
         day: '2-digit',
@@ -29,18 +26,15 @@ export function GlassDateInput({
 
   return (
     <div className={`relative ${className}`}>
-      {/* visual trigger — looks like Input */}
-      <button
-        type="button"
-        onClick={() => inputRef.current?.showPicker?.()}
+      {/* ── Visual layer — decorative only, never receives pointer events ── */}
+      <div
+        aria-hidden="true"
         className={[
-          'flex items-center w-full h-[38px] rounded-full overflow-hidden cursor-pointer',
+          'flex items-center w-full h-[38px] rounded-full overflow-hidden pointer-events-none',
           'bg-white/[0.08]',
           'backdrop-blur-[40px] backdrop-saturate-[180%]',
           'border-[0.5px] border-white/[0.18]',
           'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-          'transition-all duration-150',
-          'focus-within:border-white/30 focus-within:bg-white/[0.12]',
         ].join(' ')}
       >
         <div className="w-10 flex items-center justify-center shrink-0 text-white/40">
@@ -54,16 +48,19 @@ export function GlassDateInput({
         >
           {formatted || placeholder}
         </span>
-      </button>
+      </div>
 
-      {/* hidden native input for picker */}
+      {/*
+        ── Native datetime-local input — transparent overlay on top ──
+        iOS Safari opens its native picker on a direct tap to <input>.
+        showPicker() is Chrome-only and silently fails on WebKit — removed.
+        No pointer-events-none, no tabIndex=-1 — input must be reachable.
+      */}
       <input
-        ref={inputRef}
         type="datetime-local"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="absolute inset-0 opacity-0 pointer-events-none"
-        tabIndex={-1}
+        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
       />
     </div>
   );

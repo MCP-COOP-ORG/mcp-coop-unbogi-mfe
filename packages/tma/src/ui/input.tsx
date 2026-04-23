@@ -4,7 +4,19 @@ interface GlassInputProps extends InputHTMLAttributes<HTMLInputElement> {
   icon?: ReactNode;
 }
 
-export function Input({ icon, className = '', ...props }: GlassInputProps) {
+export function Input({ icon, className = '', onFocus, ...props }: GlassInputProps) {
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    /*
+     * On iOS the virtual keyboard shrinks the viewport after ~300ms.
+     * Scrolling before it finishes renders results in wrong final position,
+     * so we wait for the keyboard animation to settle first.
+     */
+    setTimeout(() => {
+      e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 300);
+    onFocus?.(e);
+  };
+
   return (
     <div
       className={[
@@ -26,6 +38,7 @@ export function Input({ icon, className = '', ...props }: GlassInputProps) {
           'placeholder:text-white/25',
           icon ? 'pr-5' : 'px-5',
         ].join(' ')}
+        onFocus={handleFocus}
         {...props}
       />
     </div>
