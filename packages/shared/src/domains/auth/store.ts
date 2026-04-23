@@ -56,7 +56,7 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     if (!initData) {
       isTelegramAuthResolved = true;
       set({ status: AUTH_STATUS.UNAUTHENTICATED });
-    } else if (startParam && startParam.startsWith(INVITE_PREFIX)) {
+    } else if (startParam) {
       invitesApi
         .redeemEmailInvite(startParam, initData)
         .then(({ token }) => signInWithCustomToken(auth, token))
