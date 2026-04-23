@@ -1,9 +1,11 @@
 import { useGiftsStore, useHolidaysStore } from '@unbogi/shared';
-import { useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 import { FlipCard } from '@/ui/flip-card';
 import { GiftBack } from '@/ui/gift-back';
+import { LockOverlay } from '@/ui/lock-overlay';
 import { Postcard } from '@/ui/postcard';
+import { ScratchCanvas } from '@/ui/scratch-canvas';
 import { Slider } from '@/ui/slider';
 
 /** Spinner shown while gifts are loading. */
@@ -26,20 +28,50 @@ function EmptyState({ label }: { label: string }) {
 }
 
 /**
- * Surprises screen — displays received gifts as flippable postcards.
- * UI is identical to CollectionScreen; data source is receivedGifts instead of openedGifts.
- *
- * TODO: add <LockOverlay> + <ScratchCanvas> per card when those features are ready.
+ * Surprises screen — 3-layer architecture matching UnBoGi/frontend:
+ *   Layer 0 (z-0):  FlipCard — Postcard front ↔ GiftBack back
+ *   Layer 1 (z-10): ScratchCanvas — gold foil, scratch to reveal
+ *   Layer 2 (z-20): LockOverlay — countdown timer until unpackDate
  */
 export function SurprisesScreen() {
-  const { receivedGifts: gifts, loadGifts, isLoaded, isLoading } = useGiftsStore();
+  const { receivedGifts: gifts, scratchGift, loadGifts, isLoaded, isLoading } = useGiftsStore();
   const { holidays, loadHolidays } = useHolidaysStore();
   const t = useT();
+  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     loadGifts();
     loadHolidays();
   }, [loadGifts, loadHolidays]);
+
+  // Tick every second to re-evaluate which gifts have passed their unpackDate
+  useEffect(() => {
+    if (gifts.length === 0) return;
+    const timer = setInterval(() => {
+      const now = Date.now();
+      setUnlockedIds((prev) => {
+        let changed = false;
+        const next = new Set(prev);
+        for (const gift of gifts) {
+          if (new Date(gift.unpackDate).getTime() <= now) {
+            if (!next.has(gift.id)) {
+              next.add(gift.id);
+              changed = true;
+            }
+          }
+        }
+        return changed ? next : prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [gifts]);
+
+  const handleScratched = useCallback(
+    (giftId: string) => {
+      scratchGift(giftId);
+    },
+    [scratchGift],
+  );
 
   if (!isLoaded || isLoading) return <LoadingState />;
   if (gifts.length === 0) return <EmptyState label={t.surprises.empty} />;
@@ -51,36 +83,58 @@ export function SurprisesScreen() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-6 px-4">
-      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: 'calc(100vh - 160px)' }}>
+    <div className="w-full h-full">
       <Slider
         items={gifts}
         getKey={(gift) => gift.id}
-        renderItem={(gift) => (
-          <FlipCard
-            front={
-              <Postcard
-                imageUrl={gift.imageUrl}
-                additionalInfo={{
-                  from: gift.senderName,
-                  date: new Date(gift.unpackDate),
-                  id: gift.id,
-                }}
-              />
-            }
-            back={
-              <GiftBack
-                holidayName={resolveHolidayName(gift.holidayId)}
-                greeting={gift.greeting}
-                senderName={gift.senderName}
-                date={new Date(gift.unpackDate)}
-                code={{ value: gift.scratchCode.value, format: gift.scratchCode.format }}
-              />
-            }
-          />
-        )}
+        renderItem={(gift) => {
+          const isUnlocked = unlockedIds.has(gift.id);
+          const lockedUntil = new Date(gift.unpackDate);
+          return (
+            <div className="relative w-full h-full rounded-[inherit]">
+              {/* Layer 2: Timer Lock (Topmost) */}
+              {!isUnlocked && (
+                <LockOverlay lockedUntil={lockedUntil} senderName={gift.senderName} />
+              )}
+
+              {/* Layer 1: Scratch Foil (Middle) */}
+              <div className="absolute inset-0 z-10 pointer-events-none rounded-[inherit] overflow-hidden">
+                <ScratchCanvas
+                  clearThreshold={40}
+                  brushSize={80}
+                  isUnlocked={isUnlocked}
+                  onReveal={() => handleScratched(gift.id)}
+                />
+              </div>
+
+              {/* Layer 0: The Flip Card (Bottom) */}
+              <div className="absolute inset-0 z-0 rounded-[inherit]">
+                <FlipCard
+                  front={
+                    <Postcard
+                      imageUrl={gift.imageUrl}
+                      additionalInfo={{
+                        from: gift.senderName,
+                        date: new Date(gift.unpackDate),
+                        id: gift.id,
+                      }}
+                    />
+                  }
+                  back={
+                    <GiftBack
+                      holidayName={resolveHolidayName(gift.holidayId)}
+                      greeting={gift.greeting}
+                      senderName={gift.senderName}
+                      date={new Date(gift.unpackDate)}
+                      code={{ value: gift.scratchCode.value, format: gift.scratchCode.format }}
+                    />
+                  }
+                />
+              </div>
+            </div>
+          );
+        }}
       />
-      </div>
     </div>
   );
 }

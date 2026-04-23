@@ -2,6 +2,15 @@ name: Deploy to GCP VM
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/tma/**'
+      - 'packages/shared/**'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - '.github/workflows/deploy.yml'
 
 env:
   PROJECT_ID: ${{ secrets.MCP_COOP_ORG_PROJECT_ID }}

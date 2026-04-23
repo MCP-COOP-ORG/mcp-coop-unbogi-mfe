@@ -54,7 +54,7 @@ export function FlipCard({ front, back, disabled = false }: FlipCardProps) {
           className="absolute bottom-[20px] left-1/2 -translate-x-1/2 z-50 !w-[48px] !h-[48px] shadow-[0_0_16px_rgba(124,58,237,0.4)]"
           aria-label={t.giftBack.flipCard}
         >
-          <ArrowLeftRight className="w-[20px] h-[20px]" />
+          <ArrowLeftRight className="w-[20px] h-[20px] text-black/80" />
         </IconButton>
       )}
     </div>

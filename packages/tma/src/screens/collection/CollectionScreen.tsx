@@ -49,8 +49,7 @@ export function CollectionScreen() {
   };
 
   return (
-    <div className="w-full flex flex-col items-center pt-6 px-4">
-      <div className="w-full" style={{ aspectRatio: '3/4', maxHeight: 'calc(100vh - 160px)' }}>
+    <div className="w-full h-full">
       <Slider
         items={gifts}
         getKey={(gift) => gift.id}
@@ -78,7 +77,6 @@ export function CollectionScreen() {
           />
         )}
       />
-      </div>
     </div>
   );
 }

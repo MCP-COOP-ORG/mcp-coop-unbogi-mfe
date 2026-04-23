@@ -36,6 +36,8 @@ const en = {
   },
   surprises: {
     empty: 'No surprises yet',
+    fromSender: 'From: {{name}}',
+    canBeUnpacked: 'Can be unpacked: {{date}}',
   },
   giftBack: {
     activationCode: 'Activation Code',

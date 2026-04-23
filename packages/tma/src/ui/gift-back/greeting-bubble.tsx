@@ -20,7 +20,7 @@ export function GreetingBubble({ text, senderName, date }: GreetingBubbleProps) 
   });
 
   return (
-    <div className="w-full flex-1 flex flex-col items-center justify-center px-2 relative z-10">
+    <div className="w-full flex flex-col items-center px-2 relative z-10">
       {/* Frosted glass bubble */}
       <div className="w-full bg-white/[0.06] border border-white/10 rounded-2xl px-5 py-4 backdrop-blur-sm shadow-inner">
         {/* Opening decorative quote */}

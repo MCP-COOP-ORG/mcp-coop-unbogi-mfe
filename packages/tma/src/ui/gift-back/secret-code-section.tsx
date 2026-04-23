@@ -45,7 +45,7 @@ export function SecretCodeSection({ value, format }: SecretCodeSectionProps) {
           <button
             type="button"
             onClick={handleCopy}
-            className="text-[28px] md:text-3xl font-mono tracking-[0.12em] font-bold text-white bg-black/40 px-7 py-4 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md transition-all duration-150 active:scale-95 cursor-pointer select-all"
+            className="text-[18px] font-mono tracking-[0.10em] font-bold text-white bg-black/40 px-5 py-3 rounded-2xl border border-white/10 shadow-2xl backdrop-blur-md transition-all duration-150 active:scale-95 cursor-pointer select-all w-full text-center"
           >
             {value}
           </button>

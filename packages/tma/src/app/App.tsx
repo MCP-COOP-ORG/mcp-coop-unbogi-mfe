@@ -9,7 +9,7 @@ import { SurprisesScreen } from '@/screens/surprises/SurprisesScreen';
 import { BottomNav } from '@/ui/bottom-nav';
 
 // ⚡ Feature flag: set to `true` to bypass auth locally
-const SKIP_AUTH = true;
+const SKIP_AUTH = false;
 
 function ActiveScreen({ screenId }: { screenId: ScreenId }) {
   switch (screenId) {
@@ -41,7 +41,10 @@ export function App() {
   if (isAuthed) {
     return (
       <div className="flex flex-col h-full relative">
-        <main className={`flex-1 ${isSendScreen ? 'overflow-hidden' : 'overflow-y-auto pb-[78px]'}`}>
+        <main
+          className={`flex-1 ${isSendScreen ? 'overflow-hidden' : 'flex flex-col overflow-hidden'}`}
+          style={isSendScreen ? undefined : { padding: '20px 20px 100px' }}
+        >
           <ActiveScreen screenId={activeScreen} />
         </main>
         {!isSendScreen && <BottomNav />}

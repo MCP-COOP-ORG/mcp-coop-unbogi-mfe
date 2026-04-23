@@ -10,3 +10,6 @@ export { Slider } from './slider';
 export { FlipCard } from './flip-card';
 export { Postcard, type PostcardProps, type PostcardMetadata } from './postcard';
 export { GiftBack, type GiftBackProps } from './gift-back';
+// ── Scratch / Lock overlays ──
+export { ScratchCanvas } from './scratch-canvas';
+export { LockOverlay } from './lock-overlay';
