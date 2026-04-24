@@ -1,3 +1,5 @@
+import { APP_CONFIG } from '@unbogi/shared';
+
 export interface PostcardMetadata {
   from?: string;
   date?: Date;
@@ -23,15 +25,11 @@ export function Postcard({ imageUrl, additionalInfo }: PostcardProps) {
           <span>
             {additionalInfo.from && <>from {additionalInfo.from}</>}
             {additionalInfo.from && additionalInfo.date && ' • '}
-            {additionalInfo.date && (
-              <>
-                {additionalInfo.date.toLocaleDateString('ru-RU', {
-                  day: 'numeric',
-                  month: 'short',
-                  year: 'numeric',
-                })}
-              </>
-            )}
+            {additionalInfo.date?.toLocaleDateString(APP_CONFIG.DEFAULT_LOCALE, {
+              day: 'numeric',
+              month: 'short',
+              year: 'numeric',
+            })}
             {(additionalInfo.from || additionalInfo.date) && additionalInfo.id && ' • '}
             {additionalInfo.id && <>ID: {additionalInfo.id}</>}
           </span>

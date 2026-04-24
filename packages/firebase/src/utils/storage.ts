@@ -34,4 +34,3 @@ type FirestoreTimestamp = admin.firestore.Timestamp | { toDate(): Date } | undef
 export function mapTimestamp(ts: FirestoreTimestamp): string | undefined {
   return ts?.toDate?.()?.toISOString();
 }
-

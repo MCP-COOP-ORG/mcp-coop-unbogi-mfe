@@ -1,7 +1,5 @@
-// Domains
-
 // Constants
-export { AUTH_STATUS, type AuthStatus, CLOUD_FUNCTIONS, GIFT_CONFIG, OTP_CONFIG } from './constants';
+export { APP_CONFIG, AUTH_STATUS, type AuthStatus, CLOUD_FUNCTIONS, GIFT_CONFIG, OTP_CONFIG } from './constants';
 export * from './domains/auth';
 export * from './domains/contacts';
 export * from './domains/gifts';

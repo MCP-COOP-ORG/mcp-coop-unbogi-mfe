@@ -19,9 +19,7 @@ export const surprisesStrategy: GiftScreenStrategy = {
   renderOverlays: (gift, { isUnlocked, onScratched }) => (
     <>
       {/* Layer 2 — lock countdown (topmost, removed once unlocked) */}
-      {!isUnlocked && (
-        <LockOverlay lockedUntil={new Date(gift.unpackDate)} senderName={gift.senderName} />
-      )}
+      {!isUnlocked && <LockOverlay lockedUntil={new Date(gift.unpackDate)} senderName={gift.senderName} />}
 
       {/* Layer 1 — scratch foil (pointer-events delegated to canvas internals) */}
       <div className="absolute inset-0 z-10 pointer-events-none rounded-[inherit] overflow-hidden">

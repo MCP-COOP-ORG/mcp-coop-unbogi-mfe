@@ -61,7 +61,7 @@ export function ScratchCanvas({
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, parent.clientWidth, parent.clientHeight);
 
-      if (fingerprintImgRef.current && fingerprintImgRef.current.complete) {
+      if (fingerprintImgRef.current?.complete) {
         const size = 90;
         ctx.save();
         ctx.globalAlpha = 0.5 * progress;
@@ -126,7 +126,7 @@ export function ScratchCanvas({
         drawCanvasState();
       }
     };
-    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgData);
+    img.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
   }, [drawCanvasState]);
 
   // Handle Resize

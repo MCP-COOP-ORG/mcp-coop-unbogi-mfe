@@ -1,8 +1,8 @@
 import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight, Loader2, Mail, Heart, Star, Send, Zap } from 'lucide-react';
+import { Loader2, Mail } from 'lucide-react';
 import { useT } from '@/hooks/use-t';
-import { IconButton, CircleButton } from '@/ui';
+import { CircleButton } from '@/ui';
 import { Input } from '@/ui/input';
 import { OtpTimer, useAuthForm } from './components';
 
@@ -33,7 +33,7 @@ export function LoginScreen() {
         className="text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-rose-400 to-fuchsia-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.1)] pb-1"
         style={{
           fontFamily: '"Fredoka", "Nunito", "Baloo 2", "Comic Sans MS", sans-serif',
-          WebkitTextStroke: '2px rgb(96 2 165)'
+          WebkitTextStroke: '2px rgb(96 2 165)',
         }}
       >
         UnBoGi
@@ -46,7 +46,7 @@ export function LoginScreen() {
         className="text-[14px] uppercase tracking-[0.2em] font-bold"
         style={{
           color: '#2b2a2c',
-          textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)'
+          textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
         }}
       >
         {t.auth.subtitle}
@@ -119,7 +119,9 @@ export function LoginScreen() {
                   onKeyDown={(e) => e.key === 'Enter' && form.handleSubmitCode()}
                   placeholder={t.auth.codePlaceholder}
                   rightIcon={
-                    form.otpSentAt ? <OtpTimer sentAt={form.otpSentAt} onExpired={form.handleTimerExpired} /> : undefined
+                    form.otpSentAt ? (
+                      <OtpTimer sentAt={form.otpSentAt} onExpired={form.handleTimerExpired} />
+                    ) : undefined
                   }
                   disabled={form.isLoading || form.otpExpired}
                   variant={form.errorToShow ? 'error' : 'normal'}
@@ -150,13 +152,15 @@ export function LoginScreen() {
             exit={{ opacity: 0, y: -10 }}
             className="-mt-2 text-center relative z-10 drop-shadow-sm"
           >
-            <p className="text-[16px] font-bold text-[#2b2a2c]/80" style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}>
+            <p
+              className="text-[16px] font-bold text-[#2b2a2c]/80"
+              style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}
+            >
               {t.auth.codeSent} <span className="font-black text-[#2b2a2c]">{form.email}</span>
             </p>
           </motion.div>
         )}
       </AnimatePresence>
-
     </div>
   );
 }

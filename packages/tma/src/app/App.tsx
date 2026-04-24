@@ -22,16 +22,16 @@ export function App() {
           radial-gradient(130vw 130vh at 0% 0%, rgba(15, 231, 234, 0.91) 0%, transparent 100%),
           radial-gradient(130vw 130vh at 100% 100%, rgba(221, 201, 19, 0.89) 0%, transparent 100%),
           radial-gradient(100vw 100vh at 50% 50%, rgba(106, 44, 164, 0.4) 0%, transparent 100%)
-        `
+        `,
       }}
     >
       {/* 2. Polka Dots Pattern */}
       <div
         className="absolute inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: "radial-gradient(rgb(129 24 205 / 20%) 2px, transparent 2.5px)",
-          backgroundSize: "24px 24px",
-          backgroundPosition: "0px 0px"
+          backgroundImage: 'radial-gradient(rgb(129 24 205 / 20%) 2px, transparent 2.5px)',
+          backgroundSize: '24px 24px',
+          backgroundPosition: '0px 0px',
         }}
       />
 
@@ -43,7 +43,7 @@ export function App() {
           backgroundRepeat: 'repeat',
           backgroundPosition: 'center center',
           backgroundSize: '180px',
-          opacity: 0.9
+          opacity: 0.9,
         }}
       />
 

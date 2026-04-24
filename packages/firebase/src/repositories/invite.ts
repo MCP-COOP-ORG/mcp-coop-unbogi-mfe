@@ -127,11 +127,7 @@ export class InviteRepository {
    * Enqueues two symmetric contact documents within an active transaction.
    * Deterministic IDs (`a_b` / `b_a`) prevent duplicate contacts between the same pair.
    */
-  private createBidirectionalContacts(
-    tx: FirebaseFirestore.Transaction,
-    userId1: string,
-    userId2: string,
-  ): void {
+  private createBidirectionalContacts(tx: FirebaseFirestore.Transaction, userId1: string, userId2: string): void {
     const contacts = this.db.collection(COLLECTIONS.CONTACTS);
 
     tx.set(contacts.doc(`${userId1}_${userId2}`), {

@@ -46,3 +46,7 @@ export const GIFT_CONFIG = {
   /** Visible rows before scroll kicks in (change here to reconfigure) */
   CONTACT_DROPDOWN_VISIBLE_ROWS: 5,
 } as const;
+
+export const APP_CONFIG = {
+  DEFAULT_LOCALE: 'en-US',
+} as const;

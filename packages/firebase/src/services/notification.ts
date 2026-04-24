@@ -1,4 +1,4 @@
-import { TELEGRAM_BOT_API_URL, TG_MESSAGES, FUNCTION_CONFIG } from '@unbogi/contracts';
+import { FUNCTION_CONFIG, TELEGRAM_BOT_API_URL, TG_MESSAGES } from '@unbogi/contracts';
 import { getFunctions } from 'firebase-admin/functions';
 import { logger } from 'firebase-functions/v2';
 import type { UserRepository } from '../repositories/user';
@@ -32,7 +32,9 @@ export class NotificationService {
     }
 
     try {
-      const queue = getFunctions().taskQueue(`locations/${FUNCTION_CONFIG.REGION}/functions/notifications-onGiftReadyTask`);
+      const queue = getFunctions().taskQueue(
+        `locations/${FUNCTION_CONFIG.REGION}/functions/notifications-onGiftReadyTask`,
+      );
       await queue.enqueue({ giftId, receiverId }, { scheduleDelaySeconds: delaySeconds, dispatchDeadlineSeconds: 300 });
       logger.info(`[NotificationService] Scheduled gift-ready task for ${giftId} in ${delaySeconds}s`);
     } catch (err) {

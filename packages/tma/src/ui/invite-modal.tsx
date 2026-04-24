@@ -28,9 +28,9 @@ export function InviteModal() {
         setStatus('idle');
         setEmail('');
       }, 2000);
-    } catch (err: any) {
+    } catch (err: unknown) {
       setStatus('error');
-      setErrorMessage(err.message || 'Failed to send invite');
+      setErrorMessage(err instanceof Error ? err.message : 'Failed to send invite');
     }
   };
 

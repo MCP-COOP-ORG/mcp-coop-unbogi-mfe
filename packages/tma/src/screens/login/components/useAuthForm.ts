@@ -1,5 +1,5 @@
 import { SendOtpSchema, VerifyOtpSchema } from '@unbogi/contracts';
-import { authApi, OTP_CONFIG, useAuthStore } from '@unbogi/shared';
+import { auth, authApi, OTP_CONFIG, useAuthStore } from '@unbogi/shared';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 import { tg } from '@/lib/telegram';
@@ -113,6 +113,7 @@ export function useAuthForm() {
 
     try {
       await authApi.verifyEmailOtp(state.email, state.code);
+      useAuthStore.getState().setUser(auth.currentUser);
       tg.haptic('medium');
     } catch (err: unknown) {
       tg.haptic('heavy');

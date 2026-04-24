@@ -83,7 +83,10 @@ export class GiftService {
           throw new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND);
         }
         if (err.code === 'permission-denied') {
-          throw new HttpsError(ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED);
+          throw new HttpsError(
+            ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode,
+            GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED,
+          );
         }
       }
       throw new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR);

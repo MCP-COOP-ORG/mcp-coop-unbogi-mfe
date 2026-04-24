@@ -119,4 +119,3 @@ export const FUNCTION_CONFIG = {
 
 /** Base URL for the Telegram Bot HTTP API. Append `<token>/methodName` to form a full URL. */
 export const TELEGRAM_BOT_API_URL = 'https://api.telegram.org/bot';
-

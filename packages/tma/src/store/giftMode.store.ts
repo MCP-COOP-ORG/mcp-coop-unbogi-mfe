@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { surprisesStrategy } from '@/screens/main/components/strategies';
 import type { GiftScreenStrategy } from '@/screens/main/components/strategies';
+import { surprisesStrategy } from '@/screens/main/components/strategies';
 
 interface GiftModeState {
   /** Active display strategy (surprises | collection). Persists across Send navigation. */

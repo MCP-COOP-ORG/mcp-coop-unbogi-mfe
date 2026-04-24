@@ -32,12 +32,7 @@ export function GiftCardItem({ gift, strategy, isUnlocked, onScratched, resolveH
       {/* Layer 0 — FlipCard: always present, always at the bottom */}
       <div className="absolute inset-0 z-0 rounded-[inherit]">
         <FlipCard
-          front={
-            <Postcard
-              imageUrl={gift.imageUrl}
-              additionalInfo={{ from: gift.senderName, date, id: gift.id }}
-            />
-          }
+          front={<Postcard imageUrl={gift.imageUrl} additionalInfo={{ from: gift.senderName, date, id: gift.id }} />}
           back={
             <GiftBack
               holidayName={resolveHoliday(gift.holidayId)}

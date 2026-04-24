@@ -2,10 +2,10 @@ import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolida
 import { AnimatePresence, motion } from 'framer-motion';
 import { Camera, ChevronLeft, Gift, ScanLine, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { SCREENS, useNavigationStore } from '@/store';
 import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
+import { SCREENS, useNavigationStore } from '@/store';
 import { GlassDateInput, GlassSelect, GlassTextarea, IconButton, Input, type SelectOption } from '@/ui';
 import { formReducer, initialState } from './send-form-model';
 
@@ -285,7 +285,10 @@ export function SendForm() {
               />
             </div>
             <IconButton
-              onClick={() => { dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' }); handleScanQr(); }}
+              onClick={() => {
+                dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' });
+                handleScanQr();
+              }}
               aria-label="Scan QR"
               className={state.payloadType === 'qr' ? 'bg-white/[0.14] border-white/30' : ''}
             >

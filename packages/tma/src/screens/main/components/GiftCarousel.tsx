@@ -1,7 +1,7 @@
 import { type GiftRecord, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { useCallback, useEffect, useState } from 'react';
-import { useGiftModeStore } from '@/store';
 import { useT } from '@/hooks/use-t';
+import { useGiftModeStore } from '@/store';
 import { Slider } from '@/ui';
 import { GiftCardItem } from './GiftCardItem';
 

@@ -45,4 +45,3 @@ export function errorToHttpsError(error: unknown): HttpsError {
 
   return new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, String(error));
 }
-

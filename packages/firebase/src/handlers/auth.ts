@@ -1,4 +1,11 @@
-import { ERROR_CODES, ERROR_MESSAGES, FUNCTION_CONFIG, SendOtpSchema, TelegramAuthSchema, VerifyOtpSchema } from '@unbogi/contracts';
+import {
+  ERROR_CODES,
+  ERROR_MESSAGES,
+  FUNCTION_CONFIG,
+  SendOtpSchema,
+  TelegramAuthSchema,
+  VerifyOtpSchema,
+} from '@unbogi/contracts';
 import { defineSecret } from 'firebase-functions/params';
 import { type FunctionsErrorCode, HttpsError, onCall } from 'firebase-functions/v2/https';
 import { OtpRepository, UserRepository } from '../repositories';

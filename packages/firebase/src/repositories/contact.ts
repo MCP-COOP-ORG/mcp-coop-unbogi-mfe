@@ -17,11 +17,7 @@ export class ContactRepository {
 
   /** Returns `true` when a contact record exists from `userId1` to `userId2`. */
   async areUsersConnected(userId1: string, userId2: string): Promise<boolean> {
-    const snap = await this.collection
-      .where('ownerId', '==', userId1)
-      .where('userId', '==', userId2)
-      .limit(1)
-      .get();
+    const snap = await this.collection.where('ownerId', '==', userId1).where('userId', '==', userId2).limit(1).get();
 
     return !snap.empty;
   }
