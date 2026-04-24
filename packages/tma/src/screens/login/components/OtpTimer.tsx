@@ -34,8 +34,8 @@ export function OtpTimer({ sentAt, onExpired }: OtpTimerProps) {
   const label = `${minutes}:${String(seconds).padStart(2, '0')}`;
 
   return (
-    <span className="text-[11px] font-mono text-purple-300/70 tabular-nums leading-none">
-      {remainingMs > 0 ? label : <Timer size={14} className="text-red-400/70" />}
+    <span className="text-[12px] font-mono font-bold text-[#5D4037]/70 tabular-nums leading-none">
+      {remainingMs > 0 ? label : <Timer size={14} className="text-[#FF9494]" />}
     </span>
   );
 }

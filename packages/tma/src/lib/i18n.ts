@@ -2,7 +2,7 @@ const en = {
   auth: {
     subtitle: 'Gifts worth waiting for',
     emailPlaceholder: 'Email to receive code',
-    codePlaceholder: 'Enter the code from your email',
+    codePlaceholder: 'Enter 6-digit code',
     codeSent: 'Code sent to',
     otpExpired: 'Code expired. Go back and request a new one.',
     sending: 'Sending…',
