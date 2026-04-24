@@ -15,9 +15,17 @@ function LoadingState() {
 
 function EmptyState({ label }: { label: string }) {
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-3 opacity-50 px-8 text-center">
-      <span className="text-4xl">🎁</span>
-      <p className="text-sm text-white/60">{label}</p>
+    <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
+      <div
+        className="w-[172px] h-[172px] bg-contain bg-center bg-no-repeat shrink-0 opacity-90"
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}logo-3.png)` }}
+      />
+      <p
+        className="text-[14px] uppercase tracking-[0.15em] font-bold mt-2"
+        style={{ color: '#2b2a2c', textShadow: '0 1px 3px rgba(255, 255, 255, 0.8)' }}
+      >
+        {label}
+      </p>
     </div>
   );
 }

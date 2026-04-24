@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import React, { type ComponentProps } from 'react';
 
-export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'gray' | 'transparent';
+export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';
 export type ButtonIcon =
   | 'ChevronRight'
   | 'Check'
@@ -70,13 +70,6 @@ export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: stri
     pressedShadow:
       '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(80,140,0,0.4), inset 0px 8px 16px rgba(80,140,0,0.2)',
   },
-  gray: {
-    bg: '#A1A1AA',
-    normalShadow:
-      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(80,80,80,0.3)',
-    pressedShadow:
-      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(80,80,80,0.4), inset 0px 8px 16px rgba(80,80,80,0.2)',
-  },
   transparent: {
     bg: 'transparent',
     normalShadow: 'none',
@@ -86,8 +79,7 @@ export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: stri
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'orange', icon, layout = 'circle', className, children, disabled, ...props }, ref) => {
-    // If disabled, we force the gray variant for styling, except if it's transparent
-    const activeVariant = disabled && variant !== 'transparent' ? 'gray' : variant;
+    const activeVariant = variant;
     const t = buttonTheme[activeVariant];
     const IconComponent = icon ? ICON_MAP[icon] : null;
 
@@ -97,8 +89,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     // For transparent, text color is different
     const currentTextColor = variant === 'transparent' ? '#A1A1AA' : '#FFFFFF';
-    const currentIconShadow =
-      disabled || variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
+    const currentIconShadow = variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
 
     const isCircle = layout === 'circle';
 
@@ -126,7 +117,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           height: isCircle ? 48 : 56,
           WebkitTapHighlightColor: 'transparent',
           cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.7 : 1,
+          opacity: disabled ? 0.6 : 1,
           color: currentTextColor,
         }}
         className={`relative flex items-center justify-center outline-none select-none overflow-visible ${

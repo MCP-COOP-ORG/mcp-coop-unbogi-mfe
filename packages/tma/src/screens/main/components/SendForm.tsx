@@ -163,12 +163,9 @@ export function SendForm() {
       className="flex flex-col h-full bg-[#FFF5E1]"
     >
       {/* ── Scrollable fields ── */}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '20px 20px 0' }}>
-        {/* ── Back + Title ── */}
-        <div className="relative flex items-center justify-center">
-          <div className="absolute left-0">
-            <Button layout="circle" variant="red" icon="ArrowLeft" onClick={goBack} aria-label="Back" />
-          </div>
+      <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '72px 20px 0' }}>
+        {/* ── Title ── */}
+        <div className="flex items-center justify-center mb-2">
           <h1 className="text-[18px] font-black uppercase tracking-wide text-[#5D4037] drop-shadow-sm">{t.title}</h1>
         </div>
 

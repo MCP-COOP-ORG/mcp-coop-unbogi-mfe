@@ -16,41 +16,14 @@ export function LoginScreen() {
 
   return (
     <div className="relative flex flex-col items-center justify-center h-full w-full px-6 gap-2">
-      {/* Logo & Title */}
+      {/* Logo */}
       <motion.div
         initial={{ y: -20, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ delay: 0.1, duration: 0.5, type: 'spring' }}
-        className="w-28 h-28 rounded-3xl overflow-hidden shadow-[0_0_60px_rgba(147,51,234,0.3)] border border-purple-500/20"
-      >
-        <img src={`${import.meta.env.BASE_URL}icon.png`} alt="UnBoGi" className="w-full h-full object-cover" />
-      </motion.div>
-
-      <motion.h1
-        initial={{ opacity: 0, scale: 0.9, y: 10 }}
-        animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.25, duration: 0.5, type: 'spring' }}
-        className="text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-amber-300 via-rose-400 to-fuchsia-400 drop-shadow-[0_4px_8px_rgba(0,0,0,0.1)] pb-1"
-        style={{
-          fontFamily: '"Fredoka", "Nunito", "Baloo 2", "Comic Sans MS", sans-serif',
-          WebkitTextStroke: '2px rgb(96 2 165)',
-        }}
-      >
-        UnBoGi
-      </motion.h1>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.8 }}
-        transition={{ delay: 0.4, duration: 0.4 }}
-        className="text-[14px] uppercase tracking-[0.2em] font-bold"
-        style={{
-          color: '#2b2a2c',
-          textShadow: '0 1px 3px rgba(0, 0, 0, 0.5)',
-        }}
-      >
-        {t.auth.subtitle}
-      </motion.p>
+        className="w-[172px] h-[172px] bg-contain bg-center bg-no-repeat shrink-0"
+        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}logo-3.png)` }}
+      />
 
       {/* Input + Action Button (transitions between steps) */}
       <div className="w-full max-w-[320px] mt-4 min-h-[44px]">

@@ -63,7 +63,7 @@ export function InviteModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-xl"
+            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-l"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
@@ -78,14 +78,14 @@ export function InviteModal() {
               'shadow-[0_8px_32px_rgba(0,0,0,0.12)]',
             ].join(' ')}
           >
-            <div className="flex-1 flex flex-col items-center gap-4" style={{ padding: '32px 20px 0' }}>
-              <img src={`${import.meta.env.BASE_URL}bird.png`} alt="Invite Bird" className="w-24 h-24 object-contain" />
+            <div className="flex-1 flex flex-col items-center gap-2" style={{ padding: '20px 20px 0' }}>
+              <img src={`${import.meta.env.BASE_URL}bird.png`} alt="Invite Bird" className="w-20 h-20 object-contain" />
 
               {/* ── Title ── */}
-              <h1 className="text-[22px] font-bold text-[#4A3A35]">Invite a Friend</h1>
+              <h1 className="text-[20px] font-bold text-[#4A3A35]">Invite a Friend</h1>
 
               {/* ── Content ── */}
-              <p className="text-[15px] text-[#4A3A35]/70 text-center px-4">
+              <p className="text-[14px] text-[#4A3A35]/70 text-center px-4">
                 Send an exclusive invitation link directly to their email.
               </p>
 
@@ -93,13 +93,13 @@ export function InviteModal() {
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center py-6"
+                  className="flex flex-col items-center py-4"
                 >
-                  <CheckCircle className="w-12 h-12 text-[#10b981] mb-2" strokeWidth={1.5} />
+                  <CheckCircle className="w-10 h-10 text-[#10b981] mb-2" strokeWidth={1.5} />
                   <p className="text-[#4A3A35] font-medium">Invite Sent!</p>
                 </motion.div>
               ) : (
-                <form id="invite-form" onSubmit={handleSubmit} className="flex flex-col gap-6 w-full mt-2">
+                <form id="invite-form" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-1">
                   <div className="relative">
                     <Input
                       type="email"
@@ -121,7 +121,7 @@ export function InviteModal() {
             </div>
 
             {/* ── Pinned bottom buttons ── */}
-            <div className="shrink-0 flex gap-3" style={{ padding: '24px 20px 20px' }}>
+            <div className="shrink-0 flex gap-3" style={{ padding: '16px 20px 20px' }}>
               {status === 'success' ? (
                 <Button layout="pill" variant="cyan" onClick={handleClose}>
                   Close
