@@ -94,11 +94,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const currentBg = t.bg;
     const currentNormalShadow = t.normalShadow;
     const currentPressedShadow = disabled ? currentNormalShadow : t.pressedShadow;
-    
+
     // For transparent, text color is different
     const currentTextColor = variant === 'transparent' ? '#A1A1AA' : '#FFFFFF';
-    const currentIconShadow = disabled || variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
-    
+    const currentIconShadow =
+      disabled || variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
+
     const isCircle = layout === 'circle';
 
     return (

@@ -6,27 +6,10 @@ import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
 import { SCREENS, useNavigationStore } from '@/store';
-import { GlassDateInput, GlassSelect, GlassTextarea, Button, Input, type SelectOption } from '@/ui';
+import { Button, Input, Select, type SelectOption, Textarea } from '@/ui';
 import { formReducer, initialState } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */
-
-function FieldError({ message }: { message?: string }) {
-  return (
-    <AnimatePresence>
-      {message && (
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="absolute -bottom-[18px] left-5 text-red-400 text-[11px] leading-none z-10"
-        >
-          {message}
-        </motion.p>
-      )}
-    </AnimatePresence>
-  );
-}
 
 /* ──────────────────────── component ──────────────────────── */
 
@@ -114,7 +97,10 @@ export function SendForm() {
   /* ── QR scan ── */
   const handleScanQr = async () => {
     const result = await tg.scanQr('Point camera at QR code');
-    if (result) dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: result });
+    if (result) {
+      dispatch({ type: 'SET_FIELD', field: 'payloadType', value: 'qr' });
+      dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: result });
+    }
   };
 
   /* ── submit ── */
@@ -174,22 +160,16 @@ export function SendForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.25, ease: 'easeOut' }}
-      className="flex flex-col h-full"
+      className="flex flex-col h-full bg-[#FFF5E1]"
     >
       {/* ── Scrollable fields ── */}
       <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '20px 20px 0' }}>
         {/* ── Back + Title ── */}
         <div className="relative flex items-center justify-center">
           <div className="absolute left-0">
-            <Button
-              layout="circle"
-              variant="transparent"
-              icon="ArrowLeft"
-              onClick={goBack}
-              aria-label="Back"
-            />
+            <Button layout="circle" variant="red" icon="ArrowLeft" onClick={goBack} aria-label="Back" />
           </div>
-          <h1 className="text-[17px] font-semibold text-white">{t.title}</h1>
+          <h1 className="text-[18px] font-black uppercase tracking-wide text-[#5D4037] drop-shadow-sm">{t.title}</h1>
         </div>
 
         {/* ── Contact Search ── */}
@@ -202,6 +182,7 @@ export function SendForm() {
             onFocus={() => setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
             autoComplete="off"
+            error={errors.receiverId}
           />
           <AnimatePresence>
             {showDropdown && filteredContacts.length > 0 && !state.receiverId && (
@@ -212,9 +193,9 @@ export function SendForm() {
                 className={[
                   'absolute left-0 right-0 top-[calc(100%+4px)] z-50',
                   'rounded-2xl p-[6px] overflow-y-auto',
-                  'bg-[#1a0a2e]',
-                  'border-[0.5px] border-white/[0.18]',
-                  'shadow-[0_12px_40px_rgba(0,0,0,0.6)]',
+                  'bg-[#FFFDF8]',
+                  'border-2 border-[#FFD1B3]',
+                  'shadow-[0_4px_16px_rgba(255,184,112,0.25)]',
                 ].join(' ')}
                 style={{ maxHeight: GIFT_CONFIG.CONTACT_DROPDOWN_VISIBLE_ROWS * CONTACT_ITEM_HEIGHT }}
               >
@@ -225,9 +206,9 @@ export function SendForm() {
                       onMouseDown={(e) => e.preventDefault()}
                       onClick={() => handleSelectContact(c.id, c.displayName)}
                       className={[
-                        'w-full text-left px-4 py-[10px] text-[14px] cursor-pointer',
+                        'w-full text-left px-4 py-[10px] text-[15px] font-medium cursor-pointer',
                         'rounded-xl transition-colors duration-100',
-                        'text-white/80 hover:text-white/95 hover:bg-white/[0.06] active:bg-white/[0.08]',
+                        'text-[#5D4037] hover:bg-[#FFF5E1] active:bg-[#FFE0B2]',
                       ].join(' ')}
                     >
                       {c.displayName}
@@ -237,43 +218,42 @@ export function SendForm() {
               </motion.ul>
             )}
           </AnimatePresence>
-          <FieldError message={errors.receiverId} />
         </div>
 
         {/* ── Holiday Select ── */}
         <div className="relative">
-          <GlassSelect
+          <Select
             icon={<Gift size={15} strokeWidth={2} />}
             options={holidayOptions}
             value={state.holidayId}
             placeholder={t.selectHoliday}
-            onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'holidayId', value: val })}
+            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'holidayId', value: e.target.value })}
+            error={errors.holidayId}
           />
-          <FieldError message={errors.holidayId} />
         </div>
 
         {/* ── Greeting ── */}
         <div className="relative">
-          <GlassTextarea
+          <Textarea
             rows={6}
             placeholder={t.greetingPlaceholder}
             value={state.greeting}
             onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'greeting', value: e.target.value })}
             maxLength={GIFT_CONFIG.GREETING_MAX_LENGTH}
-            maxChars={GIFT_CONFIG.GREETING_MAX_LENGTH}
             currentLength={state.greeting.length}
+            error={errors.greeting}
           />
-          <FieldError message={errors.greeting} />
         </div>
 
         {/* ── Unpack Date ── */}
         <div className="relative">
-          <GlassDateInput
+          <Input
+            type="datetime-local"
             value={state.unpackDate}
-            onChange={(val) => dispatch({ type: 'SET_FIELD', field: 'unpackDate', value: val })}
+            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'unpackDate', value: e.target.value })}
             placeholder={t.unpackDate}
+            error={errors.unpackDate}
           />
-          <FieldError message={errors.unpackDate} />
         </div>
 
         {/* ── Gift Code ── */}
@@ -284,29 +264,30 @@ export function SendForm() {
                 leftIcon={<ScanLine size={15} strokeWidth={2} />}
                 placeholder={t.codePlaceholder}
                 value={state.payloadContent}
-                onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: e.target.value })}
-                readOnly={state.payloadType === 'qr'}
+                onChange={(e) => {
+                  dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: e.target.value });
+                  if (state.payloadType !== 'text') {
+                    dispatch({ type: 'SET_FIELD', field: 'payloadType', value: 'text' });
+                  }
+                }}
+                error={errors.payload}
               />
             </div>
-            <Button
-              layout="circle"
-              variant="transparent"
-              onClick={() => {
-                dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' });
-                handleScanQr();
-              }}
-              aria-label="Scan QR"
-              className={state.payloadType === 'qr' ? 'bg-white/[0.14] border-white/30' : ''}
-            >
-              <Camera size={16} strokeWidth={2} />
-            </Button>
+            <div className="w-12 shrink-0 flex justify-center pb-6">
+              <Button layout="circle" variant="orange" onClick={handleScanQr} aria-label="Scan QR">
+                <Camera size={16} strokeWidth={2} />
+              </Button>
+            </div>
           </div>
-          <FieldError message={errors.payload} />
         </div>
 
         {/* ── Submit Error ── */}
         {errors.submit && (
-          <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-red-400 text-[13px] text-center">
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-[#FF5A5A] font-bold text-[13px] text-center"
+          >
             {errors.submit}
           </motion.p>
         )}
@@ -317,12 +298,7 @@ export function SendForm() {
         <Button layout="pill" variant="transparent" onClick={goBack}>
           {t.cancel}
         </Button>
-        <Button
-          layout="pill"
-          variant="cyan"
-          onClick={handleSubmit}
-          disabled={!isFormValid || submitting}
-        >
+        <Button layout="pill" variant={isFormValid ? 'lime' : 'cyan'} onClick={handleSubmit} disabled={submitting}>
           {submitting ? t.sending : t.send}
         </Button>
       </div>

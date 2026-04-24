@@ -10,12 +10,23 @@ export function InviteModal() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [isTouched, setIsTouched] = useState(false);
+
+  const isEmailValid = /^\S+@\S+\.\S+$/.test(email);
+  const showEmailError = isTouched && !isEmailValid;
+  const currentError =
+    status === 'error'
+      ? errorMessage
+      : showEmailError
+        ? email.length === 0
+          ? 'Email is required'
+          : 'Please enter a valid email address'
+        : undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !/^\S+@\S+\.\S+$/.test(email)) {
-      setStatus('error');
-      setErrorMessage('Please enter a valid email address');
+    setIsTouched(true);
+    if (!email || !isEmailValid) {
       return;
     }
 
@@ -39,6 +50,7 @@ export function InviteModal() {
     setStatus('idle');
     setEmail('');
     setErrorMessage('');
+    setIsTouched(false);
   };
 
   return (
@@ -67,8 +79,8 @@ export function InviteModal() {
             ].join(' ')}
           >
             <div className="flex-1 flex flex-col items-center gap-4" style={{ padding: '32px 20px 0' }}>
-              <img src="/bird.png" alt="Invite Bird" className="w-24 h-24 object-contain" />
-              
+              <img src={`${import.meta.env.BASE_URL}bird.png`} alt="Invite Bird" className="w-24 h-24 object-contain" />
+
               {/* ── Title ── */}
               <h1 className="text-[22px] font-bold text-[#4A3A35]">Invite a Friend</h1>
 
@@ -97,9 +109,11 @@ export function InviteModal() {
                         setEmail(e.target.value);
                         if (status === 'error') setStatus('idle');
                       }}
+                      onBlur={() => setIsTouched(true)}
                       placeholder="friend@example.com"
                       disabled={status === 'loading'}
-                      error={status === 'error' ? errorMessage : undefined}
+                      variant={currentError ? 'error' : 'normal'}
+                      error={currentError}
                     />
                   </div>
                 </form>
@@ -114,22 +128,21 @@ export function InviteModal() {
                 </Button>
               ) : (
                 <>
-                  <Button
-                    layout="pill"
-                    variant="transparent"
-                    onClick={handleClose}
-                    disabled={status === 'loading'}
-                  >
+                  <Button layout="pill" variant="transparent" onClick={handleClose} disabled={status === 'loading'}>
                     Cancel
                   </Button>
                   <Button
                     form="invite-form"
                     type="submit"
                     layout="pill"
-                    variant="cyan"
-                    disabled={status === 'loading' || !email}
+                    variant={isEmailValid ? 'lime' : 'cyan'}
+                    disabled={status === 'loading'}
                   >
-                    {status === 'loading' ? <Loader2 className="w-5 h-5 animate-spin" color="#FFFFFF" /> : 'Send Invite'}
+                    {status === 'loading' ? (
+                      <Loader2 className="w-5 h-5 animate-spin" color="#FFFFFF" />
+                    ) : (
+                      'Send Invite'
+                    )}
                   </Button>
                 </>
               )}
