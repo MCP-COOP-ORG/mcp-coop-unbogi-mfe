@@ -1,0 +1,92 @@
+import { type GiftRecord, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
+import { useCallback, useEffect, useState } from 'react';
+import { useGiftModeStore } from '@/store';
+import { useT } from '@/hooks/use-t';
+import { Slider } from '@/ui';
+import { GiftCardItem } from './GiftCardItem';
+
+function LoadingState() {
+  return (
+    <div className="flex items-center justify-center h-full">
+      <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[var(--color-primary)] animate-spin" />
+    </div>
+  );
+}
+
+function EmptyState({ label }: { label: string }) {
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-3 opacity-50 px-8 text-center">
+      <span className="text-4xl">🎁</span>
+      <p className="text-sm text-white/60">{label}</p>
+    </div>
+  );
+}
+
+/**
+ * GiftCarousel — Template Method (GoF).
+ *
+ * Renders the gift slider for the active strategy (surprises / collection).
+ * Owned by MainScreen; never mounts navigation or overlay concerns.
+ */
+export function GiftCarousel() {
+  const strategy = useGiftModeStore((s) => s.strategy);
+  const { receivedGifts, openedGifts, scratchGift, loadGifts, isLoaded, isLoading } = useGiftsStore();
+  const { holidays, loadHolidays } = useHolidaysStore();
+  const t = useT();
+  const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
+
+  // Step 1 — Bootstrap
+  useEffect(() => {
+    loadGifts();
+    loadHolidays();
+  }, [loadGifts, loadHolidays]);
+
+  const gifts = strategy.selectGifts({ receivedGifts, openedGifts });
+
+  // Step 2 — Countdown timer (surprises mode only)
+  useEffect(() => {
+    if (!strategy.requiresTimer || gifts.length === 0) return;
+    const timer = setInterval(() => {
+      const now = Date.now();
+      setUnlockedIds((prev) => {
+        const next = new Set(prev);
+        let changed = false;
+        for (const gift of gifts) {
+          if (!next.has(gift.id) && new Date(gift.unpackDate).getTime() <= now) {
+            next.add(gift.id);
+            changed = true;
+          }
+        }
+        return changed ? next : prev;
+      });
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [strategy, gifts]);
+
+  const onScratched = useCallback((id: string) => scratchGift(id), [scratchGift]);
+  const resolveHoliday = (id: string) => holidays.find((h) => h.id === id)?.name ?? id;
+
+  // Step 3 — Guards
+  if (!isLoaded || isLoading) return <LoadingState />;
+  if (gifts.length === 0) return <EmptyState label={strategy.emptyLabel(t)} />;
+
+  // Step 4 — Render
+  return (
+    <div className="w-full h-full">
+      <Slider<GiftRecord>
+        items={gifts}
+        getKey={(g) => g.id}
+        renderItem={(gift) => (
+          <GiftCardItem
+            key={gift.id}
+            gift={gift}
+            strategy={strategy}
+            isUnlocked={unlockedIds.has(gift.id)}
+            onScratched={onScratched}
+            resolveHoliday={resolveHoliday}
+          />
+        )}
+      />
+    </div>
+  );
+}

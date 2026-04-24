@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 
 export const SCREENS = {
-  SURPRISES: 'surprises',
-  COLLECTION: 'collection',
+  /** Unified gift screen — active mode (surprises/collection) is in giftMode.store. */
+  MAIN: 'main',
   SEND: 'send',
 } as const;
 
@@ -14,6 +14,6 @@ interface NavigationState {
 }
 
 export const useNavigationStore = create<NavigationState>((set) => ({
-  activeScreen: SCREENS.SURPRISES,
+  activeScreen: SCREENS.MAIN,
   setScreen: (screen) => set({ activeScreen: screen }),
 }));

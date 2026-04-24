@@ -4,8 +4,7 @@ import { ArrowLeft, ArrowRight, Loader2, Mail } from 'lucide-react';
 import { useT } from '@/hooks/use-t';
 import { IconButton } from '@/ui';
 import { Input } from '@/ui/input';
-import { OtpTimer } from './OtpTimer';
-import { useAuthForm } from './useAuthForm';
+import { OtpTimer, useAuthForm } from './components';
 
 export function LoginScreen() {
   const t = useT();

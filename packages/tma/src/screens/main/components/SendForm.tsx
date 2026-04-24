@@ -2,7 +2,7 @@ import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolida
 import { AnimatePresence, motion } from 'framer-motion';
 import { Camera, ChevronLeft, Gift, ScanLine, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { SCREENS, useNavigationStore } from '@/app/navigation';
+import { SCREENS, useNavigationStore } from '@/store';
 import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
@@ -30,7 +30,11 @@ function FieldError({ message }: { message?: string }) {
 
 /* ──────────────────────── component ──────────────────────── */
 
-export function SendScreen() {
+/**
+ * SendForm — full-screen overlay form for sending a gift.
+ * Mounted conditionally by MainScreen; owns its own scroll and back-button logic.
+ */
+export function SendForm() {
   const setScreen = useNavigationStore((s) => s.setScreen);
   const t = useT().send;
 
@@ -55,15 +59,15 @@ export function SendScreen() {
     loadHolidays();
   }, [loadContacts, loadHolidays]);
 
-  /* ── back button ── */
+  /* ── back / close ── */
   const goBack = useCallback(() => {
     dispatch({ type: 'RESET' });
-    setScreen(SCREENS.SURPRISES);
+    setScreen(SCREENS.MAIN);
   }, [setScreen]);
 
   useTelegramBackButton(goBack);
 
-  /* ── holiday options for custom select ── */
+  /* ── holiday options ── */
   const holidayOptions: SelectOption[] = useMemo(
     () => holidays.map((h) => ({ value: h.id, label: h.name })),
     [holidays],
@@ -74,27 +78,21 @@ export function SendScreen() {
     if (!state.holidayId) return;
     const selected = holidays.find((h) => h.id === state.holidayId);
     if (!selected?.defaultGreeting) return;
-
     dispatch({ type: 'SET_FIELD', field: 'greeting', value: selected.defaultGreeting });
   }, [state.holidayId, holidays]);
 
-  /* ── contact search ──
-   * On focus (empty query): show all contacts sorted by 2nd letter, sliced to MAX_RESULTS.
-   * On type (>= MIN_CHARS): filter by query, same sort + slice.
-   */
-  const CONTACT_ITEM_HEIGHT = 44; // px — py-3 (24px) + 14px font + 6px gap ≈ 44
+  /* ── contact search ── */
+  const CONTACT_ITEM_HEIGHT = 44;
 
   const filteredContacts = useMemo(() => {
     const query = state.searchQuery.trim();
     const source =
       query.length >= GIFT_CONFIG.CONTACT_SEARCH_MIN_CHARS
         ? contacts.filter((c) => c.displayName.toLowerCase().includes(query.toLowerCase()))
-        : contacts; // show all on focus before typing
-
+        : contacts;
     return source
-      .slice() // avoid mutating store array
+      .slice()
       .sort((a, b) => {
-        // Sort by 2nd character of displayName (locale-aware)
         const key = (name: string) => name.slice(1).toLowerCase();
         return key(a.displayName).localeCompare(key(b.displayName));
       })
@@ -103,9 +101,7 @@ export function SendScreen() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     dispatch({ type: 'SET_FIELD', field: 'searchQuery', value: e.target.value });
-    if (state.receiverId) {
-      dispatch({ type: 'SET_FIELD', field: 'receiverId', value: '' });
-    }
+    if (state.receiverId) dispatch({ type: 'SET_FIELD', field: 'receiverId', value: '' });
     setShowDropdown(true);
   };
 
@@ -118,33 +114,25 @@ export function SendScreen() {
   /* ── QR scan ── */
   const handleScanQr = async () => {
     const result = await tg.scanQr('Point camera at QR code');
-    if (result) {
-      dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: result });
-    }
+    if (result) dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: result });
   };
 
   /* ── submit ── */
   const handleSubmit = async () => {
     setErrors({});
-
     const parsed = sendFormSchema.safeParse({
       receiverId: state.receiverId,
       holidayId: state.holidayId,
       greeting: state.greeting,
       unpackDate: state.unpackDate ? new Date(state.unpackDate) : undefined,
-      payload: {
-        type: state.payloadType,
-        content: state.payloadContent,
-      },
+      payload: { type: state.payloadType, content: state.payloadContent },
     });
 
     if (!parsed.success) {
       const fieldErrors: Record<string, string> = {};
       parsed.error.issues.forEach((issue) => {
         const key = issue.path[0] as string;
-        if (key && !fieldErrors[key]) {
-          fieldErrors[key] = issue.message;
-        }
+        if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
       return;
@@ -158,13 +146,10 @@ export function SendScreen() {
         holidayId: parsed.data.holidayId,
         greeting: parsed.data.greeting,
         unpackDate: state.unpackDate ? new Date(state.unpackDate).toISOString() : '',
-        scratchCode: {
-          value: parsed.data.payload.content,
-          format: parsed.data.payload.type,
-        },
+        scratchCode: { value: parsed.data.payload.content, format: parsed.data.payload.type },
       });
       dispatch({ type: 'RESET' });
-      setScreen(SCREENS.SURPRISES);
+      setScreen(SCREENS.MAIN);
     } catch {
       setErrors({ submit: t.errorSubmit });
     } finally {
@@ -174,7 +159,6 @@ export function SendScreen() {
 
   /* ── loading ── */
   const isLoading = (!contactsLoaded && contactsLoading) || (!holidaysLoaded && holidaysLoading);
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
@@ -221,11 +205,6 @@ export function SendScreen() {
                 initial={{ opacity: 0, y: -4 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -4 }}
-                /*
-                 * Solid bg instead of backdrop-filter — backdrop-filter silently fails
-                 * on position:absolute children inside overflow:auto on iOS Safari/WebKit.
-                 * maxHeight + overflow-y-auto = scroll when contacts > VISIBLE_ROWS.
-                 */
                 className={[
                   'absolute left-0 right-0 top-[calc(100%+4px)] z-50',
                   'rounded-2xl p-[6px] overflow-y-auto',
@@ -306,10 +285,7 @@ export function SendScreen() {
               />
             </div>
             <IconButton
-              onClick={() => {
-                dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' });
-                handleScanQr();
-              }}
+              onClick={() => { dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' }); handleScanQr(); }}
               aria-label="Scan QR"
               className={state.payloadType === 'qr' ? 'bg-white/[0.14] border-white/30' : ''}
             >
@@ -334,12 +310,10 @@ export function SendScreen() {
           onClick={goBack}
           className={[
             'flex-1 h-[38px] rounded-full text-[14px] font-medium cursor-pointer',
-            'bg-white/[0.08]',
-            'backdrop-blur-[40px] backdrop-saturate-[180%]',
+            'bg-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[180%]',
             'border-[0.5px] border-white/[0.18]',
             'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-            'text-white/60',
-            'active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
+            'text-white/60 active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
           ].join(' ')}
         >
           {t.cancel}
@@ -350,12 +324,10 @@ export function SendScreen() {
           disabled={!isFormValid || submitting}
           className={[
             'flex-1 h-[38px] rounded-full text-[14px] font-medium cursor-pointer',
-            'bg-white/[0.08]',
-            'backdrop-blur-[40px] backdrop-saturate-[180%]',
+            'bg-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[180%]',
             'border-[0.5px] border-white/[0.18]',
             'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-            'text-white/90',
-            'active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
+            'text-white/90 active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
             'disabled:opacity-30 disabled:pointer-events-none',
           ].join(' ')}
         >

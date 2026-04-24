@@ -2,7 +2,7 @@ import { invitesApi } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Loader2, Mail, X } from 'lucide-react';
 import { useState } from 'react';
-import { useInviteModalStore } from '@/app/inviteModalStore';
+import { useInviteModalStore } from '@/store';
 import { IconButton, Input } from '@/ui';
 
 export function InviteModal() {
