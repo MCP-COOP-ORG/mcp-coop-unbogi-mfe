@@ -1,22 +1,29 @@
 import { motion } from 'framer-motion';
 import {
   ArrowLeft,
+  ArrowLeftRight,
+  Camera,
   Check,
   ChevronRight,
   Gift,
   LayoutGrid,
   Library,
   type LucideIcon,
+  RefreshCw,
   Send,
   UserPlus,
 } from 'lucide-react';
 import React, { type ComponentProps } from 'react';
 
 export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';
+export type ButtonStatus = 'idle' | 'loading' | 'disabled';
 export type ButtonIcon =
   | 'ChevronRight'
   | 'Check'
   | 'ArrowLeft'
+  | 'ArrowLeftRight'
+  | 'Camera'
+  | 'RefreshCw'
   | 'Send'
   | 'UserPlus'
   | 'Gift'
@@ -27,6 +34,9 @@ const ICON_MAP: Record<ButtonIcon, LucideIcon> = {
   ChevronRight,
   Check,
   ArrowLeft,
+  ArrowLeftRight,
+  Camera,
+  RefreshCw,
   Send,
   UserPlus,
   Gift,
@@ -36,109 +46,178 @@ const ICON_MAP: Record<ButtonIcon, LucideIcon> = {
 
 export interface ButtonProps extends Omit<ComponentProps<typeof motion.button>, 'variant' | 'layout'> {
   variant?: ButtonVariant;
+  /**
+   * Controls the button's interactive state.
+   * - `'idle'`     — normal, interactive.
+   * - `'loading'`  — shows built-in spinner, non-interactive, full opacity.
+   * - `'disabled'` — non-interactive, dimmed to 0.6 opacity.
+   *
+   * Prefer `status` over the native `disabled` prop.
+   */
+  status?: ButtonStatus;
   icon?: ButtonIcon;
   layout?: 'circle' | 'pill';
+  /** Text content only. Never pass JSX icons — use the `icon` prop instead. */
   children?: React.ReactNode;
+  /**
+   * When provided, enables "tab mode": the button becomes a transparent hitbox
+   * and its colored background is rendered as a child `motion.div` with this
+   * layoutId — allowing framer-motion to animate it between sibling tab buttons.
+   */
+  layoutId?: string;
+  /** Used in tab mode to control whether the sliding background is visible. */
+  isActive?: boolean;
 }
 
+// Press: subtle translate for tactile feel; glow fades out on press.
+// Shadow stack (inside→out): fill → B1(black) → W(white) → B2(black) → colored ambient glow.
+const OFFSET = 1;  // press translate px
+const B1 = 1;      // inner black line px
+const W  = 2;      // white ring px
+const B2 = 1;      // outer black border px
+const T  = B1 + W + B2; // total spread = 5px
+
+const borders = `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1 + W}px #FFFFFF, 0 0 0 ${T}px #1A1A1A`;
+
+const makeGlow = (rgba: string) => ({
+  normalShadow:  `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1 + W}px #FFFFFF, 0 0 0 ${T}px #1A1A1A, 0 5px 8px 2px ${rgba}`,
+  pressedShadow: `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1}px #FFFFFF, 0 0 0 ${B1 + 1}px #1A1A1A, 0 0px 0px 0px ${rgba}`,
+});
+
+/** Single source of truth for circle button / tab button size in px. */
+export const BUTTON_SIZE = 42;
+
 export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: string; pressedShadow: string }> = {
-  orange: {
-    bg: '#FFB870',
-    normalShadow:
-      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(200,90,0,0.3)',
-    pressedShadow:
-      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(180,80,0,0.4), inset 0px 8px 16px rgba(180,80,0,0.2)',
-  },
-  red: {
-    bg: '#FF9494',
-    normalShadow:
-      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(200,40,40,0.3)',
-    pressedShadow:
-      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(180,30,30,0.4), inset 0px 8px 16px rgba(180,30,30,0.2)',
-  },
-  cyan: {
-    bg: '#63D2D6',
-    normalShadow:
-      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(0,120,120,0.3)',
-    pressedShadow:
-      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(0,100,100,0.4), inset 0px 8px 16px rgba(0,100,100,0.2)',
-  },
-  lime: {
-    bg: '#A3E635',
-    normalShadow:
-      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(100,160,0,0.3)',
-    pressedShadow:
-      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(80,140,0,0.4), inset 0px 8px 16px rgba(80,140,0,0.2)',
-  },
-  transparent: {
-    bg: 'transparent',
-    normalShadow: 'none',
-    pressedShadow: 'none',
-  },
+  orange:      { bg: '#F5A623', ...makeGlow('rgba(245,166,35,0.55)')  },
+  red:         { bg: '#E05252', ...makeGlow('rgba(224,82,82,0.55)')   },
+  cyan:        { bg: '#5AABDE', ...makeGlow('rgba(90,171,222,0.55)')  },
+  lime:        { bg: '#7AB648', ...makeGlow('rgba(122,182,72,0.55)')  },
+  transparent: { bg: 'transparent', normalShadow: 'none', pressedShadow: 'none' },
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'orange', icon, layout = 'circle', className, children, disabled, ...props }, ref) => {
-    const activeVariant = variant;
-    const t = buttonTheme[activeVariant];
+  ({ variant = 'orange', status = 'idle', icon, layout = 'circle', layoutId, isActive, className, children, disabled, ...props }, ref) => {
+    const isLoading = status === 'loading';
+    const isDisabled = status === 'disabled' || disabled || isLoading;
+
+    const t = buttonTheme[variant];
     const IconComponent = icon ? ICON_MAP[icon] : null;
 
-    const currentBg = t.bg;
-    const currentNormalShadow = t.normalShadow;
-    const currentPressedShadow = disabled ? currentNormalShadow : t.pressedShadow;
-
-    // For transparent, text color is different
-    const currentTextColor = variant === 'transparent' ? '#A1A1AA' : '#FFFFFF';
-    const currentIconShadow = variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
-
     const isCircle = layout === 'circle';
+    const isTransparent = variant === 'transparent';
+    const textColor = isTransparent ? '#A1A1AA' : '#1A1A1A';
+    const isTabMode = !!layoutId;
 
+    // ── Tab mode ────────────────────────────────────────────────────────────
+    // Transparent hitbox + inner motion.div (layoutId) slides between tab positions.
+    if (isTabMode) {
+      return (
+        <motion.button
+          ref={ref}
+          disabled={isDisabled}
+          whileTap={isDisabled ? undefined : { scale: 0.92, filter: 'brightness(0.88)' }}
+          transition={{ type: 'spring', stiffness: 600, damping: 20 }}
+          style={{
+            width: BUTTON_SIZE,
+            height: BUTTON_SIZE,
+            backgroundColor: 'transparent',
+            position: 'relative',
+            WebkitTapHighlightColor: 'transparent',
+            cursor: isDisabled ? 'not-allowed' : 'pointer',
+          }}
+          className="flex items-center justify-center rounded-full outline-none select-none"
+          {...props}
+        >
+          {isActive && (
+            <motion.div
+              layoutId={layoutId}
+              className="absolute inset-0 rounded-full"
+              initial={{ background: t.bg, boxShadow: t.normalShadow }}
+              animate={{ background: t.bg, boxShadow: t.normalShadow }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+            />
+          )}
+          {IconComponent && (
+            <IconComponent
+              size={24}
+              color={isActive ? '#1A1A1A' : '#5AABDE'}
+              strokeWidth={2.5}
+              fill="none"
+              style={{ position: 'relative', zIndex: 10 }}
+            />
+          )}
+        </motion.button>
+      );
+    }
+
+    // ── Normal mode ─────────────────────────────────────────────────────────
     return (
       <motion.button
         ref={ref}
-        disabled={disabled}
+        disabled={isDisabled}
         initial="normal"
         animate="normal"
-        whileTap={disabled ? undefined : 'pressed'}
+        whileTap={isDisabled ? undefined : 'pressed'}
         variants={{
-          normal: {
-            boxShadow: currentNormalShadow,
-            scale: 1,
-          },
-          pressed: {
-            boxShadow: currentPressedShadow,
-            scale: 0.96,
-          },
+          normal:  { boxShadow: t.normalShadow,  scale: 1,    filter: 'brightness(1)'    },
+          pressed: { boxShadow: t.pressedShadow, scale: 0.92, filter: isTransparent ? 'brightness(1)' : 'brightness(0.88)' },
         }}
-        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        transition={{ type: 'spring', stiffness: 600, damping: 20 }}
         style={{
-          backgroundColor: currentBg,
-          width: isCircle ? 48 : '100%',
-          height: isCircle ? 48 : 56,
+          backgroundColor: t.bg,
+          width: isCircle ? BUTTON_SIZE : '100%',
+          height: BUTTON_SIZE,
           WebkitTapHighlightColor: 'transparent',
-          cursor: disabled ? 'not-allowed' : 'pointer',
-          opacity: disabled ? 0.6 : 1,
-          color: currentTextColor,
+          cursor: isDisabled ? 'not-allowed' : 'pointer',
+          opacity: !isLoading && (status === 'disabled' || disabled) ? 0.6 : 1,
+          color: textColor,
         }}
-        className={`relative flex items-center justify-center outline-none select-none overflow-visible ${
-          isCircle ? 'rounded-full' : 'rounded-[28px] px-6 text-[17px] font-bold tracking-wide'
+        className={`relative flex items-center justify-center gap-2 outline-none select-none overflow-visible ${
+          isCircle ? 'rounded-full' : 'rounded-[28px] px-5 text-[17px] font-bold tracking-wide'
         } ${className || ''}`}
         {...props}
       >
-        {IconComponent && (
-          <IconComponent
-            size={isCircle ? 28 : 20}
-            color={currentTextColor}
-            strokeWidth={2}
-            fill="none"
-            style={{ filter: currentIconShadow }}
-            className={children ? 'mr-2' : ''}
-          />
-        )}
-        {children && (
-          <span style={{ textShadow: variant === 'transparent' ? 'none' : '0px 1px 2px rgba(0,0,0,0.2)' }}>
-            {children}
-          </span>
+        {isCircle ? (
+          // Circle: spinner replaces icon
+          isLoading ? (
+            <RefreshCw
+              size={24}
+              color={textColor}
+              strokeWidth={2.5}
+              className="animate-spin"
+            />
+          ) : (
+            IconComponent && (
+              <IconComponent
+                size={24}
+                color={textColor}
+                strokeWidth={2.5}
+                fill="none"
+              />
+            )
+          )
+        ) : (
+          // Pill: spinner replaces text+icon; idle = text then icon inline
+          isLoading ? (
+            <RefreshCw
+              size={20}
+              color={textColor}
+              strokeWidth={2.5}
+              className="animate-spin"
+            />
+          ) : (
+            <>
+              {children && <span>{children}</span>}
+              {IconComponent && (
+                <IconComponent
+                  size={20}
+                  color={textColor}
+                  strokeWidth={2.5}
+                  fill="none"
+                />
+              )}
+            </>
+          )
         )}
       </motion.button>
     );

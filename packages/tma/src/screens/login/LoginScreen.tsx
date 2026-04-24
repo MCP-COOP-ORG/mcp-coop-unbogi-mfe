@@ -67,7 +67,7 @@ export function LoginScreen() {
                   variant="cyan"
                   icon="ChevronRight"
                   onClick={form.handleSendEmail}
-                  disabled={!form.isEmailValid || form.isLoading}
+                  status={form.isLoading ? 'loading' : !form.isEmailValid ? 'disabled' : 'idle'}
                   aria-label="Send code"
                 />
               </div>
@@ -108,7 +108,7 @@ export function LoginScreen() {
                   variant={form.isCodeValid && !form.otpExpired ? 'lime' : 'red'}
                   icon={form.isCodeValid && !form.otpExpired ? 'Check' : 'ArrowLeft'}
                   onClick={form.isCodeValid && !form.otpExpired ? form.handleSubmitCode : form.handleBack}
-                  disabled={form.isLoading}
+                  status={form.isLoading ? 'loading' : 'idle'}
                   aria-label={form.isCodeValid && !form.otpExpired ? 'Submit code' : 'Go back'}
                 />
               </div>

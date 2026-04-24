@@ -1,6 +1,6 @@
 import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Camera, Gift, ScanLine, Search } from 'lucide-react';
+import { Gift, ScanLine, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
@@ -163,7 +163,7 @@ export function SendForm() {
       className="flex flex-col h-full bg-[#FFF5E1]"
     >
       {/* ── Scrollable fields ── */}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '72px 20px 0' }}>
+      <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '68px 20px 0' }}>
         {/* ── Title ── */}
         <div className="flex items-center justify-center mb-2">
           <h1 className="text-[18px] font-black uppercase tracking-wide text-[#5D4037] drop-shadow-sm">{t.title}</h1>
@@ -271,9 +271,7 @@ export function SendForm() {
               />
             </div>
             <div className="w-12 shrink-0 flex justify-center pb-6">
-              <Button layout="circle" variant="orange" onClick={handleScanQr} aria-label="Scan QR">
-                <Camera size={16} strokeWidth={2} />
-              </Button>
+              <Button layout="circle" variant="orange" icon="Camera" onClick={handleScanQr} aria-label="Scan QR" />
             </div>
           </div>
         </div>
@@ -295,8 +293,13 @@ export function SendForm() {
         <Button layout="pill" variant="transparent" onClick={goBack}>
           {t.cancel}
         </Button>
-        <Button layout="pill" variant={isFormValid ? 'lime' : 'cyan'} onClick={handleSubmit} disabled={submitting}>
-          {submitting ? t.sending : t.send}
+        <Button
+          layout="pill"
+          variant={isFormValid ? 'lime' : 'cyan'}
+          status={submitting ? 'loading' : 'idle'}
+          onClick={handleSubmit}
+        >
+          {t.send}
         </Button>
       </div>
     </motion.div>

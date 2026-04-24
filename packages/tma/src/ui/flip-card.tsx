@@ -1,4 +1,3 @@
-import { ArrowLeftRight } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 import { Button } from './button';
@@ -47,17 +46,20 @@ export function FlipCard({ front, back, disabled = false }: FlipCardProps) {
         </div>
       </div>
 
-      {/* Flip toggle — frosted-glass circle with purple glow */}
+      {/* Flip toggle — circle button with purple glow via wrapper */}
       {!disabled && (
-        <Button
-          layout="circle"
-          variant="transparent"
-          onClick={() => setIsFlipped((v) => !v)}
-          className="absolute bottom-[20px] left-1/2 -translate-x-1/2 z-50 !w-[48px] !h-[48px] shadow-[0_0_16px_rgba(124,58,237,0.4)]"
-          aria-label={t.giftBack.flipCard}
+        <div
+          className="absolute bottom-[20px] left-1/2 -translate-x-1/2 z-50"
+          style={{ filter: 'drop-shadow(0px 0px 8px rgba(124,58,237,0.4))' }}
         >
-          <ArrowLeftRight className="w-[20px] h-[20px] text-black/80" />
-        </Button>
+          <Button
+            layout="circle"
+            variant="transparent"
+            icon="ArrowLeftRight"
+            onClick={() => setIsFlipped((v) => !v)}
+            aria-label={t.giftBack.flipCard}
+          />
+        </div>
       )}
     </div>
   );

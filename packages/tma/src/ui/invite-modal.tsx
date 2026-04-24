@@ -1,21 +1,23 @@
 import { invitesApi } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
-import { CheckCircle, Loader2, Mail } from 'lucide-react';
+import { CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
 import { useInviteModalStore } from '@/store';
 import { Button, Input } from '@/ui';
 
+type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
+
 export function InviteModal() {
   const { isInviteModalOpen, closeInviteModal } = useInviteModalStore();
   const [email, setEmail] = useState('');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [isTouched, setIsTouched] = useState(false);
 
   const isEmailValid = /^\S+@\S+\.\S+$/.test(email);
   const showEmailError = isTouched && !isEmailValid;
   const currentError =
-    status === 'error'
+    submitStatus === 'error'
       ? errorMessage
       : showEmailError
         ? email.length === 0
@@ -26,38 +28,38 @@ export function InviteModal() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsTouched(true);
-    if (!email || !isEmailValid) {
-      return;
-    }
+    if (!email || !isEmailValid) return;
 
-    setStatus('loading');
+    setSubmitStatus('loading');
     try {
       await invitesApi.sendEmailInvite(email);
-      setStatus('success');
+      setSubmitStatus('success');
       setTimeout(() => {
         closeInviteModal();
-        setStatus('idle');
+        setSubmitStatus('idle');
         setEmail('');
       }, 2000);
     } catch (err: unknown) {
-      setStatus('error');
+      setSubmitStatus('error');
       setErrorMessage(err instanceof Error ? err.message : 'Failed to send invite');
     }
   };
 
   const handleClose = () => {
     closeInviteModal();
-    setStatus('idle');
+    setSubmitStatus('idle');
     setEmail('');
     setErrorMessage('');
     setIsTouched(false);
   };
 
+  const isLoading = submitStatus === 'loading';
+
   return (
     <AnimatePresence>
       {isInviteModalOpen && (
         <>
-          {/* Backdrop: removed the heavy black, using strong blur */}
+          {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -71,7 +73,7 @@ export function InviteModal() {
             exit={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
             className={[
               'fixed top-1/2 left-1/2 z-50 flex flex-col',
-              'w-[calc(100%-40px)]', // 20px indent from edges
+              'w-[calc(100%-40px)]',
               'rounded-[32px] overflow-hidden',
               'bg-[#FFF5E1]',
               'border-2 border-[#FFD1B3]',
@@ -81,15 +83,13 @@ export function InviteModal() {
             <div className="flex-1 flex flex-col items-center gap-2" style={{ padding: '20px 20px 0' }}>
               <img src={`${import.meta.env.BASE_URL}bird.png`} alt="Invite Bird" className="w-20 h-20 object-contain" />
 
-              {/* ── Title ── */}
               <h1 className="text-[20px] font-bold text-[#4A3A35]">Invite a Friend</h1>
 
-              {/* ── Content ── */}
               <p className="text-[14px] text-[#4A3A35]/70 text-center px-4">
                 Send an exclusive invitation link directly to their email.
               </p>
 
-              {status === 'success' ? (
+              {submitStatus === 'success' ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -107,11 +107,11 @@ export function InviteModal() {
                       value={email}
                       onChange={(e) => {
                         setEmail(e.target.value);
-                        if (status === 'error') setStatus('idle');
+                        if (submitStatus === 'error') setSubmitStatus('idle');
                       }}
                       onBlur={() => setIsTouched(true)}
                       placeholder="friend@example.com"
-                      disabled={status === 'loading'}
+                      disabled={isLoading}
                       variant={currentError ? 'error' : 'normal'}
                       error={currentError}
                     />
@@ -120,15 +120,20 @@ export function InviteModal() {
               )}
             </div>
 
-            {/* ── Pinned bottom buttons ── */}
+            {/* Pinned bottom buttons */}
             <div className="shrink-0 flex gap-3" style={{ padding: '16px 20px 20px' }}>
-              {status === 'success' ? (
+              {submitStatus === 'success' ? (
                 <Button layout="pill" variant="cyan" onClick={handleClose}>
                   Close
                 </Button>
               ) : (
                 <>
-                  <Button layout="pill" variant="transparent" onClick={handleClose} disabled={status === 'loading'}>
+                  <Button
+                    layout="pill"
+                    variant="transparent"
+                    status={isLoading ? 'disabled' : 'idle'}
+                    onClick={handleClose}
+                  >
                     Cancel
                   </Button>
                   <Button
@@ -136,13 +141,9 @@ export function InviteModal() {
                     type="submit"
                     layout="pill"
                     variant={isEmailValid ? 'lime' : 'cyan'}
-                    disabled={status === 'loading'}
+                    status={isLoading ? 'loading' : 'idle'}
                   >
-                    {status === 'loading' ? (
-                      <Loader2 className="w-5 h-5 animate-spin" color="#FFFFFF" />
-                    ) : (
-                      'Send Invite'
-                    )}
+                    Send Invite
                   </Button>
                 </>
               )}

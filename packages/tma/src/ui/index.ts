@@ -1,5 +1,5 @@
 export { BottomNav } from './bottom-nav';
-export { Button, type ButtonProps, type ButtonVariant } from './button';
+export { Button, BUTTON_SIZE, buttonTheme, type ButtonIcon, type ButtonProps, type ButtonStatus, type ButtonVariant } from './button';
 export { FlipCard } from './flip-card';
 export { GiftBack, type GiftBackProps } from './gift-back';
 export { Input } from './input';
