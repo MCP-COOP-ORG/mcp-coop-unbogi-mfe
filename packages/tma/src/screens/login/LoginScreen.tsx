@@ -2,7 +2,7 @@ import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Mail } from 'lucide-react';
 import { useT } from '@/hooks/use-t';
-import { CircleButton } from '@/ui';
+import { Button } from '@/ui';
 import { Input } from '@/ui/input';
 import { OtpTimer, useAuthForm } from './components';
 
@@ -90,7 +90,7 @@ export function LoginScreen() {
                 />
               </div>
               <div className="w-12 shrink-0 flex justify-center">
-                <CircleButton
+                <Button
                   variant="cyan"
                   icon="ChevronRight"
                   onClick={form.handleSendEmail}
@@ -130,7 +130,8 @@ export function LoginScreen() {
                 />
               </div>
               <div className="w-12 shrink-0 flex justify-center">
-                <CircleButton
+                <Button
+                  layout="circle"
                   variant={form.isCodeValid && !form.otpExpired ? 'lime' : 'red'}
                   icon={form.isCodeValid && !form.otpExpired ? 'Check' : 'ArrowLeft'}
                   onClick={form.isCodeValid && !form.otpExpired ? form.handleSubmitCode : form.handleBack}

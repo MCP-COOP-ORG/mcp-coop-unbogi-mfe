@@ -1,48 +1,156 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { tg } from '@/lib/telegram';
+import { motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  Check,
+  ChevronRight,
+  Gift,
+  LayoutGrid,
+  Library,
+  type LucideIcon,
+  Send,
+  UserPlus,
+} from 'lucide-react';
+import React, { type ComponentProps } from 'react';
 
-/**
- * Apple-style frosted glass icon button.
- * 32×32 circle, strong backdrop blur + saturation, thin half-pixel border,
- * subtle inner top-highlight, soft diffuse shadow.
- */
-interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  children: ReactNode;
+export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'gray' | 'transparent';
+export type ButtonIcon =
+  | 'ChevronRight'
+  | 'Check'
+  | 'ArrowLeft'
+  | 'Send'
+  | 'UserPlus'
+  | 'Gift'
+  | 'Library'
+  | 'LayoutGrid';
+
+const ICON_MAP: Record<ButtonIcon, LucideIcon> = {
+  ChevronRight,
+  Check,
+  ArrowLeft,
+  Send,
+  UserPlus,
+  Gift,
+  Library,
+  LayoutGrid,
+};
+
+export interface ButtonProps extends Omit<ComponentProps<typeof motion.button>, 'variant' | 'layout'> {
+  variant?: ButtonVariant;
+  icon?: ButtonIcon;
+  layout?: 'circle' | 'pill';
+  children?: React.ReactNode;
 }
 
-export function IconButton({ className = '', onClick, children, disabled, ...props }: IconButtonProps) {
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (disabled) return;
-    tg.haptic('light');
-    onClick?.(e);
-  };
+export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: string; pressedShadow: string }> = {
+  orange: {
+    bg: '#FFB870',
+    normalShadow:
+      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(200,90,0,0.3)',
+    pressedShadow:
+      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(180,80,0,0.4), inset 0px 8px 16px rgba(180,80,0,0.2)',
+  },
+  red: {
+    bg: '#FF9494',
+    normalShadow:
+      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(200,40,40,0.3)',
+    pressedShadow:
+      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(180,30,30,0.4), inset 0px 8px 16px rgba(180,30,30,0.2)',
+  },
+  cyan: {
+    bg: '#63D2D6',
+    normalShadow:
+      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(0,120,120,0.3)',
+    pressedShadow:
+      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(0,100,100,0.4), inset 0px 8px 16px rgba(0,100,100,0.2)',
+  },
+  lime: {
+    bg: '#A3E635',
+    normalShadow:
+      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(100,160,0,0.3)',
+    pressedShadow:
+      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(80,140,0,0.4), inset 0px 8px 16px rgba(80,140,0,0.2)',
+  },
+  gray: {
+    bg: '#A1A1AA',
+    normalShadow:
+      '0px 8px 16px rgba(0,0,0,0.15), 0px 2px 4px rgba(0,0,0,0.1), inset 0px 2px 4px rgba(255,255,255,0.9), inset 0px -4px 8px rgba(80,80,80,0.3)',
+    pressedShadow:
+      '0px 2px 4px rgba(0,0,0,0.05), inset 0px 4px 8px rgba(80,80,80,0.4), inset 0px 8px 16px rgba(80,80,80,0.2)',
+  },
+  transparent: {
+    bg: 'transparent',
+    normalShadow: 'none',
+    pressedShadow: 'none',
+  },
+};
 
-  return (
-    <button
-      type="button"
-      disabled={disabled}
-      className={[
-        /* layout */
-        'flex items-center justify-center w-[38px] h-[38px] rounded-full',
-        /* Apple frosted glass material */
-        'bg-white/[0.08]',
-        'backdrop-blur-[40px] backdrop-saturate-[180%]',
-        /* thin half-pixel border + inner top highlight */
-        'border-[0.5px] border-white/[0.18]',
-        'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-        /* text */
-        'text-white/90',
-        /* interaction */
-        'transition-all duration-150 ease-out',
-        'active:scale-90 active:bg-white/[0.14]',
-        'disabled:opacity-30 disabled:pointer-events-none',
-        'cursor-pointer select-none',
-        className,
-      ].join(' ')}
-      onClick={handleClick}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ variant = 'orange', icon, layout = 'circle', className, children, disabled, ...props }, ref) => {
+    // If disabled, we force the gray variant for styling, except if it's transparent
+    const activeVariant = disabled && variant !== 'transparent' ? 'gray' : variant;
+    const t = buttonTheme[activeVariant];
+    const IconComponent = icon ? ICON_MAP[icon] : null;
+
+    const currentBg = t.bg;
+    const currentNormalShadow = t.normalShadow;
+    const currentPressedShadow = disabled ? currentNormalShadow : t.pressedShadow;
+    
+    // For transparent, text color is different
+    const currentTextColor = variant === 'transparent' ? '#A1A1AA' : '#FFFFFF';
+    const currentIconShadow = disabled || variant === 'transparent' ? 'none' : 'drop-shadow(0px 1px 2px rgba(0,0,0,0.25))';
+    
+    const isCircle = layout === 'circle';
+
+    return (
+      <motion.button
+        ref={ref}
+        disabled={disabled}
+        initial="normal"
+        animate="normal"
+        whileTap={disabled ? undefined : 'pressed'}
+        variants={{
+          normal: {
+            boxShadow: currentNormalShadow,
+            scale: 1,
+          },
+          pressed: {
+            boxShadow: currentPressedShadow,
+            scale: 0.96,
+          },
+        }}
+        transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+        style={{
+          backgroundColor: currentBg,
+          width: isCircle ? 48 : '100%',
+          height: isCircle ? 48 : 56,
+          WebkitTapHighlightColor: 'transparent',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.7 : 1,
+          color: currentTextColor,
+        }}
+        className={`relative flex items-center justify-center outline-none select-none overflow-visible ${
+          isCircle ? 'rounded-full' : 'rounded-[28px] px-6 text-[17px] font-bold tracking-wide'
+        } ${className || ''}`}
+        {...props}
+      >
+        {IconComponent && (
+          <IconComponent
+            size={isCircle ? 28 : 20}
+            color={currentTextColor}
+            strokeWidth={2}
+            fill="none"
+            style={{ filter: currentIconShadow }}
+            className={children ? 'mr-2' : ''}
+          />
+        )}
+        {children && (
+          <span style={{ textShadow: variant === 'transparent' ? 'none' : '0px 1px 2px rgba(0,0,0,0.2)' }}>
+            {children}
+          </span>
+        )}
+      </motion.button>
+    );
+  },
+);
+
+Button.displayName = 'Button';

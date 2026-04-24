@@ -3,11 +3,10 @@ import { Gift, LayoutGrid } from 'lucide-react';
 import { tg } from '@/lib/telegram';
 import { collectionStrategy, type GiftScreenStrategy, surprisesStrategy } from '@/screens/main/components/strategies';
 import { SCREENS, useGiftModeStore, useInviteModalStore, useNavigationStore } from '@/store';
-import { CircleButton } from '@/ui';
-import { type CircleButtonVariant, circleButtonTheme } from './circle-button';
+import { Button, type ButtonVariant, buttonTheme } from './button';
 
 // Tab definitions — each tab maps to a concrete strategy and variant
-const tabs: { strategy: GiftScreenStrategy; Icon: typeof Gift; label: string; variant: CircleButtonVariant }[] = [
+const tabs: { strategy: GiftScreenStrategy; Icon: typeof Gift; label: string; variant: ButtonVariant }[] = [
   { strategy: surprisesStrategy, Icon: Gift, label: 'Surprises', variant: 'red' },
   { strategy: collectionStrategy, Icon: LayoutGrid, label: 'Collection', variant: 'orange' },
 ];
@@ -36,16 +35,15 @@ export function BottomNav() {
       style={{ padding: '20px 40px' }}
       className="absolute bottom-0 left-0 w-full z-50 flex items-center justify-between pointer-events-none box-border"
     >
-      {/* Left — invite / profile action */}
       <div className="pointer-events-auto">
-        <CircleButton variant="lime" icon="UserPlus" onClick={handleUserAction} aria-label="Profile or Invite" />
+        <Button variant="lime" icon="UserPlus" onClick={handleUserAction} aria-label="Profile or Invite" />
       </div>
 
       {/* Center — sliding tab bar (strategy selector) */}
       <div className="pointer-events-auto flex items-center h-[56px] rounded-[28px] p-1 relative overflow-hidden bg-[#FFF5E1] border-2 border-[#FFD1B3] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
         {tabs.map(({ strategy, Icon, variant }) => {
           const isActive = activeStrategy.mode === strategy.mode;
-          const t = circleButtonTheme[variant];
+          const t = buttonTheme[variant];
 
           return (
             <button
@@ -81,7 +79,7 @@ export function BottomNav() {
 
       {/* Right — send gift action */}
       <div className="pointer-events-auto">
-        <CircleButton
+        <Button
           variant="cyan"
           icon="Send"
           onClick={() => {

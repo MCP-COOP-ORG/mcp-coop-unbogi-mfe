@@ -1,12 +1,12 @@
 import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Camera, ChevronLeft, Gift, ScanLine, Search } from 'lucide-react';
+import { Camera, Gift, ScanLine, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useT } from '@/hooks/use-t';
 import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
 import { SCREENS, useNavigationStore } from '@/store';
-import { GlassDateInput, GlassSelect, GlassTextarea, IconButton, Input, type SelectOption } from '@/ui';
+import { GlassDateInput, GlassSelect, GlassTextarea, Button, Input, type SelectOption } from '@/ui';
 import { formReducer, initialState } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */
@@ -181,9 +181,13 @@ export function SendForm() {
         {/* ── Back + Title ── */}
         <div className="relative flex items-center justify-center">
           <div className="absolute left-0">
-            <IconButton onClick={goBack} aria-label="Back">
-              <ChevronLeft size={18} strokeWidth={2.5} />
-            </IconButton>
+            <Button
+              layout="circle"
+              variant="transparent"
+              icon="ArrowLeft"
+              onClick={goBack}
+              aria-label="Back"
+            />
           </div>
           <h1 className="text-[17px] font-semibold text-white">{t.title}</h1>
         </div>
@@ -191,7 +195,7 @@ export function SendForm() {
         {/* ── Contact Search ── */}
         <div className="relative">
           <Input
-            icon={<Search size={15} strokeWidth={2} />}
+            leftIcon={<Search size={15} strokeWidth={2} />}
             placeholder={t.searchFriend}
             value={state.searchQuery}
             onChange={handleSearchChange}
@@ -277,14 +281,16 @@ export function SendForm() {
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <Input
-                icon={<ScanLine size={15} strokeWidth={2} />}
+                leftIcon={<ScanLine size={15} strokeWidth={2} />}
                 placeholder={t.codePlaceholder}
                 value={state.payloadContent}
                 onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: e.target.value })}
                 readOnly={state.payloadType === 'qr'}
               />
             </div>
-            <IconButton
+            <Button
+              layout="circle"
+              variant="transparent"
               onClick={() => {
                 dispatch({ type: 'SET_PAYLOAD_TYPE', value: 'qr' });
                 handleScanQr();
@@ -293,7 +299,7 @@ export function SendForm() {
               className={state.payloadType === 'qr' ? 'bg-white/[0.14] border-white/30' : ''}
             >
               <Camera size={16} strokeWidth={2} />
-            </IconButton>
+            </Button>
           </div>
           <FieldError message={errors.payload} />
         </div>
@@ -308,34 +314,17 @@ export function SendForm() {
 
       {/* ── Pinned bottom buttons ── */}
       <div className="shrink-0 flex gap-3" style={{ padding: 20 }}>
-        <button
-          type="button"
-          onClick={goBack}
-          className={[
-            'flex-1 h-[38px] rounded-full text-[14px] font-medium cursor-pointer',
-            'bg-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[180%]',
-            'border-[0.5px] border-white/[0.18]',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-            'text-white/60 active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
-          ].join(' ')}
-        >
+        <Button layout="pill" variant="transparent" onClick={goBack}>
           {t.cancel}
-        </button>
-        <button
-          type="button"
+        </Button>
+        <Button
+          layout="pill"
+          variant="cyan"
           onClick={handleSubmit}
           disabled={!isFormValid || submitting}
-          className={[
-            'flex-1 h-[38px] rounded-full text-[14px] font-medium cursor-pointer',
-            'bg-white/[0.08] backdrop-blur-[40px] backdrop-saturate-[180%]',
-            'border-[0.5px] border-white/[0.18]',
-            'shadow-[0_8px_32px_rgba(0,0,0,0.12),inset_0_0.5px_0_rgba(255,255,255,0.2)]',
-            'text-white/90 active:scale-[0.97] active:bg-white/[0.14] transition-all duration-150',
-            'disabled:opacity-30 disabled:pointer-events-none',
-          ].join(' ')}
         >
           {submitting ? t.sending : t.send}
-        </button>
+        </Button>
       </div>
     </motion.div>
   );

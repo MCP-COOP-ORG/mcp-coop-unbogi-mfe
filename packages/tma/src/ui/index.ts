@@ -1,6 +1,5 @@
 export { BottomNav } from './bottom-nav';
-export { IconButton } from './button';
-export { CircleButton } from './circle-button';
+export { Button, type ButtonProps, type ButtonVariant } from './button';
 export { FlipCard } from './flip-card';
 export { GiftBack, type GiftBackProps } from './gift-back';
 export { GlassCard } from './glass-card';

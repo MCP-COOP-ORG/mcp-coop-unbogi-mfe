@@ -3,7 +3,7 @@
  * All TG API access goes through this module — single point for mocking & future changes.
  */
 
-const getWebApp = () => window.Telegram?.WebApp;
+const getWebApp = () => (window as any).Telegram?.WebApp;
 
 export const tg = {
   get initData(): string {
