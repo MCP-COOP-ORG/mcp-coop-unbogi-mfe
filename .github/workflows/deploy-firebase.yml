@@ -2,6 +2,18 @@ name: Deploy Firebase Backend
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - 'packages/firebase/**'
+      - 'packages/contracts/**'
+      - '.github/workflows/deploy-firebase.yml'
+  pull_request:
+    paths:
+      - 'packages/firebase/**'
+      - 'packages/contracts/**'
+      - '.github/workflows/deploy-firebase.yml'
 
 jobs:
   deploy-functions:
@@ -34,6 +46,15 @@ jobs:
         run: |
           pnpm --filter @unbogi/contracts run build || true
           pnpm --filter @unbogi/firebase run build
+
+      - name: Run Linter
+        run: pnpm --filter @unbogi/firebase run lint
+
+      - name: Run Type Check
+        run: pnpm --filter @unbogi/firebase run typecheck
+
+      - name: Run Unit Tests with Coverage
+        run: pnpm --filter @unbogi/firebase run test --coverage
 
       - name: Deploy to Firebase
         run: |

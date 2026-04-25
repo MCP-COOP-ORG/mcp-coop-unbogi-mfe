@@ -32,6 +32,6 @@
     }
   },
   "files": {
-    "includes": ["**", "!**/node_modules", "!**/dist", "!**/lib", "!**/*.json"]
+    "includes": ["**", "!**/node_modules", "!**/dist", "!**/lib", "!**/*.json", "!**/coverage", "!**/.firebase"]
   }
 }
