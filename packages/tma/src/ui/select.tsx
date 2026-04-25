@@ -70,8 +70,21 @@ export function Select({ icon, options, error, placeholder, className = '', disa
 
         {/* Chevron */}
         <div className="absolute right-4 pointer-events-none text-[#1A1A1A]">
-          <svg width="12" height="8" viewBox="0 0 12 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M1 1.5L6 6.5L11 1.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+          <svg
+            width="12"
+            height="8"
+            viewBox="0 0 12 8"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            aria-hidden="true"
+          >
+            <path
+              d="M1 1.5L6 6.5L11 1.5"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
           </svg>
         </div>
       </div>
@@ -87,7 +100,11 @@ export function Select({ icon, options, error, placeholder, className = '', disa
           >
             <span
               className="text-[14px] uppercase tracking-[0.15em] font-bold text-center"
-              style={{ color: '#EB2D2D', textShadow: '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)' }}
+              style={{
+                color: '#EB2D2D',
+                textShadow:
+                  '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)',
+              }}
             >
               {error}
             </span>

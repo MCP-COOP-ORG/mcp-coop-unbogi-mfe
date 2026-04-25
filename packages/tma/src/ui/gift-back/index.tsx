@@ -24,15 +24,19 @@ export interface GiftBackProps {
  */
 export function GiftBack({ holidayName, greeting, senderName, date, code }: GiftBackProps) {
   return (
-    <div className="w-full h-full bg-[#1c1c1d] border border-white/10 flex flex-col items-center text-white relative rounded-[inherit] overflow-hidden py-6 gap-4">
-      {/* Subtle radial glow at the top */}
-      <div className="absolute inset-0 opacity-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-white via-transparent to-transparent pointer-events-none" />
+    <div className="w-full h-full bg-[#FAF6EE] border border-black rounded-[inherit] overflow-hidden">
+      {/* Inner scroll container */}
+      <div className="w-full h-full overflow-y-auto flex flex-col items-center text-[#1A1A1A] p-[20px]">
+        <HolidayHeading name={holidayName} />
 
-      <HolidayHeading name={holidayName} />
+        <div className="mt-[10px] w-full">
+          <GreetingBubble text={greeting} senderName={senderName} date={date} />
+        </div>
 
-      <GreetingBubble text={greeting} senderName={senderName} date={date} />
-
-      <SecretCodeSection value={code.value} format={code.format} />
+        <div className="mt-[20px] w-full">
+          <SecretCodeSection value={code.value} format={code.format} />
+        </div>
+      </div>
     </div>
   );
 }

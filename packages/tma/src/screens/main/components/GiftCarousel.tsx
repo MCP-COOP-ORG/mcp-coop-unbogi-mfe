@@ -42,6 +42,7 @@ export function GiftCarousel() {
   const { holidays, loadHolidays } = useHolidaysStore();
   const t = useT();
   const [unlockedIds, setUnlockedIds] = useState<Set<string>>(new Set());
+  const [scratchedIds, setScratchedIds] = useState<Set<string>>(new Set());
 
   // Step 1 — Bootstrap
   useEffect(() => {
@@ -71,7 +72,13 @@ export function GiftCarousel() {
     return () => clearInterval(timer);
   }, [strategy, gifts]);
 
-  const onScratched = useCallback((id: string) => scratchGift(id), [scratchGift]);
+  const onScratched = useCallback(
+    (id: string) => {
+      scratchGift(id);
+      setScratchedIds((prev) => new Set(prev).add(id));
+    },
+    [scratchGift],
+  );
   const resolveHoliday = (id: string) => holidays.find((h) => h.id === id)?.name ?? id;
 
   // Step 3 — Guards
@@ -90,6 +97,7 @@ export function GiftCarousel() {
             gift={gift}
             strategy={strategy}
             isUnlocked={unlockedIds.has(gift.id)}
+            isScratched={scratchedIds.has(gift.id)}
             onScratched={onScratched}
             resolveHoliday={resolveHoliday}
           />

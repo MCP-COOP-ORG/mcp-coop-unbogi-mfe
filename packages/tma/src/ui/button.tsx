@@ -71,16 +71,13 @@ export interface ButtonProps extends Omit<ComponentProps<typeof motion.button>, 
 
 // Press: subtle translate for tactile feel; glow fades out on press.
 // Shadow stack (inside→out): fill → B1(black) → W(white) → B2(black) → colored ambient glow.
-const OFFSET = 1;  // press translate px
-const B1 = 1;      // inner black line px
-const W  = 2;      // white ring px
-const B2 = 1;      // outer black border px
-const T  = B1 + W + B2; // total spread = 5px
-
-const borders = `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1 + W}px #FFFFFF, 0 0 0 ${T}px #1A1A1A`;
+const B1 = 1; // inner black line px
+const W = 2; // white ring px
+const B2 = 1; // outer black border px
+const T = B1 + W + B2; // total spread = 5px
 
 const makeGlow = (rgba: string) => ({
-  normalShadow:  `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1 + W}px #FFFFFF, 0 0 0 ${T}px #1A1A1A, 0 5px 8px 2px ${rgba}`,
+  normalShadow: `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1 + W}px #FFFFFF, 0 0 0 ${T}px #1A1A1A, 0 5px 8px 2px ${rgba}`,
   pressedShadow: `0 0 0 ${B1}px #1A1A1A, 0 0 0 ${B1}px #FFFFFF, 0 0 0 ${B1 + 1}px #1A1A1A, 0 0px 0px 0px ${rgba}`,
 });
 
@@ -88,15 +85,29 @@ const makeGlow = (rgba: string) => ({
 export const BUTTON_SIZE = 42;
 
 export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: string; pressedShadow: string }> = {
-  orange:      { bg: '#F5A623', ...makeGlow('rgba(245,166,35,0.55)')  },
-  red:         { bg: '#E05252', ...makeGlow('rgba(224,82,82,0.55)')   },
-  cyan:        { bg: '#5AABDE', ...makeGlow('rgba(90,171,222,0.55)')  },
-  lime:        { bg: '#7AB648', ...makeGlow('rgba(122,182,72,0.55)')  },
+  orange: { bg: '#F5A623', ...makeGlow('rgba(245,166,35,0.55)') },
+  red: { bg: '#E05252', ...makeGlow('rgba(224,82,82,0.55)') },
+  cyan: { bg: '#5AABDE', ...makeGlow('rgba(90,171,222,0.55)') },
+  lime: { bg: '#7AB648', ...makeGlow('rgba(122,182,72,0.55)') },
   transparent: { bg: 'transparent', normalShadow: 'none', pressedShadow: 'none' },
 };
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = 'orange', status = 'idle', icon, layout = 'circle', layoutId, isActive, className, children, disabled, ...props }, ref) => {
+  (
+    {
+      variant = 'orange',
+      status = 'idle',
+      icon,
+      layout = 'circle',
+      layoutId,
+      isActive,
+      className,
+      children,
+      disabled,
+      ...props
+    },
+    ref,
+  ) => {
     const isLoading = status === 'loading';
     const isDisabled = status === 'disabled' || disabled || isLoading;
 
@@ -160,8 +171,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         animate="normal"
         whileTap={isDisabled ? undefined : 'pressed'}
         variants={{
-          normal:  { boxShadow: t.normalShadow,  scale: 1,    filter: 'brightness(1)'    },
-          pressed: { boxShadow: t.pressedShadow, scale: isTransparent ? 0.94 : 0.92, filter: isTransparent ? 'brightness(0.65)' : 'brightness(0.88)' },
+          normal: { boxShadow: t.normalShadow, scale: 1, filter: 'brightness(1)' },
+          pressed: {
+            boxShadow: t.pressedShadow,
+            scale: isTransparent ? 0.94 : 0.92,
+            filter: isTransparent ? 'brightness(0.65)' : 'brightness(0.88)',
+          },
         }}
         transition={{ type: 'spring', stiffness: 600, damping: 20 }}
         style={{
@@ -186,44 +201,18 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isCircle ? (
           // Circle: spinner replaces icon
           isLoading ? (
-            <RefreshCw
-              size={24}
-              color={textColor}
-              strokeWidth={2.5}
-              className="animate-spin"
-            />
+            <RefreshCw size={24} color={textColor} strokeWidth={2.5} className="animate-spin" />
           ) : (
-            IconComponent && (
-              <IconComponent
-                size={24}
-                color={textColor}
-                strokeWidth={2.5}
-                fill="none"
-              />
-            )
+            IconComponent && <IconComponent size={24} color={textColor} strokeWidth={2.5} fill="none" />
           )
+        ) : // Pill: spinner replaces text+icon; idle = text then icon inline
+        isLoading ? (
+          <RefreshCw size={20} color={textColor} strokeWidth={2.5} className="animate-spin" />
         ) : (
-          // Pill: spinner replaces text+icon; idle = text then icon inline
-          isLoading ? (
-            <RefreshCw
-              size={20}
-              color={textColor}
-              strokeWidth={2.5}
-              className="animate-spin"
-            />
-          ) : (
-            <>
-              {children && <span>{children}</span>}
-              {IconComponent && (
-                <IconComponent
-                  size={20}
-                  color={textColor}
-                  strokeWidth={2.5}
-                  fill="none"
-                />
-              )}
-            </>
-          )
+          <>
+            {children && <span>{children}</span>}
+            {IconComponent && <IconComponent size={20} color={textColor} strokeWidth={2.5} fill="none" />}
+          </>
         )}
       </motion.button>
     );

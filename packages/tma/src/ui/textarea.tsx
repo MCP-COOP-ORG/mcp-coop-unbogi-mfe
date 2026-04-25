@@ -53,7 +53,11 @@ export function Textarea({ error, className = '', disabled, maxLength, currentLe
           >
             <span
               className="text-[14px] uppercase tracking-[0.15em] font-bold text-center"
-              style={{ color: '#EB2D2D', textShadow: '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)' }}
+              style={{
+                color: '#EB2D2D',
+                textShadow:
+                  '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)',
+              }}
             >
               {error}
             </span>

@@ -7,14 +7,14 @@ import { Button, type ButtonIcon, type ButtonVariant } from './button';
 const TAB_LAYOUT_ID = 'bottom-nav-tab-pill';
 
 const tabs: { strategy: GiftScreenStrategy; icon: ButtonIcon; label: string; variant: ButtonVariant }[] = [
-  { strategy: surprisesStrategy,  icon: 'Gift',       label: 'Surprises',  variant: 'red'  },
-  { strategy: collectionStrategy, icon: 'LayoutGrid',  label: 'Collection', variant: 'lime' },
+  { strategy: surprisesStrategy, icon: 'Gift', label: 'Surprises', variant: 'red' },
+  { strategy: collectionStrategy, icon: 'LayoutGrid', label: 'Collection', variant: 'lime' },
 ];
 
 export function BottomNav() {
   const activeStrategy = useGiftModeStore((s) => s.strategy);
-  const setStrategy    = useGiftModeStore((s) => s.setStrategy);
-  const setScreen      = useNavigationStore((s) => s.setScreen);
+  const setStrategy = useGiftModeStore((s) => s.setStrategy);
+  const setScreen = useNavigationStore((s) => s.setScreen);
   const openInviteModal = useInviteModalStore((s) => s.openInviteModal);
 
   const handleTabTap = (strategy: GiftScreenStrategy) => {
@@ -30,7 +30,15 @@ export function BottomNav() {
     >
       {/* Left — invite */}
       <div className="pointer-events-auto">
-        <Button variant="orange" icon="UserPlus" onClick={() => { tg.haptic('light'); openInviteModal(); }} aria-label="Profile or Invite" />
+        <Button
+          variant="orange"
+          icon="UserPlus"
+          onClick={() => {
+            tg.haptic('light');
+            openInviteModal();
+          }}
+          aria-label="Profile or Invite"
+        />
       </div>
 
       {/* Center — sliding tab bar */}
@@ -53,7 +61,10 @@ export function BottomNav() {
         <Button
           variant="cyan"
           icon="Send"
-          onClick={() => { tg.haptic('light'); setScreen(SCREENS.SEND); }}
+          onClick={() => {
+            tg.haptic('light');
+            setScreen(SCREENS.SEND);
+          }}
           aria-label="Send Gift"
         />
       </div>

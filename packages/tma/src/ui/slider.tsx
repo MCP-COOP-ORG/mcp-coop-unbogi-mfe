@@ -23,23 +23,31 @@ export function Slider<T>({ items, getKey, renderItem, className = '' }: SliderP
     const container = containerRef.current;
     if (!container) return;
 
-    const handleScroll = () => {
-      const width = container.clientWidth;
-      if (width === 0) return;
-      // Slide width + gap-4 (16 px)
-      const index = Math.round(container.scrollLeft / (width + 16));
-      setActiveIndex(index);
-    };
+    const slides = Array.from(container.children) as HTMLElement[];
 
-    container.addEventListener('scroll', handleScroll, { passive: true });
-    return () => container.removeEventListener('scroll', handleScroll);
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.5) {
+            const index = slides.indexOf(entry.target as HTMLElement);
+            if (index !== -1) setActiveIndex(index);
+          }
+        });
+      },
+      { root: container, threshold: 0.5 },
+    );
+
+    slides.forEach((slide) => {
+      observer.observe(slide);
+    });
+    return () => observer.disconnect();
   }, []);
 
   const total = items.length;
 
   const dots =
     total <= 1 ? null : (
-      <div className="absolute -bottom-[25px] left-0 right-0 flex items-center justify-center gap-2 pointer-events-none z-10">
+      <div className="absolute -bottom-[28px] left-0 right-0 flex items-center justify-center gap-[6px] pointer-events-none z-10">
         {items.map((item, i) => {
           const isActive = i === activeIndex;
           return (
@@ -47,10 +55,10 @@ export function Slider<T>({ items, getKey, renderItem, className = '' }: SliderP
               key={getKey(item)}
               initial={false}
               animate={{
-                width: isActive ? 20 : 6,
-                backgroundColor: isActive ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.4)',
+                width: isActive ? 24 : 7,
+                opacity: isActive ? 1 : 0.45,
               }}
-              className="h-[6px] rounded-full shadow-sm"
+              className="h-[7px] rounded-full bg-white border border-black"
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
             />
           );

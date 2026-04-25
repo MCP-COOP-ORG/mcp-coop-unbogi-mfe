@@ -23,4 +23,6 @@ export interface GiftScreenStrategy {
   selectDate(gift: GiftRecord): Date;
   emptyLabel(t: Translations): string;
   renderOverlays(gift: GiftRecord, ctx: OverlayContext): ReactNode;
+  /** Optional: overlay rendered inside the Postcard image area only (e.g. ScratchCanvas). */
+  renderImageOverlay?(gift: GiftRecord, ctx: OverlayContext): ReactNode;
 }

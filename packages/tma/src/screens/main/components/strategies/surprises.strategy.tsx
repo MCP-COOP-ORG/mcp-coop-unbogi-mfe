@@ -4,9 +4,9 @@ import type { GiftScreenStrategy } from './types';
 /**
  * Surprises strategy — received (not yet opened) gifts.
  *
- * Layers rendered on top of FlipCard:
- *   z-20  LockOverlay  — countdown until unpackDate
- *   z-10  ScratchCanvas — gold foil the user scratches away
+ * Layers:
+ *   z-20  renderOverlays    → LockOverlay  (covers full card transparently)
+ *   image renderImageOverlay → ScratchCanvas (confined inside Postcard image div)
  */
 export const surprisesStrategy: GiftScreenStrategy = {
   mode: 'surprises',
@@ -16,20 +16,21 @@ export const surprisesStrategy: GiftScreenStrategy = {
   selectDate: (gift) => new Date(gift.unpackDate),
   emptyLabel: (t) => t.surprises.empty,
 
-  renderOverlays: (gift, { isUnlocked, onScratched }) => (
-    <>
-      {/* Layer 2 — lock countdown (topmost, removed once unlocked) */}
-      {!isUnlocked && <LockOverlay lockedUntil={new Date(gift.unpackDate)} senderName={gift.senderName} />}
+  /** Full-card overlay — only the transparent LockOverlay countdown. */
+  renderOverlays: (gift, { isUnlocked }) => (
+    <>{!isUnlocked && <LockOverlay lockedUntil={new Date(gift.unpackDate)} senderName={gift.senderName} />}</>
+  ),
 
-      {/* Layer 1 — scratch foil (pointer-events delegated to canvas internals) */}
-      <div className="absolute inset-0 z-10 pointer-events-none rounded-[inherit] overflow-hidden">
-        <ScratchCanvas
-          clearThreshold={40}
-          brushSize={80}
-          isUnlocked={isUnlocked}
-          onReveal={() => onScratched(gift.id)}
-        />
-      </div>
-    </>
+  /** Image-area overlay — ScratchCanvas clipped inside the Postcard image div. */
+  renderImageOverlay: (gift, { isUnlocked, onScratched }) => (
+    <ScratchCanvas
+      clearThreshold={40}
+      brushSize={80}
+      frostOpacity={0.6}
+      isUnlocked={isUnlocked}
+      imageUrl={gift.imageUrl}
+      logoUrl={`${import.meta.env.BASE_URL}logo-3.png`}
+      onReveal={() => onScratched(gift.id)}
+    />
   ),
 };
