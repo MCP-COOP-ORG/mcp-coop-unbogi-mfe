@@ -18,7 +18,7 @@ export function MainScreen() {
   return (
     <div className="flex flex-col h-full relative">
       {/* Persistent gift carousel — padding accounts for BottomNav height */}
-      <main className="flex-1 flex flex-col overflow-hidden" style={{ padding: '120px 20px' }}>
+      <main className="flex-1 flex flex-col overflow-hidden" style={{ padding: '20px 20px 120px' }}>
         <GiftCarousel />
       </main>
 

@@ -56,7 +56,7 @@ export function LoginScreen() {
                   onBlur={form.handleEmailBlur}
                   onKeyDown={(e) => e.key === 'Enter' && form.handleSendEmail()}
                   placeholder={t.auth.emailPlaceholder}
-                  leftIcon={<Mail size={20} strokeWidth={1.5} />}
+                  leftIcon={<Mail size={24} strokeWidth={2.5} />}
                   disabled={form.isLoading}
                   variant={form.errorToShow ? 'error' : 'normal'}
                   error={form.errorToShow || undefined}
@@ -127,10 +127,10 @@ export function LoginScreen() {
             className="-mt-2 text-center relative z-10 drop-shadow-sm"
           >
             <p
-              className="text-[16px] font-bold text-[#2b2a2c]/80"
-              style={{ textShadow: '0 1px 2px rgba(255, 255, 255, 0.5)' }}
+              className="text-[16px] tracking-[0.15em] font-bold"
+              style={{ color: 'rgba(43, 42, 44, 0.8)', textShadow: '0 1px 3px rgba(255, 255, 255, 0.8)' }}
             >
-              {t.auth.codeSent} <span className="font-black text-[#2b2a2c]">{form.email}</span>
+              {t.auth.codeSent} <span style={{ color: '#2b2a2c', textTransform: 'uppercase' }}>{form.email}</span>
             </p>
           </motion.div>
         )}

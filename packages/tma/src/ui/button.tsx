@@ -105,7 +105,8 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const isCircle = layout === 'circle';
     const isTransparent = variant === 'transparent';
-    const textColor = isTransparent ? '#A1A1AA' : '#1A1A1A';
+    const textColor = isTransparent ? 'rgba(43, 42, 44, 0.8)' : '#1A1A1A';
+    const textShadow = isTransparent ? '0 1px 3px rgba(255, 255, 255, 0.8)' : undefined;
     const isTabMode = !!layoutId;
 
     // ── Tab mode ────────────────────────────────────────────────────────────
@@ -160,7 +161,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         whileTap={isDisabled ? undefined : 'pressed'}
         variants={{
           normal:  { boxShadow: t.normalShadow,  scale: 1,    filter: 'brightness(1)'    },
-          pressed: { boxShadow: t.pressedShadow, scale: 0.92, filter: isTransparent ? 'brightness(1)' : 'brightness(0.88)' },
+          pressed: { boxShadow: t.pressedShadow, scale: isTransparent ? 0.94 : 0.92, filter: isTransparent ? 'brightness(0.65)' : 'brightness(0.88)' },
         }}
         transition={{ type: 'spring', stiffness: 600, damping: 20 }}
         style={{
@@ -171,9 +172,14 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           cursor: isDisabled ? 'not-allowed' : 'pointer',
           opacity: !isLoading && (status === 'disabled' || disabled) ? 0.6 : 1,
           color: textColor,
+          textShadow,
         }}
         className={`relative flex items-center justify-center gap-2 outline-none select-none overflow-visible ${
-          isCircle ? 'rounded-full' : 'rounded-[28px] px-5 text-[17px] font-bold tracking-wide'
+          isCircle
+            ? 'rounded-full'
+            : isTransparent
+              ? 'rounded-[28px] px-5 text-[14px] font-bold uppercase tracking-[0.15em]'
+              : 'rounded-[28px] px-5 text-[17px] font-bold tracking-wide'
         } ${className || ''}`}
         {...props}
       >

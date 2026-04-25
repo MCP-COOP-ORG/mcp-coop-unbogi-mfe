@@ -34,7 +34,7 @@ export function BottomNav() {
       </div>
 
       {/* Center — sliding tab bar */}
-      <div className="pointer-events-auto flex items-center gap-3 h-[56px] rounded-[28px] p-[7px] relative overflow-hidden bg-[#FFF5E1] border-2 border-[#FFD1B3] shadow-[0_2px_8px_rgba(0,0,0,0.04)]">
+      <div className="pointer-events-auto flex items-center gap-3 h-[52px] rounded-[26px] p-[5px] relative overflow-hidden bg-[#FFF5E1] shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFD1B3,0_0_0_4px_#1A1A1A,0_2px_12px_rgba(0,0,0,0.08)]">
         {tabs.map(({ strategy, icon, variant, label }) => (
           <Button
             key={strategy.mode}

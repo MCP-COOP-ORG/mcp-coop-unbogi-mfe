@@ -65,7 +65,7 @@ export function InviteModal() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={handleClose}
-            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-l"
+            className="fixed inset-0 z-50 bg-black/20 backdrop-blur-xl"
           />
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: '-50%', x: '-50%' }}
@@ -76,8 +76,7 @@ export function InviteModal() {
               'w-[calc(100%-40px)]',
               'rounded-[32px] overflow-hidden',
               'bg-[#FFF5E1]',
-              'border-2 border-[#FFD1B3]',
-              'shadow-[0_8px_32px_rgba(0,0,0,0.12)]',
+              'shadow-[0_0_0_2px_#1A1A1A,0_0_0_5px_#FFD1B3,0_0_0_7px_#1A1A1A,0_8px_32px_rgba(0,0,0,0.18)]',
             ].join(' ')}
           >
             <div className="flex-1 flex flex-col items-center gap-2" style={{ padding: '20px 20px 0' }}>
@@ -100,22 +99,20 @@ export function InviteModal() {
                 </motion.div>
               ) : (
                 <form id="invite-form" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-1">
-                  <div className="relative">
-                    <Input
-                      type="email"
-                      leftIcon={<Mail size={15} strokeWidth={2} />}
-                      value={email}
-                      onChange={(e) => {
-                        setEmail(e.target.value);
-                        if (submitStatus === 'error') setSubmitStatus('idle');
-                      }}
-                      onBlur={() => setIsTouched(true)}
-                      placeholder="friend@example.com"
-                      disabled={isLoading}
-                      variant={currentError ? 'error' : 'normal'}
-                      error={currentError}
-                    />
-                  </div>
+                  <Input
+                    type="email"
+                    leftIcon={<Mail size={24} strokeWidth={2.5} />}
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (submitStatus === 'error') setSubmitStatus('idle');
+                    }}
+                    onBlur={() => setIsTouched(true)}
+                    placeholder="friend@example.com"
+                    disabled={isLoading}
+                    variant={currentError ? 'error' : 'normal'}
+                    error={currentError}
+                  />
                 </form>
               )}
             </div>

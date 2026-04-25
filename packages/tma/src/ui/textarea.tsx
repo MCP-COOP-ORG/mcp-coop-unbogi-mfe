@@ -9,33 +9,39 @@ export interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
 export function Textarea({ error, className = '', disabled, maxLength, currentLength, ...props }: TextareaProps) {
   const isError = !!error;
 
+  const shadow = isError
+    ? [
+        'shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#EB2D2D,0_0_0_4px_#1A1A1A,0_2px_8px_rgba(235,45,45,0.25)]',
+        'focus-within:shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#EB2D2D,0_0_0_4px_#1A1A1A,0_4px_16px_rgba(235,45,45,0.55)]',
+      ].join(' ')
+    : [
+        'shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFD1B3,0_0_0_4px_#1A1A1A]',
+        'focus-within:shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFB870,0_0_0_4px_#1A1A1A,0_4px_16px_rgba(255,184,112,0.4)]',
+      ].join(' ');
+
   return (
-    <div className={`relative w-full pb-6 ${className}`}>
+    <div className={`relative w-full pb-8 ${className}`}>
       <div
         className={`
-          relative flex w-full rounded-[16px] overflow-hidden
-          bg-[#FFFDF8] transition-all duration-300
-          border-2 z-10
-          ${
-            isError
-              ? 'border-[#FF9494] shadow-[0_2px_8px_rgba(255,148,148,0.1)] focus-within:border-[#FF7070] focus-within:shadow-[0_4px_16px_rgba(255,112,112,0.25)]'
-              : 'border-[#FFD1B3] shadow-[0_2px_8px_rgba(0,0,0,0.04)] focus-within:border-[#FFB870] focus-within:shadow-[0_4px_16px_rgba(255,184,112,0.25)]'
-          }
-          ${disabled ? 'opacity-60 bg-[#F5F5F4] border-[#E5E5E4] cursor-not-allowed shadow-none' : ''}
+          relative flex w-full rounded-[14px] overflow-hidden
+          bg-[#FFF5E1] transition-shadow duration-200 z-10
+          ${shadow}
+          ${disabled ? 'opacity-60 pointer-events-none !shadow-[0_0_0_1px_#CCC,0_0_0_3px_#EEE,0_0_0_4px_#CCC]' : ''}
         `}
       >
         <textarea
-          className="flex-1 min-w-0 bg-transparent outline-none text-[#5D4037] text-[16px] font-medium placeholder:text-[#D7CCC8] p-4 resize-none"
+          className="flex-1 min-w-0 bg-transparent outline-none text-[#1A1A1A] text-[14px] font-bold placeholder:text-[#A1A1AA] placeholder:font-normal p-4 resize-none"
           disabled={disabled}
           maxLength={maxLength}
           {...props}
         />
         {maxLength !== undefined && currentLength !== undefined && (
-          <div className="absolute bottom-2 right-3 text-[11px] font-bold text-[#D7CCC8]">
+          <div className="absolute bottom-2 right-3 text-[11px] font-bold text-[#A1A1AA]">
             {currentLength} / {maxLength}
           </div>
         )}
       </div>
+
       <AnimatePresence>
         {error && (
           <motion.div
@@ -43,9 +49,12 @@ export function Textarea({ error, className = '', disabled, maxLength, currentLe
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
-            className="absolute bottom-0 left-0 right-0 flex justify-center pointer-events-none z-0"
+            className="absolute bottom-0 left-0 right-0 flex justify-center pointer-events-none z-20"
           >
-            <span className="text-[13px] font-bold text-[#FF5A5A] drop-shadow-[0_1px_2px_rgba(255,253,248,0.9)] tracking-wide">
+            <span
+              className="text-[14px] uppercase tracking-[0.15em] font-bold text-center"
+              style={{ color: '#EB2D2D', textShadow: '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)' }}
+            >
               {error}
             </span>
           </motion.div>

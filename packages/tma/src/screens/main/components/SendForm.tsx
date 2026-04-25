@@ -163,7 +163,7 @@ export function SendForm() {
       className="flex flex-col h-full bg-[#FFF5E1]"
     >
       {/* ── Scrollable fields ── */}
-      <div className="flex-1 overflow-y-auto flex flex-col gap-6" style={{ padding: '68px 20px 0' }}>
+      <div className="flex-1 overflow-y-auto flex flex-col gap-2" style={{ padding: '20px 20px' }}>
         {/* ── Title ── */}
         <div className="flex items-center justify-center mb-2">
           <h1 className="text-[18px] font-black uppercase tracking-wide text-[#5D4037] drop-shadow-sm">{t.title}</h1>
@@ -172,7 +172,7 @@ export function SendForm() {
         {/* ── Contact Search ── */}
         <div className="relative">
           <Input
-            leftIcon={<Search size={15} strokeWidth={2} />}
+            leftIcon={<Search size={24} strokeWidth={2.5} />}
             placeholder={t.searchFriend}
             value={state.searchQuery}
             onChange={handleSearchChange}
@@ -190,9 +190,8 @@ export function SendForm() {
                 className={[
                   'absolute left-0 right-0 top-[calc(100%+4px)] z-50',
                   'rounded-2xl p-[6px] overflow-y-auto',
-                  'bg-[#FFFDF8]',
-                  'border-2 border-[#FFD1B3]',
-                  'shadow-[0_4px_16px_rgba(255,184,112,0.25)]',
+                  'bg-[#FFF5E1]',
+                  'shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFD1B3,0_0_0_4px_#1A1A1A,0_4px_16px_rgba(0,0,0,0.08)]',
                 ].join(' ')}
                 style={{ maxHeight: GIFT_CONFIG.CONTACT_DROPDOWN_VISIBLE_ROWS * CONTACT_ITEM_HEIGHT }}
               >
@@ -220,7 +219,7 @@ export function SendForm() {
         {/* ── Holiday Select ── */}
         <div className="relative">
           <Select
-            icon={<Gift size={15} strokeWidth={2} />}
+            icon={<Gift size={24} strokeWidth={2.5} />}
             options={holidayOptions}
             value={state.holidayId}
             placeholder={t.selectHoliday}
@@ -258,7 +257,7 @@ export function SendForm() {
           <div className="flex items-center gap-2">
             <div className="flex-1">
               <Input
-                leftIcon={<ScanLine size={15} strokeWidth={2} />}
+                leftIcon={<ScanLine size={24} strokeWidth={2.5} />}
                 placeholder={t.codePlaceholder}
                 value={state.payloadContent}
                 onChange={(e) => {
@@ -289,7 +288,7 @@ export function SendForm() {
       </div>
 
       {/* ── Pinned bottom buttons ── */}
-      <div className="shrink-0 flex gap-3" style={{ padding: 20 }}>
+      <div className="shrink-0 flex gap-2" style={{ padding: '20px 20px 40px' }}>
         <Button layout="pill" variant="transparent" onClick={goBack}>
           {t.cancel}
         </Button>
