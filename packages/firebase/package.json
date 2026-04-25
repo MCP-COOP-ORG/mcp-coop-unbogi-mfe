@@ -13,6 +13,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run -c vitest.integration.config.ts",
+    "test:report": "vitest run -c vitest.integration.config.ts --reporter=html --outputFile.html=./integration-rep/index.html && npx vite preview --outDir integration-rep --open",
     "typecheck": "tsc --noEmit",
     "lint": "biome check ."
   },
@@ -25,6 +26,7 @@
   "devDependencies": {
     "@unbogi/contracts": "file:../contracts",
     "@vitest/coverage-v8": "^2.1.9",
+    "@vitest/ui": "^2.1.9",
     "firebase-functions-test": "^3.2.0",
     "testcontainers": "^11.14.0",
     "tsup": "^8.5.1",

@@ -16,7 +16,9 @@
         "src",
         "lib",
         "tsup.config.ts",
-        "tsconfig.json"
+        "tsconfig.json",
+        "pnpm-lock.yaml",
+        ".npmrc"
       ],
       "predeploy": [
         "pnpm --filter @unbogi/firebase run build"

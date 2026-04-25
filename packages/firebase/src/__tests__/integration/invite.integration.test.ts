@@ -3,13 +3,6 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { InviteRepository } from '../../repositories/invite';
 import { clearFirestoreData } from '../setup.integration';
 
-// Ensure Firebase is initialized for integration tests connected to the emulator
-if (!admin.apps.length) {
-  process.env.FIRESTORE_EMULATOR_HOST = '127.0.0.1:8080';
-  process.env.GCLOUD_PROJECT = 'demo-unbogi';
-  admin.initializeApp({ projectId: 'demo-unbogi' });
-}
-
 describe('Invite Flow (Integration)', () => {
   let inviteRepo: InviteRepository;
   let db: admin.firestore.Firestore;
@@ -40,13 +33,15 @@ describe('Invite Flow (Integration)', () => {
     // 2. Accept Invite
     await inviteRepo.runAcceptInviteTransaction(token, acceptorId);
 
-    // 3. Verify Invite is deleted after acceptance
-    const deletedInvite = await db.collection('invites').doc(token).get();
-    expect(deletedInvite.exists).toBe(false);
+    // 3. Verify Invite is marked as ACCEPTED
+    const acceptedInvite = await db.collection('invites').doc(token).get();
+    expect(acceptedInvite.exists).toBe(true);
+    expect(acceptedInvite.data()?.status).toBe('accepted');
+    expect(acceptedInvite.data()?.acceptedBy).toBe(acceptorId);
 
     // 4. Verify Contacts are established bidirectionally
-    const contactSender = await db.collection('users').doc(senderId).collection('contacts').doc(acceptorId).get();
-    const contactAcceptor = await db.collection('users').doc(acceptorId).collection('contacts').doc(senderId).get();
+    const contactSender = await db.collection('contacts').doc(`${senderId}_${acceptorId}`).get();
+    const contactAcceptor = await db.collection('contacts').doc(`${acceptorId}_${senderId}`).get();
 
     expect(contactSender.exists).toBe(true);
     expect(contactSender.data()?.userId).toBe(acceptorId);
@@ -72,13 +67,15 @@ describe('Invite Flow (Integration)', () => {
     // 2. Redeem Email Invite
     await inviteRepo.runRedeemEmailInviteTransaction(token, acceptorUid);
 
-    // 3. Verify Invite is deleted after redemption
-    const deletedInvite = await db.collection('invites').doc(token).get();
-    expect(deletedInvite.exists).toBe(false);
+    // 3. Verify Invite is marked as ACCEPTED
+    const acceptedInvite = await db.collection('invites').doc(token).get();
+    expect(acceptedInvite.exists).toBe(true);
+    expect(acceptedInvite.data()?.status).toBe('accepted');
+    expect(acceptedInvite.data()?.acceptedBy).toBe(acceptorUid);
 
     // 4. Verify Contacts are established bidirectionally
-    const contactSender = await db.collection('users').doc(senderId).collection('contacts').doc(acceptorUid).get();
-    const contactAcceptor = await db.collection('users').doc(acceptorUid).collection('contacts').doc(senderId).get();
+    const contactSender = await db.collection('contacts').doc(`${senderId}_${acceptorUid}`).get();
+    const contactAcceptor = await db.collection('contacts').doc(`${acceptorUid}_${senderId}`).get();
 
     expect(contactSender.exists).toBe(true);
     expect(contactSender.data()?.userId).toBe(acceptorUid);
