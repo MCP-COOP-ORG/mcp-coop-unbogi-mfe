@@ -20,8 +20,44 @@ env:
   GAR_LOCATION: ${{ secrets.MCP_COOP_ORG_GAR_LOCATION }}
 
 jobs:
+  quality-checks:
+    name: Code Quality & Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build dependencies (shared & contracts)
+        run: |
+          pnpm --filter @unbogi/shared run build
+          pnpm --filter @unbogi/contracts run build
+
+      - name: Run quality checks
+        working-directory: packages/tma
+        run: |
+          pnpm exec biome check .
+          pnpm exec tsc --noEmit
+          pnpm exec vitest run
+          pnpm exec vite build --emptyOutDir
+
+
   build-and-push:
     name: Build & Push Docker Image
+    needs: quality-checks
     runs-on: ubuntu-latest
     permissions:
       contents: 'read'

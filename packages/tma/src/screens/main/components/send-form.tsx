@@ -265,10 +265,10 @@ export function SendForm() {
                 placeholder={t.codePlaceholder}
                 value={state.payloadContent}
                 onChange={(e) => {
-                  dispatch({ type: 'SET_PAYLOAD_CONTENT', payload: e.target.value });
                   if (state.payloadFormat !== 'code') {
                     dispatch({ type: 'SET_PAYLOAD_FORMAT', payload: 'code' });
                   }
+                  dispatch({ type: 'SET_PAYLOAD_CONTENT', payload: e.target.value });
                 }}
                 error={errors.payload}
               />

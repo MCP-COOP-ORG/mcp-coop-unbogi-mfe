@@ -40,7 +40,10 @@ export function MainScreen() {
       <BottomNav
         tabs={NAV_TABS}
         activeTabId={activeStrategy.mode}
-        onTabChange={setStrategy}
+        onTabChange={(strategy) => {
+          setStrategy(strategy);
+          setScreen(SCREENS.MAIN);
+        }}
         onInviteClick={openInviteModal}
         onSendClick={() => setScreen(SCREENS.SEND)}
       />

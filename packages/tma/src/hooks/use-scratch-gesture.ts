@@ -21,11 +21,7 @@ export interface ScratchGestureOptions {
  * Returns a ref to attach to the target <canvas> element
  * and a boolean ref indicating if the canvas has been revealed.
  */
-export function useScratchGesture({
-  clearThreshold,
-  isUnlocked,
-  onReveal,
-}: ScratchGestureOptions) {
+export function useScratchGesture({ clearThreshold, isUnlocked, onReveal }: ScratchGestureOptions) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const revealedRef = useRef(false);
   const onRevealRef = useRef(onReveal);

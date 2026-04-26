@@ -1,3 +1,4 @@
+/// <reference types="vitest" />
 import { fileURLToPath, URL } from 'node:url';
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
@@ -22,5 +23,30 @@ export default defineConfig({
   server: {
     port: 3090,
     allowedHosts: true,
+  },
+  test: {
+    globals: true,
+    environment: 'jsdom',
+    setupFiles: ['./src/test/setup.ts'],
+    coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json', 'html'],
+      thresholds: {
+        statements: 80,
+        branches: 80,
+        functions: 80,
+        lines: 80,
+      },
+      exclude: [
+        'node_modules/**',
+        'dist/**',
+        '**/*.d.ts',
+        'src/test/**',
+        'vite.config.ts',
+        'src/app/main.tsx',
+        '**/*/index.ts',
+        '**/*/types.ts',
+      ],
+    },
   },
 });

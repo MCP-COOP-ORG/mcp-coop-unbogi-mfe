@@ -27,8 +27,6 @@ export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
     return h > 0 ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
   };
 
-
-
   if (timeLeftMs <= 0) return null;
 
   return (

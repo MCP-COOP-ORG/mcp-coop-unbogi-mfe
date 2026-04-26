@@ -9,6 +9,9 @@
     ".": "./src/index.ts",
     "./domains/*": "./src/domains/*/index.ts"
   },
+  "scripts": {
+    "build": "tsc"
+  },
   "dependencies": {
     "@unbogi/contracts": "workspace:*",
     "firebase": "^12.12.0",

@@ -40,4 +40,3 @@ export function Postcard({ imageUrl, additionalInfo, imageOverlay }: PostcardPro
     </div>
   );
 }
-

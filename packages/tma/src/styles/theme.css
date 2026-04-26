@@ -16,12 +16,12 @@
   --color-text-dim: rgba(255, 255, 255, 0.3);
 
   /* ─── Neo-Brutalism Surface Tokens ─── */
-  --color-ink: #1A1A1A;
-  --color-cream: #FFF5E1;
-  --color-warm-bg: #FAF6EE;
-  --color-error-red: #EB2D2D;
-  --color-success-green: #7AB648;
-  --color-muted: #A1A1AA;
+  --color-ink: #1a1a1a;
+  --color-cream: #fff5e1;
+  --color-warm-bg: #faf6ee;
+  --color-error-red: #eb2d2d;
+  --color-success-green: #7ab648;
+  --color-muted: #a1a1aa;
 
   /* ─── Spacing & Radius ─── */
   --radius-sm: 12px;

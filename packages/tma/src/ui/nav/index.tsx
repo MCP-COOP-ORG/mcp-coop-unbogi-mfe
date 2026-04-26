@@ -1,5 +1,4 @@
 import { tg, withHaptic } from '@/lib';
-import { SCREENS, useNavigationStore } from '@/store';
 import { Button, type ButtonIcon, type ButtonVariant } from '../elements/button';
 
 /** layoutId shared across all tab buttons — framer-motion slides the background between them. */
@@ -22,12 +21,9 @@ export interface BottomNavProps<T> {
 }
 
 export function BottomNav<T>({ tabs, activeTabId, onTabChange, onInviteClick, onSendClick }: BottomNavProps<T>) {
-  const setScreen = useNavigationStore((s) => s.setScreen);
-
   const handleTabTap = (strategy: T) => {
     tg.haptic('light');
     onTabChange(strategy);
-    setScreen(SCREENS.MAIN);
   };
 
   return (
@@ -37,12 +33,7 @@ export function BottomNav<T>({ tabs, activeTabId, onTabChange, onInviteClick, on
     >
       {/* Left — invite */}
       <div className="pointer-events-auto">
-        <Button
-          variant="orange"
-          icon="UserPlus"
-          onClick={withHaptic(onInviteClick)}
-          aria-label="Profile or Invite"
-        />
+        <Button variant="orange" icon="UserPlus" onClick={withHaptic(onInviteClick)} aria-label="Profile or Invite" />
       </div>
 
       {/* Center — sliding tab bar */}
@@ -62,14 +53,8 @@ export function BottomNav<T>({ tabs, activeTabId, onTabChange, onInviteClick, on
 
       {/* Right — send gift */}
       <div className="pointer-events-auto">
-        <Button
-          variant="cyan"
-          icon="Send"
-          onClick={withHaptic(onSendClick)}
-          aria-label="Send Gift"
-        />
+        <Button variant="cyan" icon="Send" onClick={withHaptic(onSendClick)} aria-label="Send Gift" />
       </div>
     </div>
   );
 }
-
