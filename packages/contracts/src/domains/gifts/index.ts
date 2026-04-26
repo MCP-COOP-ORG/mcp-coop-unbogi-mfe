@@ -3,7 +3,7 @@ import { SCRATCH_CODE_FORMAT } from '../../constants/index.js';
 
 export const ScratchCodeSchema = z.object({
   value: z.string().min(1),
-  format: z.enum([SCRATCH_CODE_FORMAT.TEXT, SCRATCH_CODE_FORMAT.LINK, SCRATCH_CODE_FORMAT.QR]),
+  format: z.enum([SCRATCH_CODE_FORMAT.CODE, SCRATCH_CODE_FORMAT.QR_CODE]),
 });
 export type ScratchCode = z.infer<typeof ScratchCodeSchema>;
 

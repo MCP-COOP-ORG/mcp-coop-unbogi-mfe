@@ -9,13 +9,13 @@ export const sendFormSchema = z.object({
     .min(1, 'Greeting is required')
     .max(GIFT_CONFIG.GREETING_MAX_LENGTH, `Max ${GIFT_CONFIG.GREETING_MAX_LENGTH} characters`),
   unpackDate: z.date({ message: 'Date is required' }),
-  payload: z.discriminatedUnion('type', [
+  payload: z.discriminatedUnion('format', [
     z.object({
-      type: z.literal('text'),
+      format: z.literal('code'),
       content: z.string().min(1, 'Code is required'),
     }),
     z.object({
-      type: z.literal('qr'),
+      format: z.literal('qr-code'),
       content: z.string().min(1, 'QR code is required'),
     }),
   ]),

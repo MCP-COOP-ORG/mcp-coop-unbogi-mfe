@@ -1,4 +1,4 @@
-export type ScratchCodeFormat = 'text' | 'link' | 'qr';
+export type ScratchCodeFormat = 'code' | 'qr-code';
 
 export interface ScratchCode {
   value: string;

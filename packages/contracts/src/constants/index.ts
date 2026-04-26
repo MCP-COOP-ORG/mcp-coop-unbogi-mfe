@@ -74,9 +74,8 @@ export const LOGGING = {
 } as const;
 
 export const SCRATCH_CODE_FORMAT = {
-  TEXT: 'text',
-  LINK: 'link',
-  QR: 'qr',
+  CODE: 'code',
+  QR_CODE: 'qr-code',
 } as const;
 
 export const INVITE_STATUS = {

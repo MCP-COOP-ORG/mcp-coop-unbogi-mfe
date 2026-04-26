@@ -7,7 +7,7 @@ import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
 import { SCREENS, useNavigationStore } from '@/store';
 import { Button, Input, Select, type SelectOption, Textarea } from '@/ui';
-import { formReducer, initialState } from './send-form-model';
+import { formReducer, initialState, type SendFormErrorKey } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */
 
@@ -28,7 +28,7 @@ export function SendForm() {
 
   /* ── form state ── */
   const [state, dispatch] = useReducer(formReducer, initialState);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [errors, setErrors] = useState<Partial<Record<SendFormErrorKey, string>>>({});
   const [submitting, setSubmitting] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
 
@@ -61,7 +61,7 @@ export function SendForm() {
     if (!state.holidayId) return;
     const selected = holidays.find((h) => h.id === state.holidayId);
     if (!selected?.defaultGreeting) return;
-    dispatch({ type: 'SET_FIELD', field: 'greeting', value: selected.defaultGreeting });
+    dispatch({ type: 'SET_GREETING', payload: selected.defaultGreeting });
   }, [state.holidayId, holidays]);
 
   /* ── contact search ── */
@@ -83,14 +83,14 @@ export function SendForm() {
   }, [contacts, state.searchQuery]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    dispatch({ type: 'SET_FIELD', field: 'searchQuery', value: e.target.value });
-    if (state.receiverId) dispatch({ type: 'SET_FIELD', field: 'receiverId', value: '' });
+    dispatch({ type: 'SET_SEARCH_QUERY', payload: e.target.value });
+    if (state.receiverId) dispatch({ type: 'SET_RECEIVER', payload: '' });
     setShowDropdown(true);
   };
 
   const handleSelectContact = (id: string, name: string) => {
-    dispatch({ type: 'SET_FIELD', field: 'receiverId', value: id });
-    dispatch({ type: 'SET_FIELD', field: 'searchQuery', value: name });
+    dispatch({ type: 'SET_RECEIVER', payload: id });
+    dispatch({ type: 'SET_SEARCH_QUERY', payload: name });
     setShowDropdown(false);
   };
 
@@ -98,8 +98,8 @@ export function SendForm() {
   const handleScanQr = async () => {
     const result = await tg.scanQr('Point camera at QR code');
     if (result) {
-      dispatch({ type: 'SET_FIELD', field: 'payloadType', value: 'qr' });
-      dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: result });
+      dispatch({ type: 'SET_PAYLOAD_FORMAT', payload: 'qr-code' });
+      dispatch({ type: 'SET_PAYLOAD_CONTENT', payload: result });
     }
   };
 
@@ -111,13 +111,13 @@ export function SendForm() {
       holidayId: state.holidayId,
       greeting: state.greeting,
       unpackDate: state.unpackDate ? new Date(state.unpackDate) : undefined,
-      payload: { type: state.payloadType, content: state.payloadContent },
+      payload: { format: state.payloadFormat, content: state.payloadContent },
     });
 
     if (!parsed.success) {
-      const fieldErrors: Record<string, string> = {};
+      const fieldErrors: Partial<Record<SendFormErrorKey, string>> = {};
       parsed.error.issues.forEach((issue) => {
-        const key = issue.path[0] as string;
+        const key = issue.path[0] as SendFormErrorKey;
         if (key && !fieldErrors[key]) fieldErrors[key] = issue.message;
       });
       setErrors(fieldErrors);
@@ -132,7 +132,7 @@ export function SendForm() {
         holidayId: parsed.data.holidayId,
         greeting: parsed.data.greeting,
         unpackDate: state.unpackDate ? new Date(state.unpackDate).toISOString() : '',
-        scratchCode: { value: parsed.data.payload.content, format: parsed.data.payload.type },
+        scratchCode: { value: parsed.data.payload.content, format: parsed.data.payload.format },
       });
       dispatch({ type: 'RESET' });
       setScreen(SCREENS.MAIN);
@@ -223,7 +223,7 @@ export function SendForm() {
             options={holidayOptions}
             value={state.holidayId}
             placeholder={t.selectHoliday}
-            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'holidayId', value: e.target.value })}
+            onChange={(e) => dispatch({ type: 'SET_HOLIDAY', payload: e.target.value })}
             error={errors.holidayId}
           />
         </div>
@@ -234,7 +234,7 @@ export function SendForm() {
             rows={6}
             placeholder={t.greetingPlaceholder}
             value={state.greeting}
-            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'greeting', value: e.target.value })}
+            onChange={(e) => dispatch({ type: 'SET_GREETING', payload: e.target.value })}
             maxLength={GIFT_CONFIG.GREETING_MAX_LENGTH}
             currentLength={state.greeting.length}
             error={errors.greeting}
@@ -246,7 +246,7 @@ export function SendForm() {
           <Input
             type="datetime-local"
             value={state.unpackDate}
-            onChange={(e) => dispatch({ type: 'SET_FIELD', field: 'unpackDate', value: e.target.value })}
+            onChange={(e) => dispatch({ type: 'SET_UNPACK_DATE', payload: e.target.value })}
             placeholder={t.unpackDate}
             error={errors.unpackDate}
           />
@@ -261,9 +261,9 @@ export function SendForm() {
                 placeholder={t.codePlaceholder}
                 value={state.payloadContent}
                 onChange={(e) => {
-                  dispatch({ type: 'SET_FIELD', field: 'payloadContent', value: e.target.value });
-                  if (state.payloadType !== 'text') {
-                    dispatch({ type: 'SET_FIELD', field: 'payloadType', value: 'text' });
+                  dispatch({ type: 'SET_PAYLOAD_CONTENT', payload: e.target.value });
+                  if (state.payloadFormat !== 'code') {
+                    dispatch({ type: 'SET_PAYLOAD_FORMAT', payload: 'code' });
                   }
                 }}
                 error={errors.payload}

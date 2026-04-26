@@ -18,7 +18,7 @@ export function ScratchCanvas({
   imageUrl,
   logoUrl,
   onReveal,
-}: ScratchCanvasProps = {}) {
+}: ScratchCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const patternCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const fingerprintImgRef = useRef<HTMLImageElement | null>(null);

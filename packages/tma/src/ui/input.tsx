@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import type { InputHTMLAttributes, ReactNode } from 'react';
 import { FIELD_SHADOW, FIELD_SHADOW_ERROR, FIELD_SHADOW_NORMAL } from './theme-constants';
 
-export type InputVariant = 'normal' | 'error';
+type InputVariant = 'normal' | 'error';
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: InputVariant;

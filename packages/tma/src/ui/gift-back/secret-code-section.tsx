@@ -23,7 +23,7 @@ export function SecretCodeSection({ value, format }: SecretCodeSectionProps) {
         {t.giftBack.activationCode}
       </div>
 
-      {format === 'qr' ? (
+      {format === 'qr-code' ? (
         <div className="flex flex-col items-center gap-3">
           <div className="bg-white p-3 rounded-2xl border border-black/10">
             <QRCodeSVG value={value} size={152} bgColor="#ffffff" fgColor="#1A1A1A" level="M" />
