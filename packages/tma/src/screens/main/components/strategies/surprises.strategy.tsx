@@ -1,4 +1,4 @@
-import { ASSETS } from '@/lib/assets';
+import { ASSETS } from '@/lib';
 import { LockOverlay, ScratchCanvas } from '@/ui';
 import type { GiftScreenStrategy } from './types';
 

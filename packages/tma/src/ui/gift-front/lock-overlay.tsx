@@ -1,7 +1,7 @@
 import { APP_CONFIG } from '@unbogi/shared';
 import { useEffect, useState } from 'react';
-import { useT } from '@/hooks/use-t';
-import { ASSETS } from '@/lib/assets';
+import { useT } from '@/hooks';
+import { ASSETS } from '@/lib';
 
 export interface LockOverlayProps {
   lockedUntil: Date;

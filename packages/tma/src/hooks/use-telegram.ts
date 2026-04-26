@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { tg } from '@/lib/telegram';
+import { tg } from '@/lib';
 
 /**
  * Hook to integrate Telegram BackButton with screen navigation.

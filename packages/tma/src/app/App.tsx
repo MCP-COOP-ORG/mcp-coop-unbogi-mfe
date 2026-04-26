@@ -1,8 +1,7 @@
 import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { useEffect } from 'react';
-import { tg } from '@/lib/telegram';
-import { LoginScreen } from '@/screens/login/LoginScreen';
-import { MainScreen } from '@/screens/main/MainScreen';
+import { tg } from '@/lib';
+import { LoginScreen, MainScreen } from '@/screens';
 
 export function App() {
   const initAuth = useAuthStore((s) => s.initialize);

@@ -1,11 +1,10 @@
 import { type GiftRecord, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useT } from '@/hooks/use-t';
-import { ASSETS } from '@/lib/assets';
+import { useT } from '@/hooks';
+import { ASSETS } from '@/lib';
 import { useGiftModeStore } from '@/store';
-import { Slider } from '@/ui';
-import { LoadingSpinner } from '@/ui/spinner';
-import { GiftCardItem } from './GiftCardItem';
+import { LoadingSpinner, Slider } from '@/ui';
+import { GiftCardItem } from './gift-card-item';
 
 function LoadingState() {
   return (

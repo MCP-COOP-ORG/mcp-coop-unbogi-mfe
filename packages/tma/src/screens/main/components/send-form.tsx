@@ -2,12 +2,10 @@ import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolida
 import { AnimatePresence, motion } from 'framer-motion';
 import { Gift, ScanLine, Search } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
-import { useT } from '@/hooks/use-t';
-import { useTelegramBackButton } from '@/hooks/use-telegram';
-import { tg } from '@/lib/telegram';
+import { useT, useTelegramBackButton } from '@/hooks';
+import { tg } from '@/lib';
 import { SCREENS, useNavigationStore } from '@/store';
-import { Button, Input, Select, type SelectOption, Textarea } from '@/ui';
-import { LoadingSpinner } from '@/ui/spinner';
+import { Button, Input, LoadingSpinner, Select, type SelectOption, Textarea } from '@/ui';
 import { formReducer, initialState, type SendFormErrorKey } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */

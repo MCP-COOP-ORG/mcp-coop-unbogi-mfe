@@ -1,6 +1,6 @@
 import type { GiftRecord } from '@unbogi/shared';
 import type { ReactNode } from 'react';
-import type { Translations } from '@/lib/i18n';
+import type { Translations } from '@/lib';
 
 // Context passed to renderOverlays so the strategy can wire up scratch/unlock.
 export interface OverlayContext {

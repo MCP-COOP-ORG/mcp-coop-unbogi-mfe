@@ -1,10 +1,9 @@
 import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Mail } from 'lucide-react';
-import { useT } from '@/hooks/use-t';
-import { ASSETS } from '@/lib/assets';
-import { Button } from '@/ui';
-import { Input } from '@/ui/input';
+import { useT } from '@/hooks';
+import { ASSETS } from '@/lib';
+import { Button, Input } from '@/ui';
 import { OtpTimer, useAuthForm } from './components';
 
 export function LoginScreen() {

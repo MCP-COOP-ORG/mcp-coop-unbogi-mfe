@@ -1,8 +1,8 @@
 import { SendOtpSchema, VerifyOtpSchema } from '@unbogi/contracts';
 import { auth, authApi, OTP_CONFIG, useAuthStore } from '@unbogi/shared';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { useT } from '@/hooks/use-t';
-import { tg } from '@/lib/telegram';
+import { useT } from '@/hooks';
+import { tg } from '@/lib';
 
 type Step = 'email' | 'code';
 

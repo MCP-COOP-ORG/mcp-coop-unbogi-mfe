@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { ChevronsLeft, ChevronsRight } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 
-export interface FlipCardProps {
+export interface FlipFlapProps {
   front: ReactNode;
   back: ReactNode;
   disabled?: boolean;
@@ -14,7 +14,7 @@ function FlipTrigger({ side, onClick }: { side: 'left' | 'right'; onClick: () =>
   return (
     <motion.button
       onClick={onClick}
-      aria-label="Flip card"
+      aria-label="Flip"
       whileTap={{ scale: 0.78 }}
       transition={{ type: 'spring', stiffness: 600, damping: 22 }}
       className={`absolute bottom-0 ${isLeft ? 'left-0' : 'right-0'} z-10
@@ -51,7 +51,7 @@ function FaceWithButtons({
   );
 }
 
-export function FlipCard({ front, back, disabled = false }: FlipCardProps) {
+export function FlipFlap({ front, back, disabled = false }: FlipFlapProps) {
   const [isFlipped, setIsFlipped] = useState(false);
   const toggle = () => setIsFlipped((v) => !v);
 

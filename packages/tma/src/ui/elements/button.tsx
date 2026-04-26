@@ -14,7 +14,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import React, { type ComponentProps } from 'react';
-import { LoadingSpinner } from './spinner';
+import { LoadingSpinner } from '../utils/spinner';
 
 export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';
 export type ButtonStatus = 'idle' | 'loading' | 'disabled';

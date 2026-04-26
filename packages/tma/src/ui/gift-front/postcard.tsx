@@ -1,6 +1,6 @@
 import { APP_CONFIG } from '@unbogi/shared';
 import type { ReactNode } from 'react';
-import { sanitizeImageUrl } from '@/lib/sanitize';
+import { sanitizeImageUrl } from '@/lib';
 
 export interface PostcardMetadata {
   from?: string;

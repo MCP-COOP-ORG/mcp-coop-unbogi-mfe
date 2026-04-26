@@ -1,5 +1,5 @@
 import type { GiftRecord } from '@unbogi/shared';
-import { FlipCard, GiftBack, Postcard } from '@/ui';
+import { FlipFlap, GiftBack, Postcard } from '@/ui';
 import type { GiftScreenStrategy, OverlayContext } from './strategies';
 
 interface GiftCardItemProps {
@@ -15,7 +15,7 @@ interface GiftCardItemProps {
  * Composite (GoF) — a single slide in the gift slider.
  *
  * Owns its full layer stack:
- *   z-0   FlipCard  (Postcard front ↔ GiftBack back)
+ *   z-0   FlipFlap  (Postcard front ↔ GiftBack back)
  *   z-10+ strategy.renderOverlays() — injected by the active strategy
  *
  * The strategy decides which overlays to mount (Lock + Scratch for surprises,
@@ -39,9 +39,9 @@ export function GiftCardItem({
       {/* Strategy-injected overlays (LockOverlay + ScratchCanvas, or null) */}
       {strategy.renderOverlays(gift, ctx)}
 
-      {/* Layer 0 — FlipCard: always present, always at the bottom */}
+      {/* Layer 0 — FlipFlap: always present, always at the bottom */}
       <div className="absolute inset-0 z-0 rounded-[inherit]">
-        <FlipCard
+        <FlipFlap
           disabled={flipDisabled}
           front={
             <Postcard

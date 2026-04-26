@@ -1,3 +1,3 @@
-export { collectionStrategy } from './collection.strategy';
-export { surprisesStrategy } from './surprises.strategy';
-export type { GiftScreenStrategy, OverlayContext } from './types';
+export * from './collection.strategy';
+export * from './surprises.strategy';
+export * from './types';

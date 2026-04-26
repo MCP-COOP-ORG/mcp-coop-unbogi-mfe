@@ -1,5 +1,5 @@
 import { type ReactNode, useEffect } from 'react';
-import { tg } from '@/lib/telegram';
+import { tg } from '@/lib';
 
 interface ProvidersProps {
   children: ReactNode;

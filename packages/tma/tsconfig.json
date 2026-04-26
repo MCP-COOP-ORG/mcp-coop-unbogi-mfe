@@ -4,11 +4,17 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../shared" }
+    {
+      "path": "../shared"
+    }
   ]
 }

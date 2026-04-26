@@ -1,6 +1,6 @@
-import { tg } from '@/lib/telegram';
+import { tg } from '@/lib';
 import { SCREENS, useNavigationStore } from '@/store';
-import { Button, type ButtonIcon, type ButtonVariant } from './button';
+import { Button, type ButtonIcon, type ButtonVariant } from '../elements/button';
 
 /** layoutId shared across all tab buttons — framer-motion slides the background between them. */
 const TAB_LAYOUT_ID = 'bottom-nav-tab-pill';

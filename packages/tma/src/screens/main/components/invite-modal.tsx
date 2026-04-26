@@ -3,8 +3,8 @@ import { invitesApi } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
-import { useT } from '@/hooks/use-t';
-import { ASSETS } from '@/lib/assets';
+import { useT } from '@/hooks';
+import { ASSETS } from '@/lib';
 import { useInviteModalStore } from '@/store';
 import { Button, Input } from '@/ui';
 

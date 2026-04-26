@@ -1,2 +1,2 @@
-export { OtpTimer } from './OtpTimer';
-export { useAuthForm } from './useAuthForm';
+export * from './otp-timer';
+export * from './use-auth-form';
