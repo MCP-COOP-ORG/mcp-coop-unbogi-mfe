@@ -9,6 +9,7 @@ export {
   buttonTheme,
 } from './button';
 export { FlipCard } from './flip-card';
+export { FormField, type FormFieldProps } from './form-field';
 export { GiftBack, type GiftBackProps } from './gift-back';
 export { Input } from './input';
 export { LockOverlay } from './lock-overlay';
@@ -18,4 +19,5 @@ export { ScratchCanvas } from './scratch-canvas';
 export { Select, type SelectOption, type SelectProps } from './select';
 // ── Postcard / FlipCard / Slider / GiftBack ──
 export { Slider } from './slider';
+export { LoadingSpinner, type LoadingSpinnerProps } from './spinner';
 export { Textarea, type TextareaProps } from './textarea';

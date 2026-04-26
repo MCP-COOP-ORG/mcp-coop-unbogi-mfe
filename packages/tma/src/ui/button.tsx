@@ -14,6 +14,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import React, { type ComponentProps } from 'react';
+import { LoadingSpinner } from './spinner';
 
 export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';
 export type ButtonStatus = 'idle' | 'loading' | 'disabled';
@@ -201,13 +202,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isCircle ? (
           // Circle: spinner replaces icon
           isLoading ? (
-            <RefreshCw size={24} color={textColor} strokeWidth={2.5} className="animate-spin" />
+            <LoadingSpinner size={24} color={textColor} />
           ) : (
             IconComponent && <IconComponent size={24} color={textColor} strokeWidth={2.5} fill="none" />
           )
         ) : // Pill: spinner replaces text+icon; idle = text then icon inline
         isLoading ? (
-          <RefreshCw size={20} color={textColor} strokeWidth={2.5} className="animate-spin" />
+          <LoadingSpinner size={20} color={textColor} />
         ) : (
           <>
             {children && <span>{children}</span>}
