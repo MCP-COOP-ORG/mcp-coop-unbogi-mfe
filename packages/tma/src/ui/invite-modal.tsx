@@ -3,6 +3,7 @@ import { invitesApi } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
+import { useT } from '@/hooks/use-t';
 import { ASSETS } from '@/lib/assets';
 import { useInviteModalStore } from '@/store';
 import { Button, Input } from '@/ui';
@@ -10,6 +11,7 @@ import { Button, Input } from '@/ui';
 type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
 
 export function InviteModal() {
+  const t = useT().invite;
   const { isInviteModalOpen, closeInviteModal } = useInviteModalStore();
   const [email, setEmail] = useState('');
   const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
@@ -23,8 +25,8 @@ export function InviteModal() {
       ? errorMessage
       : showEmailError
         ? email.length === 0
-          ? 'Email is required'
-          : 'Please enter a valid email address'
+          ? t.emailRequired
+          : t.emailInvalid
         : undefined;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +45,7 @@ export function InviteModal() {
       }, 2000);
     } catch (err: unknown) {
       setSubmitStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : 'Failed to send invite');
+      setErrorMessage(err instanceof Error ? err.message : t.errorGeneric);
     }
   };
 
@@ -84,11 +86,9 @@ export function InviteModal() {
             <div className="flex-1 flex flex-col items-center gap-2" style={{ padding: '20px 20px 0' }}>
               <img src={ASSETS.BIRD} alt="Invite Bird" className="w-20 h-20 object-contain" />
 
-              <h1 className="text-[20px] font-bold text-[#4A3A35]">Invite a Friend</h1>
+              <h1 className="text-[20px] font-bold text-[#4A3A35]">{t.title}</h1>
 
-              <p className="text-[14px] text-[#4A3A35]/70 text-center px-4">
-                Send an exclusive invitation link directly to their email.
-              </p>
+              <p className="text-[14px] text-[#4A3A35]/70 text-center px-4">{t.subtitle}</p>
 
               {submitStatus === 'success' ? (
                 <motion.div
@@ -97,7 +97,7 @@ export function InviteModal() {
                   className="flex flex-col items-center py-4"
                 >
                   <CheckCircle className="w-10 h-10 text-[#10b981] mb-2" strokeWidth={1.5} />
-                  <p className="text-[#4A3A35] font-medium">Invite Sent!</p>
+                  <p className="text-[#4A3A35] font-medium">{t.success}</p>
                 </motion.div>
               ) : (
                 <form id="invite-form" onSubmit={handleSubmit} className="flex flex-col gap-4 w-full mt-1">
@@ -110,7 +110,7 @@ export function InviteModal() {
                       if (submitStatus === 'error') setSubmitStatus('idle');
                     }}
                     onBlur={() => setIsTouched(true)}
-                    placeholder="friend@example.com"
+                    placeholder={t.emailPlaceholder}
                     disabled={isLoading}
                     variant={currentError ? 'error' : 'normal'}
                     error={currentError}
@@ -123,7 +123,7 @@ export function InviteModal() {
             <div className="shrink-0 flex gap-3" style={{ padding: '16px 20px 20px' }}>
               {submitStatus === 'success' ? (
                 <Button layout="pill" variant="cyan" onClick={handleClose}>
-                  Close
+                  {t.close}
                 </Button>
               ) : (
                 <>
@@ -133,7 +133,7 @@ export function InviteModal() {
                     status={isLoading ? 'disabled' : 'idle'}
                     onClick={handleClose}
                   >
-                    Cancel
+                    {t.cancel}
                   </Button>
                   <Button
                     form="invite-form"
@@ -142,7 +142,7 @@ export function InviteModal() {
                     variant={isEmailValid ? 'lime' : 'cyan'}
                     status={isLoading ? 'loading' : 'idle'}
                   >
-                    Send Invite
+                    {t.send}
                   </Button>
                 </>
               )}

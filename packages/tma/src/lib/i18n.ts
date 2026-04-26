@@ -46,6 +46,18 @@ const en = {
     from: 'from',
     flipCard: 'Flip card',
   },
+  invite: {
+    title: 'Invite a Friend',
+    subtitle: 'Send an exclusive invitation link directly to their email.',
+    success: 'Invite Sent!',
+    emailRequired: 'Email is required',
+    emailInvalid: 'Please enter a valid email address',
+    emailPlaceholder: 'friend@example.com',
+    close: 'Close',
+    cancel: 'Cancel',
+    send: 'Send Invite',
+    errorGeneric: 'Failed to send invite',
+  },
 } as const;
 
 export type Translations = typeof en;

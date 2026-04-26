@@ -5,9 +5,10 @@ import { ASSETS } from '@/lib/assets';
 
 export interface LockOverlayProps {
   lockedUntil: Date;
+  senderName?: string;
 }
 
-export function LockOverlay({ lockedUntil }: LockOverlayProps) {
+export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
   const t = useT();
   const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
 
@@ -47,9 +48,10 @@ export function LockOverlay({ lockedUntil }: LockOverlayProps) {
 
       {/* Unlock date */}
       <p
-        className="text-[10px] uppercase tracking-[0.15em] font-bold mt-2"
+        className="text-[10px] uppercase tracking-[0.15em] font-bold mt-2 text-center"
         style={{ color: 'rgb(43, 42, 44)', textShadow: 'rgba(255,255,255,0.8) 0px 1px 3px' }}
       >
+        {senderName && <span className="block mb-1">{t.surprises.fromSender.replace('{{name}}', senderName)}</span>}
         {t.surprises.canBeUnpacked.replace('{{date}}', formatDate(lockedUntil))}
       </p>
 

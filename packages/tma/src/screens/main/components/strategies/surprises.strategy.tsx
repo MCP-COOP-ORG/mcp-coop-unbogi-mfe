@@ -19,7 +19,7 @@ export const surprisesStrategy: GiftScreenStrategy = {
 
   /** Full-card overlay — only the transparent LockOverlay countdown. */
   renderOverlays: (gift, { isUnlocked }) => (
-    <>{!isUnlocked && <LockOverlay lockedUntil={new Date(gift.unpackDate)} />}</>
+    <>{!isUnlocked && <LockOverlay lockedUntil={new Date(gift.unpackDate)} senderName={gift.senderName} />}</>
   ),
 
   /** Image-area overlay — ScratchCanvas clipped inside the Postcard image div. */
