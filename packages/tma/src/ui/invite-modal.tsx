@@ -1,7 +1,9 @@
+import { isValidEmail } from '@unbogi/contracts';
 import { invitesApi } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';
+import { ASSETS } from '@/lib/assets';
 import { useInviteModalStore } from '@/store';
 import { Button, Input } from '@/ui';
 
@@ -14,7 +16,7 @@ export function InviteModal() {
   const [errorMessage, setErrorMessage] = useState('');
   const [isTouched, setIsTouched] = useState(false);
 
-  const isEmailValid = /^\S+@\S+\.\S+$/.test(email);
+  const isEmailValid = isValidEmail(email);
   const showEmailError = isTouched && !isEmailValid;
   const currentError =
     submitStatus === 'error'
@@ -80,7 +82,7 @@ export function InviteModal() {
             ].join(' ')}
           >
             <div className="flex-1 flex flex-col items-center gap-2" style={{ padding: '20px 20px 0' }}>
-              <img src={`${import.meta.env.BASE_URL}bird.png`} alt="Invite Bird" className="w-20 h-20 object-contain" />
+              <img src={ASSETS.BIRD} alt="Invite Bird" className="w-20 h-20 object-contain" />
 
               <h1 className="text-[20px] font-bold text-[#4A3A35]">Invite a Friend</h1>
 

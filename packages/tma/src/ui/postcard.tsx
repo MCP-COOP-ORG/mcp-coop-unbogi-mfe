@@ -1,5 +1,6 @@
 import { APP_CONFIG } from '@unbogi/shared';
-import type React from 'react';
+import type { ReactNode } from 'react';
+import { sanitizeImageUrl } from '@/lib/sanitize';
 
 export interface PostcardMetadata {
   from?: string;
@@ -10,7 +11,7 @@ export interface PostcardMetadata {
 export interface PostcardProps {
   imageUrl: string;
   additionalInfo?: PostcardMetadata;
-  imageOverlay?: React.ReactNode;
+  imageOverlay?: ReactNode;
 }
 
 export function Postcard({ imageUrl, additionalInfo, imageOverlay }: PostcardProps) {
@@ -21,7 +22,7 @@ export function Postcard({ imageUrl, additionalInfo, imageOverlay }: PostcardPro
     >
       <div
         className="w-full flex-1 bg-gray-100 relative overflow-hidden bg-cover bg-center border border-black"
-        style={{ backgroundImage: `url(${imageUrl})` }}
+        style={{ backgroundImage: `url(${sanitizeImageUrl(imageUrl)})` }}
       >
         {/* Image-area overlay slot (e.g. ScratchCanvas) — clipped to image bounds */}
         {imageOverlay && <div className="absolute inset-0 rounded-[inherit] overflow-hidden">{imageOverlay}</div>}

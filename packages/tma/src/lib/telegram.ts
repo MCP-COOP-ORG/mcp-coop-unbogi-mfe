@@ -3,7 +3,9 @@
  * All TG API access goes through this module — single point for mocking & future changes.
  */
 
-const getWebApp = () => (window as any).Telegram?.WebApp;
+import type { HapticImpactStyle, TelegramWebApp } from '@/types/telegram-webapp';
+
+const getWebApp = (): TelegramWebApp | undefined => window.Telegram?.WebApp;
 
 export const tg = {
   get initData(): string {
@@ -16,6 +18,11 @@ export const tg = {
 
   get isTelegram(): boolean {
     return (getWebApp()?.initData?.length ?? 0) > 0;
+  },
+
+  /** Returns true if initData is present and non-empty — safe to send to backend. */
+  get isInitDataPresent(): boolean {
+    return this.initData.length > 0;
   },
 
   get userId(): number | undefined {
@@ -42,7 +49,7 @@ export const tg = {
     }
   },
 
-  haptic(type: 'light' | 'medium' | 'heavy' = 'light') {
+  haptic(type: HapticImpactStyle = 'light') {
     try {
       getWebApp()?.HapticFeedback?.impactOccurred?.(type);
     } catch {

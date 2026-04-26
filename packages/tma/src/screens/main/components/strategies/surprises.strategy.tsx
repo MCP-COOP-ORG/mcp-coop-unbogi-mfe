@@ -1,3 +1,4 @@
+import { ASSETS } from '@/lib/assets';
 import { LockOverlay, ScratchCanvas } from '@/ui';
 import type { GiftScreenStrategy } from './types';
 
@@ -29,7 +30,7 @@ export const surprisesStrategy: GiftScreenStrategy = {
       frostOpacity={0.6}
       isUnlocked={isUnlocked}
       imageUrl={gift.imageUrl}
-      logoUrl={`${import.meta.env.BASE_URL}logo-3.png`}
+      logoUrl={ASSETS.LOGO}
       onReveal={() => onScratched(gift.id)}
     />
   ),

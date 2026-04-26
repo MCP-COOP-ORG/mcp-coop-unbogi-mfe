@@ -1,12 +1,14 @@
+import { APP_CONFIG } from '@unbogi/shared';
 import { useEffect, useState } from 'react';
 import { useT } from '@/hooks/use-t';
+import { ASSETS } from '@/lib/assets';
 
 export interface LockOverlayProps {
   lockedUntil: Date;
   senderName?: string;
 }
 
-export function LockOverlay({ lockedUntil }: LockOverlayProps) {
+export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
   const t = useT();
   const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
 
@@ -28,7 +30,7 @@ export function LockOverlay({ lockedUntil }: LockOverlayProps) {
   };
 
   const formatDate = (date: Date) =>
-    new Date(date).toLocaleDateString('ru-RU', {
+    new Date(date).toLocaleDateString(APP_CONFIG.DEFAULT_LOCALE, {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric',
@@ -41,7 +43,7 @@ export function LockOverlay({ lockedUntil }: LockOverlayProps) {
       {/* Logo */}
       <div
         className="w-[160px] h-[160px] bg-contain bg-center bg-no-repeat shrink-0"
-        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}logo-3.png)` }}
+        style={{ backgroundImage: `url(${ASSETS.LOGO})` }}
       />
 
       {/* Unlock date */}
@@ -49,6 +51,7 @@ export function LockOverlay({ lockedUntil }: LockOverlayProps) {
         className="text-[10px] uppercase tracking-[0.15em] font-bold mt-2"
         style={{ color: 'rgb(43, 42, 44)', textShadow: 'rgba(255,255,255,0.8) 0px 1px 3px' }}
       >
+        {senderName && <span className="block mb-1">{t.surprises.fromSender.replace('{{name}}', senderName)}</span>}
         {t.surprises.canBeUnpacked.replace('{{date}}', formatDate(lockedUntil))}
       </p>
 

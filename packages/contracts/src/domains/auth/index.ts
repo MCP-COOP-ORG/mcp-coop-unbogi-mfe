@@ -30,3 +30,12 @@ export const AuthResponseSchema = z.object({
   token: z.string(),
 });
 export type AuthResponse = z.infer<typeof AuthResponseSchema>;
+
+// ── Email validation helpers (SSOT — derived from SendOtpSchema) ───────────
+/** Reusable email schema — the single source of truth across the monorepo. */
+export const emailSchema = SendOtpSchema.shape.email;
+
+/** Quick boolean predicate — use instead of raw regexes or ad-hoc Zod calls. */
+export function isValidEmail(value: string): boolean {
+  return emailSchema.safeParse(value).success;
+}

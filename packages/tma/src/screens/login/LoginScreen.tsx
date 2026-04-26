@@ -2,6 +2,7 @@ import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Loader2, Mail } from 'lucide-react';
 import { useT } from '@/hooks/use-t';
+import { ASSETS } from '@/lib/assets';
 import { Button } from '@/ui';
 import { Input } from '@/ui/input';
 import { OtpTimer, useAuthForm } from './components';
@@ -21,8 +22,8 @@ export function LoginScreen() {
         initial={{ y: -20, opacity: 0, scale: 0.9 }}
         animate={{ y: 0, opacity: 1, scale: 1 }}
         transition={{ delay: 0.1, duration: 0.5, type: 'spring' }}
-        className="w-[172px] h-[172px] bg-contain bg-center bg-no-repeat shrink-0"
-        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}logo-3.png)` }}
+        className="w-[240px] h-[240px] bg-contain bg-center bg-no-repeat shrink-0"
+        style={{ backgroundImage: `url(${ASSETS.LOGO})` }}
       />
 
       {/* Input + Action Button (transitions between steps) */}

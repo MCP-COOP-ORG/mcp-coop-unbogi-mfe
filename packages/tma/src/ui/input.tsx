@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from 'framer-motion';
 import type { InputHTMLAttributes, ReactNode } from 'react';
+import { FIELD_SHADOW, FIELD_SHADOW_ERROR, FIELD_SHADOW_NORMAL } from './theme-constants';
 
 export type InputVariant = 'normal' | 'error';
 
@@ -28,15 +29,7 @@ export function Input({
 
   // Inked outline — same 3-layer shadow system as Button / BottomNav pill.
   // Ring color shifts on focus and turns red on error.
-  const shadow = isError
-    ? [
-        'shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#EB2D2D,0_0_0_4px_#1A1A1A,0_2px_8px_rgba(235,45,45,0.25)]',
-        'focus-within:shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#EB2D2D,0_0_0_4px_#1A1A1A,0_4px_16px_rgba(235,45,45,0.55)]',
-      ].join(' ')
-    : [
-        'shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFD1B3,0_0_0_4px_#1A1A1A]',
-        'focus-within:shadow-[0_0_0_1px_#1A1A1A,0_0_0_3px_#FFB870,0_0_0_4px_#1A1A1A,0_4px_16px_rgba(255,184,112,0.4)]',
-      ].join(' ');
+  const shadow = disabled ? FIELD_SHADOW.disabled : isError ? FIELD_SHADOW_ERROR : FIELD_SHADOW_NORMAL;
 
   const iconColor = isError ? 'text-[#EB2D2D]' : 'text-[#1A1A1A]';
 

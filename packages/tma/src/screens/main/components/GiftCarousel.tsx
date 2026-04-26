@@ -1,6 +1,7 @@
 import { type GiftRecord, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useT } from '@/hooks/use-t';
+import { ASSETS } from '@/lib/assets';
 import { useGiftModeStore } from '@/store';
 import { Slider } from '@/ui';
 import { GiftCardItem } from './GiftCardItem';
@@ -18,7 +19,7 @@ function EmptyState({ label }: { label: string }) {
     <div className="flex flex-col items-center justify-center h-full gap-4 px-8 text-center">
       <div
         className="w-[172px] h-[172px] bg-contain bg-center bg-no-repeat shrink-0 opacity-90"
-        style={{ backgroundImage: `url(${import.meta.env.BASE_URL}logo-3.png)` }}
+        style={{ backgroundImage: `url(${ASSETS.LOGO})` }}
       />
       <p
         className="text-[14px] uppercase tracking-[0.15em] font-bold mt-2"
@@ -79,7 +80,8 @@ export function GiftCarousel() {
     },
     [scratchGift],
   );
-  const resolveHoliday = (id: string) => holidays.find((h) => h.id === id)?.name ?? id;
+  const holidayMap = useMemo(() => new Map(holidays.map((h) => [h.id, h.name])), [holidays]);
+  const resolveHoliday = useCallback((id: string) => holidayMap.get(id) ?? id, [holidayMap]);
 
   // Step 3 — Guards
   if (!isLoaded || isLoading) return <LoadingState />;
