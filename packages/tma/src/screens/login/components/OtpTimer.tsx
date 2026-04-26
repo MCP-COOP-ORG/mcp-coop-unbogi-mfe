@@ -1,6 +1,6 @@
 import { OTP_CONFIG } from '@unbogi/shared';
 import { Timer } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface OtpTimerProps {
   sentAt: number;
@@ -15,18 +15,23 @@ interface OtpTimerProps {
 export function OtpTimer({ sentAt, onExpired }: OtpTimerProps) {
   const [remainingMs, setRemainingMs] = useState(() => Math.max(0, sentAt + OTP_CONFIG.LIFETIME_MS - Date.now()));
 
+  const onExpiredRef = useRef(onExpired);
+  useEffect(() => {
+    onExpiredRef.current = onExpired;
+  }, [onExpired]);
+
   useEffect(() => {
     const interval = setInterval(() => {
       const ms = Math.max(0, sentAt + OTP_CONFIG.LIFETIME_MS - Date.now());
       setRemainingMs(ms);
       if (ms === 0) {
         clearInterval(interval);
-        onExpired();
+        onExpiredRef.current();
       }
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [sentAt, onExpired]);
+  }, [sentAt]);
 
   const totalSeconds = Math.ceil(remainingMs / 1000);
   const minutes = Math.floor(totalSeconds / 60);

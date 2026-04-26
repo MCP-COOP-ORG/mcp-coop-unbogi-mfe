@@ -19,6 +19,7 @@ export function Slider<T>({ items, getKey, renderItem, className = '' }: SliderP
   const [activeIndex, setActiveIndex] = useState(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: items.length is required to re-run observer when slides change
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -41,7 +42,7 @@ export function Slider<T>({ items, getKey, renderItem, className = '' }: SliderP
       observer.observe(slide);
     });
     return () => observer.disconnect();
-  }, []);
+  }, [items.length]);
 
   const total = items.length;
 

@@ -4,12 +4,13 @@ import { useT } from '@/hooks/use-t';
 import { ASSETS } from '@/lib/assets';
 import { useGiftModeStore } from '@/store';
 import { Slider } from '@/ui';
+import { LoadingSpinner } from '@/ui/spinner';
 import { GiftCardItem } from './GiftCardItem';
 
 function LoadingState() {
   return (
     <div className="flex items-center justify-center h-full">
-      <div className="w-10 h-10 rounded-full border-2 border-white/20 border-t-[var(--color-primary)] animate-spin" />
+      <LoadingSpinner size={40} />
     </div>
   );
 }

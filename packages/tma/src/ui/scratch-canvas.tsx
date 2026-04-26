@@ -292,7 +292,7 @@ export function ScratchCanvas({
           lastY = touch.clientY;
 
           const now = performance.now();
-          if (now - lastCheckTime > 150) {
+          if (now - lastCheckTime > 250) {
             lastCheckTime = now;
 
             try {

@@ -7,6 +7,7 @@ import { useTelegramBackButton } from '@/hooks/use-telegram';
 import { tg } from '@/lib/telegram';
 import { SCREENS, useNavigationStore } from '@/store';
 import { Button, Input, Select, type SelectOption, Textarea } from '@/ui';
+import { LoadingSpinner } from '@/ui/spinner';
 import { formReducer, initialState, type SendFormErrorKey } from './send-form-model';
 
 /* ──────────────────────── helpers ──────────────────────── */
@@ -148,7 +149,7 @@ export function SendForm() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/80 rounded-full animate-spin" />
+        <LoadingSpinner size={24} />
       </div>
     );
   }

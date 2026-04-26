@@ -11,7 +11,7 @@ export const collectionStrategy: GiftScreenStrategy = {
   requiresTimer: false,
 
   selectGifts: ({ openedGifts }) => openedGifts,
-  selectDate: (gift) => new Date(gift.scratchedAt ?? gift.createdAt),
+  selectDate: (gift) => new Date(gift.scratchedAt ?? gift.createdAt ?? gift.unpackDate),
   emptyLabel: (t) => t.collection.empty,
 
   renderOverlays: () => null,
