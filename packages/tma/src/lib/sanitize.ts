@@ -24,3 +24,21 @@ export function sanitizeImageUrl(url: string): string {
     return url;
   }
 }
+
+/**
+ * Runtime check for image URL readiness.
+ *
+ * Returns true if the URL is a non-empty string that passes sanitization
+ * (i.e. it won't resolve to `about:blank`). Use before rendering <img> or
+ * CSS background-image to avoid broken placeholders.
+ *
+ * @example
+ * if (isImageReady(gift.imageUrl)) {
+ *   return <Postcard imageUrl={gift.imageUrl} />;
+ * }
+ */
+export function isImageReady(url: string | undefined | null): url is string {
+  if (!url || url.trim().length === 0) return false;
+  return sanitizeImageUrl(url) !== FALLBACK;
+}
+

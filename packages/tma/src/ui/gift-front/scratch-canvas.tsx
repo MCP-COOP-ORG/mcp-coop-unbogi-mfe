@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useScratchGesture } from '@/hooks';
 
 export interface ScratchCanvasProps {
   clearThreshold?: number;
@@ -19,20 +20,24 @@ export function ScratchCanvas({
   logoUrl,
   onReveal,
 }: ScratchCanvasProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
   const patternCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const fingerprintImgRef = useRef<HTMLImageElement | null>(null);
   const blurImgRef = useRef<HTMLImageElement | null>(null);
   const logoImgRef = useRef<HTMLImageElement | null>(null);
   const progressRef = useRef(1);
 
-  const onRevealRef = useRef(onReveal);
   const isUnlockedRef = useRef(isUnlocked);
   const [isRevealed, setIsRevealed] = useState(false);
 
-  useEffect(() => {
-    onRevealRef.current = onReveal;
-  }, [onReveal]);
+  // ── Gesture hook ──────────────────────────────────────────────────────────
+  const { canvasRef } = useScratchGesture({
+    clearThreshold,
+    isUnlocked,
+    onReveal: () => {
+      setIsRevealed(true);
+      onReveal?.();
+    },
+  });
 
   const drawCanvasState = useCallback(() => {
     const canvas = canvasRef.current;
@@ -129,7 +134,7 @@ export function ScratchCanvas({
     ctx.lineWidth = brushSize;
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
-  }, [brushSize, frostOpacity]);
+  }, [brushSize, frostOpacity, canvasRef]);
 
   // Sync isUnlocked → ref and redraw so logo appears immediately (no animation)
   useEffect(() => {
@@ -212,137 +217,7 @@ export function ScratchCanvas({
     resizeCanvas();
     window.addEventListener('resize', resizeCanvas);
     return () => window.removeEventListener('resize', resizeCanvas);
-  }, [drawCanvasState]);
-
-  // (no 0→1 animation needed — foil is always pre-drawn at progress=1)
-
-  // Handle Touch/Scratch Logic
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    let scratchModeTimeout: ReturnType<typeof setTimeout> | null = null;
-    let isScratchingMode = false;
-    let startX = 0;
-    let startY = 0;
-    let lastX = 0;
-    let lastY = 0;
-    let lastCheckTime = 0;
-    let localRevealed = false;
-
-    const clearScratchTimeout = () => {
-      if (scratchModeTimeout) {
-        clearTimeout(scratchModeTimeout);
-        scratchModeTimeout = null;
-      }
-    };
-
-    const handleTouchStart = (e: TouchEvent) => {
-      if (e.touches.length > 1 || localRevealed || !isUnlocked) return;
-
-      const touch = e.touches[0];
-      startX = touch.clientX;
-      startY = touch.clientY;
-      lastX = startX;
-      lastY = startY;
-      isScratchingMode = false;
-
-      clearScratchTimeout();
-      scratchModeTimeout = setTimeout(() => {
-        isScratchingMode = true;
-
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const rect = canvas.getBoundingClientRect();
-          ctx.beginPath();
-          ctx.moveTo(lastX - rect.left, lastY - rect.top);
-          ctx.lineTo(lastX - rect.left, lastY - rect.top + 0.1);
-          ctx.stroke();
-        }
-      }, 150);
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (localRevealed || !isUnlocked) return;
-
-      const touch = e.touches[0];
-      const dxFromStart = touch.clientX - startX;
-      const dyFromStart = touch.clientY - startY;
-
-      if (!isScratchingMode) {
-        if (Math.abs(dxFromStart) > 10 || Math.abs(dyFromStart) > 10) {
-          clearScratchTimeout();
-        }
-        return;
-      }
-
-      if (isScratchingMode) {
-        e.preventDefault();
-
-        const ctx = canvas.getContext('2d');
-        if (ctx) {
-          const rect = canvas.getBoundingClientRect();
-
-          ctx.beginPath();
-          ctx.moveTo(lastX - rect.left, lastY - rect.top);
-          ctx.lineTo(touch.clientX - rect.left, touch.clientY - rect.top);
-          ctx.stroke();
-
-          lastX = touch.clientX;
-          lastY = touch.clientY;
-
-          const now = performance.now();
-          if (now - lastCheckTime > 250) {
-            lastCheckTime = now;
-
-            try {
-              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-              const data = imageData.data;
-
-              let transparentPixels = 0;
-              let totalPixelsChecked = 0;
-
-              for (let i = 3; i < data.length; i += 64) {
-                totalPixelsChecked++;
-                if (data[i] < 128) {
-                  transparentPixels++;
-                }
-              }
-
-              const percentCleared = (transparentPixels / totalPixelsChecked) * 100;
-
-              if (percentCleared >= clearThreshold && !localRevealed) {
-                localRevealed = true;
-                setIsRevealed(true);
-                if (onRevealRef.current) onRevealRef.current();
-                clearScratchTimeout();
-              }
-            } catch (err) {
-              console.warn('getImageData blocked:', err);
-            }
-          }
-        }
-      }
-    };
-
-    const handleTouchEnd = () => {
-      clearScratchTimeout();
-      isScratchingMode = false;
-    };
-
-    canvas.addEventListener('touchstart', handleTouchStart, { passive: true });
-    canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-    canvas.addEventListener('touchend', handleTouchEnd, { passive: true });
-    canvas.addEventListener('touchcancel', handleTouchEnd, { passive: true });
-
-    return () => {
-      clearScratchTimeout();
-      canvas.removeEventListener('touchstart', handleTouchStart);
-      canvas.removeEventListener('touchmove', handleTouchMove);
-      canvas.removeEventListener('touchend', handleTouchEnd);
-      canvas.removeEventListener('touchcancel', handleTouchEnd);
-    };
-  }, [clearThreshold, isUnlocked]);
+  }, [drawCanvasState, canvasRef]);
 
   return (
     <div

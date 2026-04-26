@@ -1,9 +1,8 @@
 import type { ScratchCodeFormat } from '@unbogi/shared';
-import { APP_CONFIG } from '@unbogi/shared';
 import { QRCodeSVG } from 'qrcode.react';
 import { useState } from 'react';
 import { useT } from '@/hooks';
-import { tg } from '@/lib';
+import { formatLocalDate, tg } from '@/lib';
 
 export interface GiftBackProps {
   holidayName: string;
@@ -25,11 +24,7 @@ function HolidayHeading({ holidayName }: Pick<GiftBackProps, 'holidayName'>) {
 }
 
 function GreetingBubble({ greeting, senderName, date }: Pick<GiftBackProps, 'greeting' | 'senderName' | 'date'>) {
-  const dateStr = date.toLocaleDateString(APP_CONFIG.DEFAULT_LOCALE, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
+  const dateStr = formatLocalDate(date, 'full');
 
   return (
     <div className="w-full flex-1 flex flex-col px-1">
@@ -49,12 +44,14 @@ function SecretCodeSection({ code: { value, format } }: Pick<GiftBackProps, 'cod
   const t = useT();
   const [copied, setCopied] = useState(false);
 
-  const handleCopy = () => {
-    tg.hapticNotification('success');
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(value).catch(() => {});
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      tg.hapticNotification('success');
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch {
+      tg.hapticNotification('error');
     }
   };
 

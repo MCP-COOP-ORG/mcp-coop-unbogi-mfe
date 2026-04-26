@@ -1,7 +1,6 @@
-import { APP_CONFIG } from '@unbogi/shared';
 import { useEffect, useState } from 'react';
 import { useT } from '@/hooks';
-import { ASSETS } from '@/lib';
+import { ASSETS, formatLocalDate } from '@/lib';
 
 export interface LockOverlayProps {
   lockedUntil: Date;
@@ -13,8 +12,7 @@ export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
   const [timeLeftMs, setTimeLeftMs] = useState<number>(0);
 
   useEffect(() => {
-    if (!lockedUntil) return;
-    const update = () => setTimeLeftMs(Math.max(0, new Date(lockedUntil).getTime() - Date.now()));
+    const update = () => setTimeLeftMs(Math.max(0, lockedUntil.getTime() - Date.now()));
     update();
     const id = setInterval(update, 1000);
     return () => clearInterval(id);
@@ -29,12 +27,7 @@ export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
     return h > 0 ? `${pad(h)}:${pad(m)}:${pad(sec)}` : `${pad(m)}:${pad(sec)}`;
   };
 
-  const formatDate = (date: Date) =>
-    new Date(date).toLocaleDateString(APP_CONFIG.DEFAULT_LOCALE, {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-    });
+
 
   if (timeLeftMs <= 0) return null;
 
@@ -52,7 +45,7 @@ export function LockOverlay({ lockedUntil, senderName }: LockOverlayProps) {
         style={{ color: 'rgb(43, 42, 44)', textShadow: 'rgba(255,255,255,0.8) 0px 1px 3px' }}
       >
         {senderName && <span className="block mb-1">{t.surprises.fromSender.replace('{{name}}', senderName)}</span>}
-        {t.surprises.canBeUnpacked.replace('{{date}}', formatDate(lockedUntil))}
+        {t.surprises.canBeUnpacked.replace('{{date}}', formatLocalDate(lockedUntil, 'numeric'))}
       </p>
 
       {/* Countdown */}

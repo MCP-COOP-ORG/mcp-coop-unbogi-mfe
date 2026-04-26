@@ -26,13 +26,14 @@ export const FIELD_SHADOW_ERROR = `${FIELD_SHADOW.error} ${FIELD_SHADOW.errorFoc
 export const ERROR_TEXT_SHADOW =
   '-0.5px -0.5px 0 #1A1A1A, 0.5px -0.5px 0 #1A1A1A, -0.5px 0.5px 0 #1A1A1A, 0.5px 0.5px 0 #1A1A1A, 0 1px 4px rgba(255,255,255,0.9)';
 
-// ── Colors ─────────────────────────────────────────────────────────────────
+// ── Colors (reference CSS custom props from theme.css) ────────────────────
 export const COLORS = {
-  ink: '#1A1A1A',
-  error: '#EB2D2D',
-  cream: '#FFF5E1',
-  warmBg: '#FAF6EE',
-  muted: '#A1A1AA',
+  ink: 'var(--color-ink)',
+  error: 'var(--color-error-red)',
+  cream: 'var(--color-cream)',
+  warmBg: 'var(--color-warm-bg)',
+  success: 'var(--color-success-green)',
+  muted: 'var(--color-muted)',
   text: '#2b2a2c',
 } as const;
 

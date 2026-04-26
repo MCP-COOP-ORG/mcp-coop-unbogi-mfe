@@ -1,6 +1,5 @@
-import { APP_CONFIG } from '@unbogi/shared';
 import type { ReactNode } from 'react';
-import { sanitizeImageUrl } from '@/lib';
+import { formatLocalDate, sanitizeImageUrl } from '@/lib';
 
 export interface PostcardMetadata {
   from?: string;
@@ -34,14 +33,11 @@ export function Postcard({ imageUrl, additionalInfo, imageOverlay }: PostcardPro
           <span>
             {additionalInfo.from && <>from {additionalInfo.from}</>}
             {additionalInfo.from && additionalInfo.date && ' • '}
-            {additionalInfo.date?.toLocaleDateString(APP_CONFIG.DEFAULT_LOCALE, {
-              day: 'numeric',
-              month: 'short',
-              year: 'numeric',
-            })}
+            {additionalInfo.date && formatLocalDate(additionalInfo.date, 'short')}
           </span>
         </div>
       )}
     </div>
   );
 }
+

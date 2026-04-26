@@ -3,9 +3,22 @@
  * All TG API access goes through this module — single point for mocking & future changes.
  */
 
-import type { HapticImpactStyle, TelegramWebApp } from '@/types/telegram-webapp';
+import type { HapticImpactStyle, TelegramUser, TelegramWebApp } from '@/types/telegram-webapp';
 
 const getWebApp = (): TelegramWebApp | undefined => window.Telegram?.WebApp;
+
+/**
+ * Runtime type guard for TelegramUser.
+ * Validates that the raw object from initDataUnsafe has the expected shape.
+ */
+function isValidTelegramUser(raw: unknown): raw is TelegramUser {
+  if (typeof raw !== 'object' || raw === null) return false;
+  const obj = raw as Record<string, unknown>;
+  return typeof obj.id === 'number' && typeof obj.first_name === 'string';
+}
+
+/** Cached validated user — parsed once from initDataUnsafe. */
+let _cachedUser: TelegramUser | null = null;
 
 export const tg = {
   get initData(): string {
@@ -25,12 +38,24 @@ export const tg = {
     return this.initData.length > 0;
   },
 
+  /** Validated Telegram user object. Returns null if data is missing or malformed. */
+  get user(): TelegramUser | null {
+    if (_cachedUser) return _cachedUser;
+    const raw = getWebApp()?.initDataUnsafe?.user;
+    if (!isValidTelegramUser(raw)) {
+      if (raw !== undefined) console.warn('[TG] Invalid user data in initDataUnsafe:', raw);
+      return null;
+    }
+    _cachedUser = raw;
+    return _cachedUser;
+  },
+
   get userId(): number | undefined {
-    return getWebApp()?.initDataUnsafe?.user?.id;
+    return this.user?.id;
   },
 
   get languageCode(): string | undefined {
-    return getWebApp()?.initDataUnsafe?.user?.language_code;
+    return this.user?.language_code;
   },
 
   ready() {
@@ -95,3 +120,21 @@ export const tg = {
     getWebApp()?.close?.();
   },
 };
+
+/**
+ * Higher-order function that wraps a callback with haptic feedback.
+ * Eliminates repeated `tg.haptic('light'); fn()` boilerplate.
+ *
+ * @example
+ * onClick={withHaptic(onInviteClick)}         // defaults to 'light'
+ * onClick={withHaptic(onSendClick, 'medium')} // custom intensity
+ */
+export function withHaptic<A extends unknown[]>(
+  fn: (...args: A) => void,
+  level: HapticImpactStyle = 'light',
+): (...args: A) => void {
+  return (...args) => {
+    tg.haptic(level);
+    fn(...args);
+  };
+}

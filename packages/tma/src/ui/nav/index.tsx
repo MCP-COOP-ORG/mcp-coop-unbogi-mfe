@@ -1,4 +1,4 @@
-import { tg } from '@/lib';
+import { tg, withHaptic } from '@/lib';
 import { SCREENS, useNavigationStore } from '@/store';
 import { Button, type ButtonIcon, type ButtonVariant } from '../elements/button';
 
@@ -40,10 +40,7 @@ export function BottomNav<T>({ tabs, activeTabId, onTabChange, onInviteClick, on
         <Button
           variant="orange"
           icon="UserPlus"
-          onClick={() => {
-            tg.haptic('light');
-            onInviteClick();
-          }}
+          onClick={withHaptic(onInviteClick)}
           aria-label="Profile or Invite"
         />
       </div>
@@ -68,13 +65,11 @@ export function BottomNav<T>({ tabs, activeTabId, onTabChange, onInviteClick, on
         <Button
           variant="cyan"
           icon="Send"
-          onClick={() => {
-            tg.haptic('light');
-            onSendClick();
-          }}
+          onClick={withHaptic(onSendClick)}
           aria-label="Send Gift"
         />
       </div>
     </div>
   );
 }
+

@@ -52,3 +52,12 @@ src/
 - `zustand` — lightweight state management
 - `zod` — gift send form validation only
 - `@unbogi/contracts` — `COLLECTIONS`, `PROVIDERS`, `ERROR_CODES` (types shared with backend)
+
+## Related Packages
+
+| Package | Context File |
+|---------|-------------|
+| TMA (consumer) | [../tma/project-context-tma.md](../tma/project-context-tma.md) |
+| Contracts | [../contracts/project-context-contracts.md](../contracts/project-context-contracts.md) |
+| Firebase (backend) | [../firebase/project-context-firebase.md](../firebase/project-context-firebase.md) |
+

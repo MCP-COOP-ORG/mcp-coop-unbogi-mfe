@@ -45,7 +45,13 @@ const ICON_MAP: Record<ButtonIcon, LucideIcon> = {
   LayoutGrid,
 };
 
-export interface ButtonProps extends Omit<ComponentProps<typeof motion.button>, 'variant' | 'layout'> {
+// ── Discriminated Union Props ────────────────────────────────────────────────
+// Two mutually exclusive modes: Tab mode (with layoutId + isActive)
+// and Normal mode (circle/pill layout without layoutId).
+
+type MotionButtonBase = Omit<ComponentProps<typeof motion.button>, 'variant' | 'layout'>;
+
+interface ButtonPropsBase extends MotionButtonBase {
   variant?: ButtonVariant;
   /**
    * Controls the button's interactive state.
@@ -57,18 +63,26 @@ export interface ButtonProps extends Omit<ComponentProps<typeof motion.button>, 
    */
   status?: ButtonStatus;
   icon?: ButtonIcon;
+}
+
+/** Tab mode — transparent hitbox with animated sliding background via layoutId. */
+interface TabButtonProps extends ButtonPropsBase {
+  layoutId: string;
+  isActive?: boolean;
+  layout?: never;
+  children?: never;
+}
+
+/** Normal mode — circle or pill button with optional text content. */
+interface NormalButtonProps extends ButtonPropsBase {
   layout?: 'circle' | 'pill';
   /** Text content only. Never pass JSX icons — use the `icon` prop instead. */
   children?: React.ReactNode;
-  /**
-   * When provided, enables "tab mode": the button becomes a transparent hitbox
-   * and its colored background is rendered as a child `motion.div` with this
-   * layoutId — allowing framer-motion to animate it between sibling tab buttons.
-   */
-  layoutId?: string;
-  /** Used in tab mode to control whether the sliding background is visible. */
-  isActive?: boolean;
+  layoutId?: never;
+  isActive?: never;
 }
+
+export type ButtonProps = TabButtonProps | NormalButtonProps;
 
 // Press: subtle translate for tactile feel; glow fades out on press.
 // Shadow stack (inside→out): fill → B1(black) → W(white) → B2(black) → colored ambient glow.
@@ -93,37 +107,34 @@ export const buttonTheme: Record<ButtonVariant, { bg: string; normalShadow: stri
   transparent: { bg: 'transparent', normalShadow: 'none', pressedShadow: 'none' },
 };
 
+/** Type guard: does this props set represent tab mode? */
+function isTabMode(props: ButtonProps): props is TabButtonProps {
+  return 'layoutId' in props && typeof props.layoutId === 'string';
+}
+
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    {
+  (props, ref) => {
+    const {
       variant = 'orange',
       status = 'idle',
       icon,
-      layout = 'circle',
-      layoutId,
-      isActive,
       className,
-      children,
       disabled,
-      ...props
-    },
-    ref,
-  ) => {
+    } = props;
+
     const isLoading = status === 'loading';
     const isDisabled = status === 'disabled' || disabled || isLoading;
 
     const t = buttonTheme[variant];
     const IconComponent = icon ? ICON_MAP[icon] : null;
 
-    const isCircle = layout === 'circle';
     const isTransparent = variant === 'transparent';
     const textColor = isTransparent ? 'rgba(43, 42, 44, 0.8)' : '#1A1A1A';
     const textShadow = isTransparent ? '0 1px 3px rgba(255, 255, 255, 0.8)' : undefined;
-    const isTabMode = !!layoutId;
 
     // ── Tab mode ────────────────────────────────────────────────────────────
-    // Transparent hitbox + inner motion.div (layoutId) slides between tab positions.
-    if (isTabMode) {
+    if (isTabMode(props)) {
+      const { layoutId, isActive, variant: _v, status: _s, icon: _i, className: _c, disabled: _d, ...tabRest } = props;
       return (
         <motion.button
           ref={ref}
@@ -139,7 +150,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             cursor: isDisabled ? 'not-allowed' : 'pointer',
           }}
           className="flex items-center justify-center rounded-full outline-none select-none"
-          {...props}
+          {...tabRest}
         >
           {isActive && (
             <motion.div
@@ -164,6 +175,9 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     }
 
     // ── Normal mode ─────────────────────────────────────────────────────────
+    const { layout = 'circle', children, variant: _v, status: _s, icon: _i, className: _c, disabled: _d, ...normalRest } = props as NormalButtonProps;
+    const isCircle = layout === 'circle';
+
     return (
       <motion.button
         ref={ref}
@@ -197,7 +211,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
               ? 'rounded-[28px] px-5 text-[14px] font-bold uppercase tracking-[0.15em]'
               : 'rounded-[28px] px-5 text-[17px] font-bold tracking-wide'
         } ${className || ''}`}
-        {...props}
+        {...normalRest}
       >
         {isCircle ? (
           // Circle: spinner replaces icon
