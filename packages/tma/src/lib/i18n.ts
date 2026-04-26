@@ -43,6 +43,7 @@ const en = {
     activationCode: 'Activation Code',
     scanToActivate: 'Scan to activate',
     tapToCopy: 'Tap to copy',
+    copied: 'Copied!',
     from: 'from',
     flipCard: 'Flip card',
   },

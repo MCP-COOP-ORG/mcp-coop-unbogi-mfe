@@ -85,6 +85,9 @@ export function useAuthForm() {
     setState((prev) => ({ ...prev, isLoading: true }));
 
     try {
+      if (!tg.isInitDataPresent) {
+        throw new Error('Telegram environment is missing');
+      }
       await authApi.sendEmailOtp(state.email, tg.initData);
       setPendingOtp(state.email, Date.now());
       tg.haptic('light');

@@ -1,4 +1,4 @@
-export { BottomNav } from './bottom-nav';
+export { BottomNav, type BottomNavProps, type BottomNavTab } from './bottom-nav';
 export {
   BUTTON_SIZE,
   Button,

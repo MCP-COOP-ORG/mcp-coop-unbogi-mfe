@@ -57,6 +57,14 @@ export const tg = {
     }
   },
 
+  hapticNotification(type: 'error' | 'success' | 'warning') {
+    try {
+      getWebApp()?.HapticFeedback?.notificationOccurred?.(type);
+    } catch {
+      // Silently fail outside TG
+    }
+  },
+
   showBackButton(onClick: () => void) {
     const bb = getWebApp()?.BackButton;
     if (!bb) return;

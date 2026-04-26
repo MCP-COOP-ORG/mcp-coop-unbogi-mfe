@@ -177,7 +177,12 @@ export function SendForm() {
             value={state.searchQuery}
             onChange={handleSearchChange}
             onFocus={() => setShowDropdown(true)}
-            onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+            onBlur={(e) => {
+              if (e.relatedTarget && e.currentTarget.closest('.relative')?.contains(e.relatedTarget as Node)) {
+                return;
+              }
+              setShowDropdown(false);
+            }}
             autoComplete="off"
             error={errors.receiverId}
           />
