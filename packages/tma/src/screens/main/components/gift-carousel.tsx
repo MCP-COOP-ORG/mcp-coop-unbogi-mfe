@@ -9,7 +9,7 @@ import { GiftCardItem } from './gift-card-item';
 function LoadingState() {
   return (
     <div className="flex items-center justify-center h-full">
-      <LoadingSpinner size={40} />
+      <LoadingSpinner />
     </div>
   );
 }

@@ -61,7 +61,7 @@ export const sendEmailOtp = onCall(
 );
 
 /** Verifies an OTP code and completes registration. Returns a Firebase Custom Token. */
-export const verifyEmailOtp = onCall({ region: FUNCTION_CONFIG.REGION }, async (request) => {
+export const verifyEmailOtp = onCall({ region: FUNCTION_CONFIG.REGION, enforceAppCheck: true }, async (request) => {
   const parsed = VerifyOtpSchema.safeParse(request.data);
   if (!parsed.success) {
     throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);

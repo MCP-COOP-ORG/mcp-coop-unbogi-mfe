@@ -59,6 +59,16 @@ const en = {
     send: 'Send Invite',
     errorGeneric: 'Failed to send invite',
   },
+  error: {
+    title: 'Oops, something broke',
+    description: 'An unexpected error occurred. Reloading usually fixes it.',
+    reload: 'Reload App',
+  },
+  authError: {
+    title: 'Service Temporarily Unavailable',
+    description: 'Could not connect after several attempts. Please try again.',
+    retry: 'Try Again',
+  },
 } as const;
 
 export type Translations = typeof en;

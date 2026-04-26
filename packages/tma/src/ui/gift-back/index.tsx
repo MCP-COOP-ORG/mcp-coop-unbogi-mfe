@@ -1,8 +1,10 @@
 import type { ScratchCodeFormat } from '@unbogi/shared';
-import { QRCodeSVG } from 'qrcode.react';
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { useT } from '@/hooks';
 import { formatLocalDate, tg } from '@/lib';
+import { LoadingSpinner } from '@/ui';
+
+const QRCodeSVG = lazy(() => import('qrcode.react').then((m) => ({ default: m.QRCodeSVG })));
 
 export interface GiftBackProps {
   holidayName: string;
@@ -65,7 +67,9 @@ function SecretCodeSection({ code: { value, format } }: Pick<GiftBackProps, 'cod
       {format === 'qr-code' ? (
         <div className="flex flex-col items-center gap-3">
           <div className="bg-white p-3 rounded-2xl border border-black/10">
-            <QRCodeSVG value={value} size={152} bgColor="#ffffff" fgColor="#1A1A1A" level="M" />
+            <Suspense fallback={<LoadingSpinner />}>
+              <QRCodeSVG value={value} size={152} bgColor="#ffffff" fgColor="#1A1A1A" level="M" />
+            </Suspense>
           </div>
           <p className="text-[11px] text-[#1A1A1A]/50 uppercase tracking-widest">{t.giftBack.scanToActivate}</p>
         </div>

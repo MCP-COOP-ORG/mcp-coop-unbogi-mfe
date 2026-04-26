@@ -10,16 +10,26 @@
     "./domains/*": "./src/domains/*/index.ts"
   },
   "scripts": {
-    "build": "tsc"
+    "build": "tsc --build",
+    "test": "vitest run --coverage"
   },
   "dependencies": {
     "@unbogi/contracts": "workspace:*",
     "firebase": "^12.12.0",
-    "zustand": "^5.0.12",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitest/coverage-v8": "^4.1.5",
+    "jsdom": "^29.0.2",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
     "typescript": "~5.8.0",
-    "vite": "^8.0.4"
+    "vite": "^8.0.4",
+    "vitest": "^4.1.5"
   }
 }

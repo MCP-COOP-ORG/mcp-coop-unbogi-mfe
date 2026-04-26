@@ -14,6 +14,34 @@ export default defineConfig({
   base: process.env.VITE_APP_BASE || '/unbogi/',
   build: {
     outDir: process.env.VITE_APP_OUTDIR || 'dist/unbogi',
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            {
+              name: 'vendor-react',
+              test: /node_modules[\\/]react/,
+              priority: 20,
+            },
+            {
+              name: 'vendor-firebase',
+              test: /node_modules[\\/](firebase|@firebase)/,
+              priority: 15,
+            },
+            {
+              name: 'vendor-ui',
+              test: /node_modules[\\/](framer-motion|lucide-react|qrcode\.react)/,
+              priority: 10,
+            },
+            {
+              name: 'vendor',
+              test: /node_modules/,
+              priority: 5,
+            },
+          ],
+        },
+      },
+    },
   },
   // Pre-bundle qrcode.react so Vite dev server can resolve its CJS exports
   optimizeDeps: {

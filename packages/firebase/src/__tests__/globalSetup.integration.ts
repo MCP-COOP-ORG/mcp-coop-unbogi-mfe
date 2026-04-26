@@ -1,8 +1,9 @@
+import type { StartedTestContainer } from 'testcontainers';
 import { GenericContainer, Wait } from 'testcontainers';
 
-let container: any;
+let container: StartedTestContainer | undefined;
 
-export async function setup({ provide }: { provide: (key: string, value: any) => void }) {
+export async function setup({ provide }: { provide: <T>(key: string, value: T) => void }) {
   console.log('Starting Firestore Emulator container...');
 
   container = await new GenericContainer('gcr.io/google.com/cloudsdktool/google-cloud-cli:emulators')

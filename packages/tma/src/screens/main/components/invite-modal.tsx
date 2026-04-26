@@ -1,5 +1,4 @@
-import { isValidEmail } from '@unbogi/contracts';
-import { invitesApi } from '@unbogi/shared';
+import { invitesApi, isValidEmail } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CheckCircle, Mail } from 'lucide-react';
 import { useState } from 'react';

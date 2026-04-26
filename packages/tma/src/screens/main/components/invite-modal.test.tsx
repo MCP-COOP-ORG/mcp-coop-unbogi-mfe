@@ -6,11 +6,8 @@ import { useInviteModalStore } from '@/store';
 import { InviteModal } from './invite-modal';
 
 // Mock dependencies
-vi.mock('@unbogi/contracts', () => ({
-  isValidEmail: (email: string) => email.includes('@'),
-}));
-
 vi.mock('@unbogi/shared', () => ({
+  isValidEmail: (email: string) => email.includes('@'),
   invitesApi: {
     sendEmailInvite: vi.fn(),
   },

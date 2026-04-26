@@ -1,7 +1,7 @@
 import { ERROR_MESSAGES, FIREBASE_ERRORS } from '@unbogi/contracts';
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/v2/https';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
 import { getOrCreateFirebaseUser } from './firebase-auth';
 
 vi.mock('firebase-admin', () => ({
@@ -16,12 +16,12 @@ vi.mock('firebase-functions/logger', () => ({
 }));
 
 describe('FirebaseAuth Utils (Unit)', () => {
-  let mockGetUserByEmail: any;
-  let mockCreateUser: any;
+  let mockGetUserByEmail: Mock;
+  let mockCreateUser: Mock;
 
   beforeEach(() => {
     vi.clearAllMocks();
-    const authMock = admin.auth() as any;
+    const authMock = admin.auth() as unknown as Record<string, Mock>;
     mockGetUserByEmail = authMock.getUserByEmail;
     mockCreateUser = authMock.createUser;
   });

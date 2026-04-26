@@ -218,13 +218,13 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, r
       {isCircle ? (
         // Circle: spinner replaces icon
         isLoading ? (
-          <LoadingSpinner size={24} color={textColor} />
+          <LoadingSpinner />
         ) : (
           IconComponent && <IconComponent size={24} color={textColor} strokeWidth={2.5} fill="none" />
         )
       ) : // Pill: spinner replaces text+icon; idle = text then icon inline
       isLoading ? (
-        <LoadingSpinner size={20} color={textColor} />
+        <LoadingSpinner />
       ) : (
         <>
           {children && <span>{children}</span>}

@@ -1,7 +1,10 @@
 import { CONFIG, ERROR_CODES, ERROR_MESSAGES, PROVIDERS } from '@unbogi/contracts';
 import * as admin from 'firebase-admin';
-import { HttpsError } from 'firebase-functions/v2/https';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import type { InviteRepository } from '../repositories/invite';
+import type { UserRepository } from '../repositories/user';
+import type { AuthService } from './auth';
 import { InviteService } from './invite';
 
 vi.mock('firebase-admin', () => ({
@@ -28,9 +31,9 @@ vi.mock('../utils/firebase-auth', () => ({
 
 describe('InviteService (Unit)', () => {
   let inviteService: InviteService;
-  let mockInviteRepo: any;
-  let mockUserRepo: any;
-  let mockAuthService: any;
+  let mockInviteRepo: Record<string, Mock>;
+  let mockUserRepo: Record<string, Mock>;
+  let mockAuthService: Record<string, Mock>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -52,12 +55,16 @@ describe('InviteService (Unit)', () => {
       }),
     };
 
-    inviteService = new InviteService(mockInviteRepo, mockUserRepo, mockAuthService);
+    inviteService = new InviteService(
+      mockInviteRepo as unknown as InviteRepository,
+      mockUserRepo as unknown as UserRepository,
+      mockAuthService as unknown as AuthService,
+    );
   });
 
   describe('createInvite', () => {
     it('should create an invite and return a token', async () => {
-      const result = await inviteService.createInvite('sender-1', { type: 'one-time' });
+      const result = await inviteService.createInvite('sender-1', {});
       expect(mockInviteRepo.createInvite).toHaveBeenCalledWith('sender-1');
       expect(result).toEqual({ token: 'mock-token' });
     });
@@ -93,7 +100,9 @@ describe('InviteService (Unit)', () => {
       mockResendSend.mockResolvedValue({ data: null, error: new Error('Resend err') });
       await expect(
         inviteService.sendEmailInvite('sender-1', { targetEmail: 'test@example.com' }, 'botUsername', 'api-key'),
-      ).rejects.toThrow(new HttpsError(ERROR_CODES.INTERNAL as any, ERROR_MESSAGES.FAILED_TO_SEND_EMAIL));
+      ).rejects.toThrow(
+        new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.FAILED_TO_SEND_EMAIL),
+      );
     });
   });
 
@@ -103,7 +112,7 @@ describe('InviteService (Unit)', () => {
     it('should throw NOT_FOUND if invite does not exist', async () => {
       mockInviteRepo.getInvite.mockResolvedValue(null);
       await expect(inviteService.redeemEmailInvite(payload, 'bot-token')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.NOT_FOUND as any, 'Invite not found'),
+        new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, 'Invite not found'),
       );
     });
 

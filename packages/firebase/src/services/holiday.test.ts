@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { HolidayRepository } from '../repositories/holiday';
 import { HolidayService } from './holiday';
 
 vi.mock('../utils/storage', () => ({
@@ -8,13 +9,13 @@ vi.mock('../utils/storage', () => ({
 
 describe('HolidayService (Unit)', () => {
   let holidayService: HolidayService;
-  let mockHolidayRepo: any;
+  let mockHolidayRepo: Record<string, ReturnType<typeof vi.fn>>;
 
   beforeEach(() => {
     mockHolidayRepo = {
       getAllHolidays: vi.fn(),
     };
-    holidayService = new HolidayService(mockHolidayRepo);
+    holidayService = new HolidayService(mockHolidayRepo as unknown as HolidayRepository);
   });
 
   describe('listHolidays', () => {

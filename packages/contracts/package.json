@@ -19,7 +19,7 @@
     "./holidays": "./dist/domains/holidays/index.js"
   },
   "dependencies": {
-    "zod": "^3.22.4"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "typescript": "~5.8.0"

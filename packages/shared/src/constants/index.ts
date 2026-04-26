@@ -20,20 +20,25 @@ export const AUTH_STATUS = {
   AUTHENTICATED: 'authenticated',
   UNAUTHENTICATED: 'unauthenticated',
   /**
-   * TG-идентификация прошла успешно, но пользователь не зарегистрирован.
-   * Нужно пройти OTP для привязки email.
+   * TG identification succeeded but the user is not registered.
+   * OTP flow is required to bind an email.
    */
   EMAIL_REQUIRED: 'email_required',
+  /**
+   * Authentication failed after all retry attempts.
+   * Shows a "service unavailable" screen with a retry button.
+   */
+  AUTH_ERROR: 'auth_error',
 } as const;
 
 export type AuthStatus = (typeof AUTH_STATUS)[keyof typeof AUTH_STATUS];
 
 /**
- * OTP конфигурация — единый источник правды между клиентом и бэком.
- * Бэк использует CONFIG.OTP_LIFETIME_MS из @unbogi/contracts (то же значение).
+ * OTP configuration — single source of truth shared between client and backend.
+ * Backend uses CONFIG.OTP_LIFETIME_MS from @unbogi/contracts (same value).
  */
 export const OTP_CONFIG = {
-  LIFETIME_MS: 10 * 60 * 1000, // 10 минут
+  LIFETIME_MS: 10 * 60 * 1000, // 10 minutes
 } as const;
 
 export const GIFT_CONFIG = {

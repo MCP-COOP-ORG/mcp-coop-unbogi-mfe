@@ -33,7 +33,9 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 
     let isTelegramAuthResolved = false;
 
-    const performNormalAuth = () => {
+    const MAX_RETRIES = 3;
+
+    const performNormalAuth = (attempt = 1) => {
       authApi
         .authenticateTelegram(initData)
         .then(({ hasEmail }) => {
@@ -46,9 +48,14 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           }
         })
         .catch((err) => {
-          console.error('[Auth] telegramAuth failed:', err);
-          isTelegramAuthResolved = true;
-          set({ status: AUTH_STATUS.UNAUTHENTICATED });
+          console.error(`[Auth] telegramAuth failed (attempt ${attempt}/${MAX_RETRIES}):`, err);
+          if (attempt < MAX_RETRIES) {
+            const delay = 1000 * 2 ** (attempt - 1); // 1s, 2s, 4s
+            setTimeout(() => performNormalAuth(attempt + 1), delay);
+          } else {
+            isTelegramAuthResolved = true;
+            set({ status: AUTH_STATUS.AUTH_ERROR });
+          }
         });
     };
 

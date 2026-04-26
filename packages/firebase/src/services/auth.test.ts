@@ -3,7 +3,9 @@ import { CONFIG, ERROR_MESSAGES, TELEGRAM_CONSTANTS } from '@unbogi/contracts';
 import * as admin from 'firebase-admin';
 import { HttpsError } from 'firebase-functions/v2/https';
 import { Resend } from 'resend';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import type { OtpRepository } from '../repositories/otp';
+import type { UserRepository } from '../repositories/user';
 import { AuthService } from './auth';
 
 // Mock dependencies
@@ -36,8 +38,8 @@ vi.mock('../utils/firebase-auth', () => ({
 
 describe('AuthService (Unit)', () => {
   let authService: AuthService;
-  let mockUserRepo: any;
-  let mockOtpRepo: any;
+  let mockUserRepo: Record<string, Mock>;
+  let mockOtpRepo: Record<string, Mock>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -54,7 +56,7 @@ describe('AuthService (Unit)', () => {
       incrementAttempts: vi.fn(),
     };
 
-    authService = new AuthService(mockUserRepo, mockOtpRepo);
+    authService = new AuthService(mockUserRepo as unknown as UserRepository, mockOtpRepo as unknown as OtpRepository);
 
     // Stub validateAndExtractUser to bypass HMAC validation in most tests
     vi.spyOn(authService, 'validateAndExtractUser').mockReturnValue({
@@ -67,7 +69,7 @@ describe('AuthService (Unit)', () => {
   describe('validateAndExtractUser', () => {
     beforeEach(() => {
       // Restore the spy to test the real implementation
-      (authService.validateAndExtractUser as any).mockRestore();
+      (authService.validateAndExtractUser as unknown as Mock).mockRestore();
     });
 
     it('should throw INVALID_PAYLOAD if no hash', () => {
@@ -183,7 +185,7 @@ describe('AuthService (Unit)', () => {
         () =>
           ({
             emails: { send: vi.fn().mockResolvedValue({ error: new Error('Resend failed') }) },
-          }) as any,
+          }) as unknown as Resend,
       );
 
       await expect(

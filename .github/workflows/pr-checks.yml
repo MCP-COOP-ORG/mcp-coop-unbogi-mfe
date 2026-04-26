@@ -1,0 +1,64 @@
+name: PR Quality Checks
+
+on:
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: pr-${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    name: Lint · Type-check · Test · Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10.11.0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile=false
+
+      # Build workspace packages in dependency order
+      - name: Build contracts
+        run: pnpm --filter @unbogi/contracts build
+
+      - name: Build shared
+        run: pnpm --filter @unbogi/shared build
+
+      # Lint
+      - name: Biome check
+        run: pnpm exec biome check .
+
+      # Type-check
+      - name: Type-check TMA
+        run: pnpm exec tsc --noEmit -p packages/tma
+
+      - name: Type-check Firebase
+        run: pnpm --filter @unbogi/firebase run typecheck
+
+      # Tests
+      - name: Test shared
+        run: pnpm --filter @unbogi/shared test
+
+      - name: Test TMA
+        run: pnpm --filter @unbogi/tma test
+
+      - name: Test Firebase (unit only)
+        run: pnpm --filter @unbogi/firebase test
+
+      # Build TMA for bundle-size validation
+      - name: Build TMA
+        run: pnpm --filter @unbogi/tma build

@@ -147,7 +147,7 @@ export function SendForm() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-full">
-        <LoadingSpinner size={24} />
+        <LoadingSpinner />
       </div>
     );
   }

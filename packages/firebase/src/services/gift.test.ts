@@ -1,6 +1,9 @@
 import { ERROR_CODES, ERROR_MESSAGES, GIFT_ERROR_MESSAGES } from '@unbogi/contracts';
-import { HttpsError } from 'firebase-functions/v2/https';
+import { type FunctionsErrorCode, HttpsError } from 'firebase-functions/v2/https';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ContactRepository } from '../repositories/contact';
+import type { GiftRepository } from '../repositories/gift';
+import type { HolidayRepository } from '../repositories/holiday';
 import { AppError } from '../utils/errors';
 import { GiftService } from './gift';
 
@@ -24,9 +27,9 @@ vi.mock('../utils/storage', () => ({
 
 describe('GiftService (Unit)', () => {
   let giftService: GiftService;
-  let mockGiftRepo: any;
-  let mockContactRepo: any;
-  let mockHolidayRepo: any;
+  let mockGiftRepo: Record<string, ReturnType<typeof vi.fn>>;
+  let mockContactRepo: Record<string, ReturnType<typeof vi.fn>>;
+  let mockHolidayRepo: Record<string, ReturnType<typeof vi.fn>>;
 
   beforeEach(() => {
     mockGiftRepo = {
@@ -42,7 +45,11 @@ describe('GiftService (Unit)', () => {
       getHoliday: vi.fn(),
     };
 
-    giftService = new GiftService(mockGiftRepo, mockContactRepo, mockHolidayRepo);
+    giftService = new GiftService(
+      mockGiftRepo as unknown as GiftRepository,
+      mockContactRepo as unknown as ContactRepository,
+      mockHolidayRepo as unknown as HolidayRepository,
+    );
   });
 
   describe('sendGift', () => {
@@ -52,19 +59,22 @@ describe('GiftService (Unit)', () => {
       holidayId: 'holiday-1',
       greeting: 'Hello!',
       unpackDate: '2030-01-01T00:00:00Z',
-      scratchCode: { value: 'CODE', format: 'text' as const },
+      scratchCode: { value: 'CODE', format: 'code' as const },
     };
 
     it('should throw if sender is receiver', async () => {
       await expect(giftService.sendGift(defaultPayload, 'receiver-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.INVALID_ARGUMENT as any, GIFT_ERROR_MESSAGES.SELF_GIFT_FORBIDDEN),
+        new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, GIFT_ERROR_MESSAGES.SELF_GIFT_FORBIDDEN),
       );
     });
 
     it('should throw if receiver is not in contacts', async () => {
       mockContactRepo.areUsersConnected.mockResolvedValue(false);
       await expect(giftService.sendGift(defaultPayload, 'sender-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.INVALID_ARGUMENT as any, GIFT_ERROR_MESSAGES.RECEIVER_NOT_IN_CONTACTS),
+        new HttpsError(
+          ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode,
+          GIFT_ERROR_MESSAGES.RECEIVER_NOT_IN_CONTACTS,
+        ),
       );
     });
 
@@ -72,7 +82,7 @@ describe('GiftService (Unit)', () => {
       mockContactRepo.areUsersConnected.mockResolvedValue(true);
       mockHolidayRepo.getHoliday.mockResolvedValue({ exists: false });
       await expect(giftService.sendGift(defaultPayload, 'sender-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.NOT_FOUND as any, GIFT_ERROR_MESSAGES.HOLIDAY_NOT_FOUND),
+        new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.HOLIDAY_NOT_FOUND),
       );
     });
 
@@ -114,21 +124,21 @@ describe('GiftService (Unit)', () => {
     it('should throw NOT_FOUND for AppError not-found', async () => {
       mockGiftRepo.scratchGift.mockRejectedValue(new AppError('not-found', 'Gift missing'));
       await expect(giftService.scratchGift({ giftId: 'gift-1' }, 'caller-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.NOT_FOUND as any, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND),
+        new HttpsError(ERROR_CODES.NOT_FOUND as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_NOT_FOUND),
       );
     });
 
     it('should throw PERMISSION_DENIED for AppError permission-denied', async () => {
       mockGiftRepo.scratchGift.mockRejectedValue(new AppError('permission-denied', 'Denied'));
       await expect(giftService.scratchGift({ giftId: 'gift-1' }, 'caller-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.PERMISSION_DENIED as any, GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED),
+        new HttpsError(ERROR_CODES.PERMISSION_DENIED as FunctionsErrorCode, GIFT_ERROR_MESSAGES.GIFT_ACCESS_DENIED),
       );
     });
 
     it('should throw INTERNAL for other errors', async () => {
       mockGiftRepo.scratchGift.mockRejectedValue(new Error('Unknown'));
       await expect(giftService.scratchGift({ giftId: 'gift-1' }, 'caller-1')).rejects.toThrow(
-        new HttpsError(ERROR_CODES.INTERNAL as any, ERROR_MESSAGES.AUTH_SYSTEM_ERROR),
+        new HttpsError(ERROR_CODES.INTERNAL as FunctionsErrorCode, ERROR_MESSAGES.AUTH_SYSTEM_ERROR),
       );
     });
 

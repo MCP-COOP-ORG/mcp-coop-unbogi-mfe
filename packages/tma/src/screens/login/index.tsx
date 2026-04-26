@@ -1,9 +1,9 @@
 import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Loader2, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 import { useT } from '@/hooks';
 import { ASSETS } from '@/lib';
-import { Button, Input } from '@/ui';
+import { Button, Input, LoadingSpinner } from '@/ui';
 import { OtpTimer, useAuthForm } from './components';
 
 export function LoginScreen() {
@@ -37,7 +37,7 @@ export function LoginScreen() {
               transition={{ duration: 0.2 }}
               className="flex justify-center items-center w-full"
             >
-              <Loader2 className="w-6 h-6 animate-spin text-purple-400/60" />
+              <LoadingSpinner />
             </motion.div>
           ) : isEmailStep ? (
             <motion.div

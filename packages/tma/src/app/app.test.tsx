@@ -9,8 +9,19 @@ vi.mock('@unbogi/shared', () => ({
     AUTHENTICATED: 'AUTHENTICATED',
     UNAUTHENTICATED: 'UNAUTHENTICATED',
     INITIALIZING: 'INITIALIZING',
+    AUTH_ERROR: 'AUTH_ERROR',
   },
   useAuthStore: vi.fn(),
+}));
+
+vi.mock('@/hooks', () => ({
+  useT: () => ({
+    authError: {
+      title: 'Service Temporarily Unavailable',
+      description: 'Could not connect after several attempts. Please try again.',
+      retry: 'Try Again',
+    },
+  }),
 }));
 
 vi.mock('@/lib', () => ({
@@ -18,6 +29,15 @@ vi.mock('@/lib', () => ({
     initData: 'mock_init_data',
     startParam: 'mock_start_param',
   },
+}));
+
+vi.mock('@/ui', () => ({
+  LoadingSpinner: () => <div data-testid="loading-spinner" />,
+  Button: ({ children, onClick }: { children: React.ReactNode; onClick: () => void }) => (
+    <button type="button" data-testid="button" onClick={onClick}>
+      {children}
+    </button>
+  ),
 }));
 
 vi.mock('@/screens', () => ({
@@ -74,9 +94,24 @@ describe('App', () => {
     expect(screen.queryByTestId('login-screen')).not.toBeInTheDocument();
   });
 
+  it('renders auth error screen when AUTH_ERROR', () => {
+    vi.mocked(useAuthStore).mockImplementation((selector: unknown) => {
+      const state = {
+        initialize: mockInitialize,
+        status: AUTH_STATUS.AUTH_ERROR,
+      } as unknown as AuthState;
+      return (selector as (state: AuthState) => unknown)(state);
+    });
+
+    render(<App />);
+
+    expect(screen.getByText('Service Temporarily Unavailable')).toBeInTheDocument();
+    expect(screen.getByText('Try Again')).toBeInTheDocument();
+    expect(screen.queryByTestId('login-screen')).not.toBeInTheDocument();
+    expect(screen.queryByTestId('main-screen')).not.toBeInTheDocument();
+  });
+
   it('renders background patterns', () => {
-    // We can't easily test the exact inline styles, but we can check if the elements are in the DOM.
-    // However, they don't have test IDs or roles. We can verify the outer wrapper has correct classes.
     const { container } = render(<App />);
     const rootDiv = container.firstChild as HTMLElement;
 

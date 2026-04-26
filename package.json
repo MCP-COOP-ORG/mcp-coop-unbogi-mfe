@@ -5,11 +5,12 @@
   "description": "UnBoGi — cross-platform gift exchange app. Telegram Mini App + React Native monorepo powered by Firebase.",
   "scripts": {
     "dev": "pnpm --filter @unbogi/tma dev",
-    "build": "pnpm --filter @unbogi/tma build",
+    "build": "pnpm -r build",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
-    "typecheck": "tsc --build"
+    "typecheck": "tsc --build",
+    "verify": "pnpm -r build && pnpm run typecheck && pnpm run lint && pnpm -r test"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.0.0",

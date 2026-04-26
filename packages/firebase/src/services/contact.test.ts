@@ -1,17 +1,18 @@
 import { FALLBACK_NAMES } from '@unbogi/contracts';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, type Mock, vi } from 'vitest';
+import type { ContactRepository } from '../repositories/contact';
 import { ContactService } from './contact';
 
 describe('ContactService (Unit)', () => {
   let contactService: ContactService;
-  let mockContactRepo: any;
+  let mockContactRepo: Record<string, Mock>;
 
   beforeEach(() => {
     mockContactRepo = {
       getContacts: vi.fn(),
       getUsersByIds: vi.fn(),
     };
-    contactService = new ContactService(mockContactRepo);
+    contactService = new ContactService(mockContactRepo as unknown as ContactRepository);
   });
 
   describe('listContacts', () => {

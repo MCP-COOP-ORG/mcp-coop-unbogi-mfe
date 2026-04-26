@@ -1,6 +1,7 @@
 import { TELEGRAM_BOT_API_URL, TG_MESSAGES } from '@unbogi/contracts';
 import { getFunctions } from 'firebase-admin/functions';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { UserRepository } from '../repositories/user';
 import { NotificationService } from './notification';
 
 vi.mock('firebase-admin/functions', () => ({
@@ -17,9 +18,9 @@ vi.mock('firebase-functions/v2', () => ({
 
 describe('NotificationService (Unit)', () => {
   let notificationService: NotificationService;
-  let mockUserRepo: any;
-  let mockTaskQueue: any;
-  let globalFetchMock: any;
+  let mockUserRepo: Record<string, ReturnType<typeof vi.fn>>;
+  let mockTaskQueue: Record<string, ReturnType<typeof vi.fn>>;
+  let globalFetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     vi.clearAllMocks();
@@ -29,11 +30,11 @@ describe('NotificationService (Unit)', () => {
     mockTaskQueue = {
       enqueue: vi.fn().mockResolvedValue(undefined),
     };
-    (getFunctions as any).mockReturnValue({
+    vi.mocked(getFunctions).mockReturnValue({
       taskQueue: vi.fn().mockReturnValue(mockTaskQueue),
-    });
+    } as unknown as ReturnType<typeof getFunctions>);
 
-    notificationService = new NotificationService(mockUserRepo);
+    notificationService = new NotificationService(mockUserRepo as unknown as UserRepository);
 
     globalFetchMock = vi.fn();
     global.fetch = globalFetchMock;
