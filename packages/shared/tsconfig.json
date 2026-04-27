@@ -6,6 +6,7 @@
     "rootDir": "./src"
   },
   "include": ["src"],
+  "exclude": ["src/**/*.native.ts"],
   "references": [
     { "path": "../contracts" }
   ]

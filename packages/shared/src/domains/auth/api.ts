@@ -1,7 +1,5 @@
-import { signInWithCustomToken } from 'firebase/auth';
-import { httpsCallable } from 'firebase/functions';
 import { CLOUD_FUNCTIONS } from '../../constants';
-import { auth, functions } from '../../firebase';
+import { auth, functions, httpsCallable, signInWithCustomToken } from '../../firebase';
 
 export const authApi = {
   /**

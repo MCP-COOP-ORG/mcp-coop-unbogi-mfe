@@ -1,6 +1,5 @@
-import { httpsCallable } from 'firebase/functions';
 import { CLOUD_FUNCTIONS } from '../../constants';
-import { functions } from '../../firebase';
+import { functions, httpsCallable } from '../../firebase';
 import type { GiftRecord, SendGiftPayload } from './types';
 
 export const giftsApi = {
