@@ -16,7 +16,10 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.unbogi.app",
-      "googleServicesFile": "./GoogleService-Info.plist"
+      "googleServicesFile": "./GoogleService-Info.plist",
+      "entitlements": {
+        "com.apple.developer.devicecheck.appattest-environment": "production"
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -37,7 +40,9 @@
             "useFrameworks": "static",
             "forceStaticLinking": [
               "RNFBApp",
-              "RNFBAuth"
+              "RNFBAuth",
+              "RNFBFunctions",
+              "RNFBAppCheck"
             ]
           }
         }
