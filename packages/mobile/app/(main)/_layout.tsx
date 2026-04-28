@@ -1,26 +1,43 @@
 import { Tabs } from 'expo-router';
-import { colors } from '@/theme';
+import { View, StyleSheet } from 'react-native';
+import { BottomNav } from '@/ui';
 
 export default function MainLayout() {
   return (
-    <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: '#faf6ee', // warmBg
-          borderTopWidth: 2,
-          borderTopColor: '#1a1a1a', // ink
-        },
-        tabBarActiveTintColor: '#1a1a1a',
-        tabBarInactiveTintColor: '#a1a1aa',
-      }}
-    >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
+    <View style={styles.container}>
+      <Tabs
+        tabBar={(props) => <BottomNav {...props} />}
+        screenOptions={{
+          headerShown: false,
+          sceneStyle: { backgroundColor: 'transparent' },
         }}
-      />
-    </Tabs>
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
+            href: null,
+          }}
+        />
+        <Tabs.Screen
+          name="surprises"
+          options={{
+            title: 'Surprises',
+          }}
+        />
+        <Tabs.Screen
+          name="collection"
+          options={{
+            title: 'Collection',
+          }}
+        />
+      </Tabs>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+});

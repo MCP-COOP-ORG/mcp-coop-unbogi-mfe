@@ -24,7 +24,9 @@ const authService = new AuthService(userRepository, new OtpRepository());
 const inviteService = new InviteService(new InviteRepository(), userRepository, authService);
 
 /** Creates an invite link for the authenticated user. */
-export const create = onCall({ region: FUNCTION_CONFIG.REGION, enforceAppCheck: true }, async (request) => {
+export const create = onCall(
+  { region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
+  async (request) => {
   if (!request.auth) {
     throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
   }
@@ -66,7 +68,7 @@ export const accept = onCall({ region: FUNCTION_CONFIG.REGION }, async (request)
 
 /** Sends an email invite on behalf of the authenticated user. */
 export const sendEmailInvite = onCall(
-  { secrets: [telegramBotUsername, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: true },
+  { secrets: [telegramBotUsername, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
@@ -100,7 +102,7 @@ export const sendEmailInvite = onCall(
 
 /** Redeems an email invite token via Telegram initData and returns a Firebase Custom Token. */
 export const redeemEmailInvite = onCall(
-  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION, enforceAppCheck: true },
+  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
     const parsed = RedeemEmailInviteSchema.safeParse(request.data);
     if (!parsed.success) {

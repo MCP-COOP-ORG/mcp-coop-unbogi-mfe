@@ -19,7 +19,7 @@ const authService = new AuthService(new UserRepository(), new OtpRepository());
 
 /** Authenticates a Telegram user via initData HMAC. Issues a Custom Token for known users. */
 export const telegramAuth = onCall(
-  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION, enforceAppCheck: false },
+  { secrets: [telegramBotToken], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
     const parsed = TelegramAuthSchema.safeParse(request.data);
     if (!parsed.success) {
@@ -39,7 +39,7 @@ export const telegramAuth = onCall(
 
 /** Sends an OTP code to the provided email address. Idempotent for active OTPs. */
 export const sendEmailOtp = onCall(
-  { secrets: [telegramBotToken, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: false },
+  { secrets: [telegramBotToken, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
     const parsed = SendOtpSchema.safeParse(request.data);
     if (!parsed.success) {
@@ -61,7 +61,9 @@ export const sendEmailOtp = onCall(
 );
 
 /** Verifies an OTP code and completes registration. Returns a Firebase Custom Token. */
-export const verifyEmailOtp = onCall({ region: FUNCTION_CONFIG.REGION, enforceAppCheck: false }, async (request) => {
+export const verifyEmailOtp = onCall(
+  { region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
+  async (request) => {
   const parsed = VerifyOtpSchema.safeParse(request.data);
   if (!parsed.success) {
     throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);

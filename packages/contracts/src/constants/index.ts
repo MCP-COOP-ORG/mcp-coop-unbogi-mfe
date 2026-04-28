@@ -114,6 +114,7 @@ export const FUNCTION_CONFIG = {
   REGION: 'europe-west1',
   MEMORY: '256MiB',
   TIMEOUT_SECONDS: 60,
+  ENFORCE_APP_CHECK: false,
 } as const;
 
 /** Base URL for the Telegram Bot HTTP API. Append `<token>/methodName` to form a full URL. */
