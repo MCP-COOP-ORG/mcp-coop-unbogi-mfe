@@ -1,3 +1,4 @@
+/// <reference path="../env.d.ts" />
 /**
  * Firebase platform adapter — Web (Vite / TMA)
  *

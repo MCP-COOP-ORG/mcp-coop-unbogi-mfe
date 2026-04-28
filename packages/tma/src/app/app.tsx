@@ -19,16 +19,7 @@ export function App() {
   const isAuthError = status === AUTH_STATUS.AUTH_ERROR;
 
   return (
-    <div
-      className="relative flex flex-col h-full w-full overflow-hidden bg-purple-500 text-white"
-      style={{
-        backgroundImage: `
-          radial-gradient(130vw 130vh at 0% 0%, rgba(15, 231, 234, 0.91) 0%, transparent 100%),
-          radial-gradient(130vw 130vh at 100% 100%, rgba(221, 201, 19, 0.89) 0%, transparent 100%),
-          radial-gradient(100vw 100vh at 50% 50%, rgba(106, 44, 164, 0.4) 0%, transparent 100%)
-        `,
-      }}
-    >
+    <div className="relative flex flex-col h-full w-full overflow-hidden text-white">
       {/* Polka Dots Pattern */}
       <div
         className="absolute inset-0 pointer-events-none z-0"

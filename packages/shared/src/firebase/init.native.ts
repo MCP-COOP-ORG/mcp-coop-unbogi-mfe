@@ -7,11 +7,11 @@
  *
  * Metro bundler picks this file over init.web.ts thanks to the .native.ts extension.
  */
-import firebase from '@react-native-firebase/app';
+import { getApp } from '@react-native-firebase/app';
 import { getAuth } from '@react-native-firebase/auth';
 import { getFunctions } from '@react-native-firebase/functions';
 
 // Native SDKs auto-initialize from google-services.json / GoogleService-Info.plist
-export const app = firebase.app();
+export const app = getApp();
 export const auth = getAuth(app);
 export const functions = getFunctions(app, 'europe-west1');
