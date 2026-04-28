@@ -1,7 +1,5 @@
-import { signInWithCustomToken } from 'firebase/auth';
-import { httpsCallable } from 'firebase/functions';
 import { CLOUD_FUNCTIONS } from '../../constants';
-import { auth, functions } from '../../firebase';
+import { auth, functions, httpsCallable, signInWithCustomToken } from '../../firebase';
 
 export const authApi = {
   /**
@@ -27,8 +25,8 @@ export const authApi = {
    * initData is required by the backend to extract telegramId and nickname (saved into the OTP record).
    * Idempotent: if an active OTP already exists, the server won't send a new one.
    */
-  async sendEmailOtp(email: string, initData: string): Promise<void> {
-    const fn = httpsCallable<{ email: string; initData: string }, { success: boolean }>(
+  async sendEmailOtp(email: string, initData?: string): Promise<void> {
+    const fn = httpsCallable<{ email: string; initData?: string }, { success: boolean }>(
       functions,
       CLOUD_FUNCTIONS.AUTH_SEND_EMAIL_OTP,
     );

@@ -1,7 +1,6 @@
-import { onAuthStateChanged, signInWithCustomToken } from 'firebase/auth';
 import { create } from 'zustand';
 import { AUTH_STATUS } from '../../constants';
-import { auth } from '../../firebase';
+import { auth, onAuthStateChanged, signInWithCustomToken } from '../../firebase';
 import { invitesApi } from '../invites/api';
 import { authApi } from './api';
 import type { AuthState } from './types';

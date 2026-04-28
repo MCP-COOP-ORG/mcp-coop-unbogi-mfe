@@ -107,8 +107,14 @@ export class AuthService {
   async sendEmailOtp(payload: SendOtpRequest, botToken: string, resendApiKey: string): Promise<void> {
     const { email, initData } = payload;
 
-    const tgUser = this.validateAndExtractUser(initData, botToken);
-    const nickname = tgUser.username || tgUser.first_name || TELEGRAM_CONSTANTS.DEFAULT_NICKNAME;
+    let telegramId: number | undefined;
+    let nickname: string = TELEGRAM_CONSTANTS.DEFAULT_NICKNAME;
+
+    if (initData) {
+      const tgUser = this.validateAndExtractUser(initData, botToken);
+      telegramId = tgUser.id;
+      nickname = tgUser.username || tgUser.first_name || nickname;
+    }
 
     // Skip resend if a non-expired OTP already exists for this email
     const existing = await this.otpRepository.getOtp(email);
@@ -140,7 +146,7 @@ export class AuthService {
       code: otpCode,
       attempts: 0,
       expiresAt: admin.firestore.Timestamp.fromDate(newExpiresAt),
-      telegramId: tgUser.id,
+      telegramId,
       nickname,
     });
   }
@@ -184,7 +190,16 @@ export class AuthService {
       const userRecord = await getOrCreateFirebaseUser(email);
       const uid = userRecord.uid;
 
-      await this.userRepository.upsertUser(uid, { uid, email, telegramId, nickname, provider: PROVIDERS.EMAIL });
+      const updateData: { uid: string; email: string; nickname: string; provider: string; telegramId?: number } = {
+        uid,
+        email,
+        nickname,
+        provider: PROVIDERS.EMAIL,
+      };
+      if (telegramId !== undefined) {
+        updateData.telegramId = telegramId;
+      }
+      await this.userRepository.upsertUser(uid, updateData);
 
       const customToken = await admin.auth().createCustomToken(uid);
       return { token: customToken };

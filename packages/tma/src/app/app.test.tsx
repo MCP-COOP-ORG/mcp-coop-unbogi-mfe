@@ -115,15 +115,6 @@ describe('App', () => {
     const { container } = render(<App />);
     const rootDiv = container.firstChild as HTMLElement;
 
-    expect(rootDiv).toHaveClass(
-      'relative',
-      'flex',
-      'flex-col',
-      'h-full',
-      'w-full',
-      'overflow-hidden',
-      'bg-purple-500',
-      'text-white',
-    );
+    expect(rootDiv).toHaveClass('relative', 'flex', 'flex-col', 'h-full', 'w-full', 'overflow-hidden', 'text-white');
   });
 });

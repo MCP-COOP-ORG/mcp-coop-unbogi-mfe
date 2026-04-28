@@ -1,8 +1,7 @@
 :root {
   /* ─── Brand Palette ─── */
-  --color-primary: #7c3aed;
-  --color-primary-light: #a78bfa;
-  --color-primary-dark: #5b21b6;
+  --color-primary: #0fe7ea; /* Cyan as primary neo-brutalism */
+  --color-primary-dark: #0bbabf;
 
   --color-accent: #f472b6;
   --color-accent-light: #fbcfe8;

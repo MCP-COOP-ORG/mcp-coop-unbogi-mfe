@@ -12,10 +12,10 @@ export const TelegramAuthResponseSchema = z.object({
 });
 export type TelegramAuthResponse = z.infer<typeof TelegramAuthResponseSchema>;
 
-// initData обязателен — сервер извлекает telegramId и nickname для сохранения в OTP-запись
+// initData опционален — если пришел, бэкенд извлекает telegramId
 export const SendOtpSchema = z.object({
   email: z.string().email(),
-  initData: z.string().min(1),
+  initData: z.string().optional(),
 });
 export type SendOtpRequest = z.infer<typeof SendOtpSchema>;
 
