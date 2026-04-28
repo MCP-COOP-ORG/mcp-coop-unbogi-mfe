@@ -146,7 +146,7 @@ export class AuthService {
       code: otpCode,
       attempts: 0,
       expiresAt: admin.firestore.Timestamp.fromDate(newExpiresAt),
-      telegramId,
+      telegramId: telegramId ?? null,
       nickname,
     });
   }
@@ -196,7 +196,7 @@ export class AuthService {
         nickname,
         provider: PROVIDERS.EMAIL,
       };
-      if (telegramId !== undefined) {
+      if (telegramId != null) {
         updateData.telegramId = telegramId;
       }
       await this.userRepository.upsertUser(uid, updateData);

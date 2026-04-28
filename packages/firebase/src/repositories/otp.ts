@@ -7,7 +7,7 @@ export interface OtpData {
   code: string;
   attempts: number;
   expiresAt: admin.firestore.Timestamp;
-  telegramId?: number;
+  telegramId?: number | null;
   nickname: string;
 }
 

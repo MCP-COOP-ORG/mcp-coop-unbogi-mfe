@@ -16,10 +16,7 @@
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.unbogi.app",
-      "googleServicesFile": "./GoogleService-Info.plist",
-      "entitlements": {
-        "com.apple.developer.devicecheck.appattest-environment": "production"
-      }
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
