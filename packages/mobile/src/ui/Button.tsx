@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, ChevronRight, Gift, LayoutGrid, Library, Send, UserPlus } from 'lucide-react-native';
+import { ArrowLeft, Camera, Check, ChevronRight, Gift, LayoutGrid, Library, Send, UserPlus } from 'lucide-react-native';
 import type React from 'react';
-import { StyleSheet, Text, type TextStyle, TouchableOpacity, type ViewStyle, View } from 'react-native';
+import { StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';
@@ -10,7 +10,7 @@ export interface ButtonProps {
   children?: React.ReactNode;
   variant?: ButtonVariant;
   layout?: ButtonLayout;
-  icon?: 'ChevronRight' | 'ArrowLeft' | 'Check' | 'Send' | 'UserPlus' | 'Gift' | 'Library' | 'LayoutGrid';
+  icon?: 'ChevronRight' | 'ArrowLeft' | 'Check' | 'Send' | 'UserPlus' | 'Gift' | 'Library' | 'LayoutGrid' | 'Camera';
   onPress?: () => void;
   disabled?: boolean;
   status?: 'idle' | 'loading' | 'disabled';
@@ -39,6 +39,7 @@ const ICON_MAP = {
   Gift,
   Library,
   LayoutGrid,
+  Camera,
 };
 
 export const Button: React.FC<ButtonProps> = ({
@@ -68,19 +69,9 @@ export const Button: React.FC<ButtonProps> = ({
         onPress={onPress}
         disabled={isDisabled || isLoading}
         activeOpacity={0.8}
-        style={[
-          styles.tabContainer,
-          isActive && { backgroundColor: bgColor },
-          style,
-        ]}
+        style={[styles.tabContainer, isActive && { backgroundColor: bgColor }, style]}
       >
-        {IconComponent && (
-          <IconComponent
-            color={isActive ? '#1a1a1a' : '#5AABDE'}
-            size={24}
-            strokeWidth={2.5}
-          />
-        )}
+        {IconComponent && <IconComponent color={isActive ? '#1a1a1a' : '#5AABDE'} size={24} strokeWidth={2.5} />}
       </TouchableOpacity>
     );
   }

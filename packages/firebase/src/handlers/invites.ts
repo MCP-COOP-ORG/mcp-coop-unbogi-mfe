@@ -27,21 +27,22 @@ const inviteService = new InviteService(new InviteRepository(), userRepository, 
 export const create = onCall(
   { region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
-  if (!request.auth) {
-    throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
-  }
+    if (!request.auth) {
+      throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);
+    }
 
-  const parsed = CreateInviteSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);
-  }
+    const parsed = CreateInviteSchema.safeParse(request.data);
+    if (!parsed.success) {
+      throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);
+    }
 
-  const senderId = request.auth.uid;
-  const result = await inviteService.createInvite(senderId, parsed.data);
+    const senderId = request.auth.uid;
+    const result = await inviteService.createInvite(senderId, parsed.data);
 
-  logger.info(`[invites.create] Invite created by ${senderId}, token: ${result.token}`);
-  return result;
-});
+    logger.info(`[invites.create] Invite created by ${senderId}, token: ${result.token}`);
+    return result;
+  },
+);
 
 /** Accepts a link-based invite and creates bidirectional contacts. */
 export const accept = onCall({ region: FUNCTION_CONFIG.REGION }, async (request) => {
@@ -68,7 +69,11 @@ export const accept = onCall({ region: FUNCTION_CONFIG.REGION }, async (request)
 
 /** Sends an email invite on behalf of the authenticated user. */
 export const sendEmailInvite = onCall(
-  { secrets: [telegramBotUsername, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
+  {
+    secrets: [telegramBotUsername, resendApiKey],
+    region: FUNCTION_CONFIG.REGION,
+    enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK,
+  },
   async (request) => {
     if (!request.auth) {
       throw new HttpsError(ERROR_CODES.UNAUTHENTICATED as FunctionsErrorCode, ERROR_MESSAGES.AUTHENTICATION_REQUIRED);

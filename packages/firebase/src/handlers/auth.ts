@@ -39,7 +39,11 @@ export const telegramAuth = onCall(
 
 /** Sends an OTP code to the provided email address. Idempotent for active OTPs. */
 export const sendEmailOtp = onCall(
-  { secrets: [telegramBotToken, resendApiKey], region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
+  {
+    secrets: [telegramBotToken, resendApiKey],
+    region: FUNCTION_CONFIG.REGION,
+    enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK,
+  },
   async (request) => {
     const parsed = SendOtpSchema.safeParse(request.data);
     if (!parsed.success) {
@@ -64,10 +68,11 @@ export const sendEmailOtp = onCall(
 export const verifyEmailOtp = onCall(
   { region: FUNCTION_CONFIG.REGION, enforceAppCheck: FUNCTION_CONFIG.ENFORCE_APP_CHECK },
   async (request) => {
-  const parsed = VerifyOtpSchema.safeParse(request.data);
-  if (!parsed.success) {
-    throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);
-  }
+    const parsed = VerifyOtpSchema.safeParse(request.data);
+    if (!parsed.success) {
+      throw new HttpsError(ERROR_CODES.INVALID_ARGUMENT as FunctionsErrorCode, ERROR_MESSAGES.INVALID_PAYLOAD);
+    }
 
-  return authService.verifyEmailOtp(parsed.data);
-});
+    return authService.verifyEmailOtp(parsed.data);
+  },
+);

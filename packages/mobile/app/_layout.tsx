@@ -2,11 +2,11 @@ import { AUTH_STATUS, useAuthStore } from '@unbogi/shared';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { ImageBackground, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { View, ImageBackground, StyleSheet } from 'react-native';
-import Svg, { Defs, Pattern, Rect, Circle, RadialGradient, Stop } from 'react-native-svg';
+import Svg, { Circle, Defs, Pattern, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { colors } from '@/theme';
-import { InviteModal } from '@/ui';
+import { InviteModal, SendFormModal } from '@/ui';
 
 const BG_PATTERN = require('../assets/bg-pattern-3.png');
 
@@ -31,12 +31,12 @@ function GlobalBackground() {
             <Stop offset="0%" stopColor="rgb(106, 44, 164)" stopOpacity="0.4" />
             <Stop offset="100%" stopColor="rgb(106, 44, 164)" stopOpacity="0" />
           </RadialGradient>
-          
+
           <Pattern id="polka-dots" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
             <Circle cx="12" cy="12" r="2" fill="rgba(129, 24, 205, 0.2)" />
           </Pattern>
         </Defs>
-        
+
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad1)" />
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad2)" />
         <Rect x="0" y="0" width="100%" height="100%" fill="url(#grad3)" />
@@ -99,6 +99,7 @@ export default function RootLayout() {
         <Stack.Screen name="(main)" options={{ animation: 'fade' }} />
       </Stack>
       <InviteModal />
+      <SendFormModal />
     </GestureHandlerRootView>
   );
 }

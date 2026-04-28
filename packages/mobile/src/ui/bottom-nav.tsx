@@ -1,19 +1,19 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
-import { useInviteModalStore } from '../store';
+import React from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useInviteModalStore, useSendModalStore } from '../store';
 import { Button } from './Button';
 
 export function BottomNav({ state, descriptors, navigation }: BottomTabBarProps) {
   const { openInviteModal } = useInviteModalStore();
+  const { openSendModal } = useSendModalStore();
 
   const onInviteClick = () => {
     openInviteModal();
   };
 
   const onSendClick = () => {
-    // TODO: implement send modal or navigation
-    console.log('Send clicked');
+    openSendModal();
   };
 
   // Filter out any hidden routes (like the default index if not meant to be a tab)

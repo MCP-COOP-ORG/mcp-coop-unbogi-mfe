@@ -1,16 +1,7 @@
 import { invitesApi, isValidEmail } from '@unbogi/shared';
 import { CheckCircle, Mail } from 'lucide-react-native';
 import React, { useState } from 'react';
-import {
-  Modal,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-} from 'react-native';
+import { Image, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useInviteModalStore } from '../store';
 import { Button } from './Button';
@@ -92,16 +83,10 @@ export function InviteModal() {
       onRequestClose={handleClose}
       statusBarTranslucent
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.overlay}
-      >
+      <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={handleClose} />
 
-        <Animated.View
-          entering={ZoomIn.springify().damping(20).stiffness(200)}
-          style={styles.modalContainer}
-        >
+        <Animated.View entering={ZoomIn.springify().damping(20).stiffness(200)} style={styles.modalContainer}>
           <View style={styles.content}>
             <Image source={BIRD_IMAGE} style={styles.birdImage} resizeMode="contain" />
             <Text style={styles.title}>{t.title}</Text>
