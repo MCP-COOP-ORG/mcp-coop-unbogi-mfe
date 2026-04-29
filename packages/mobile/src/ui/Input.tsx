@@ -1,31 +1,42 @@
-import type React from 'react';
-import { StyleSheet, Text, TextInput, type TextInputProps, View } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, Text, TextInput, type TextInputProps, View } from 'react-native';
 
 export interface InputProps extends TextInputProps {
   label?: string;
   error?: string;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
+  onRightIconPress?: () => void;
 }
 
-export const Input: React.FC<InputProps> = ({ style, label, error, leftIcon, rightIcon, ...props }) => {
-  return (
-    <View style={styles.container}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      <View style={[styles.wrapper, error && styles.wrapperError]}>
-        {leftIcon && <View style={styles.leftIconContainer}>{leftIcon}</View>}
-        <TextInput
-          style={[styles.input, style]}
-          placeholderTextColor="#a1a1aa" // --color-muted
-          autoCapitalize="none"
-          {...props}
-        />
-        {rightIcon && <View style={styles.rightIconContainer}>{rightIcon}</View>}
+export const Input = React.forwardRef<TextInput, InputProps>(
+  ({ style, label, error, leftIcon, rightIcon, onRightIconPress, ...props }, ref) => {
+    return (
+      <View style={styles.container}>
+        {label && <Text style={styles.label}>{label}</Text>}
+        <View style={[styles.wrapper, error && styles.wrapperError]}>
+          {leftIcon && <View style={styles.leftIconContainer}>{leftIcon}</View>}
+          <TextInput
+            ref={ref}
+            style={[styles.input, style]}
+            placeholderTextColor="#a1a1aa"
+            autoCapitalize="none"
+            {...props}
+          />
+          {rightIcon &&
+            (onRightIconPress ? (
+              <Pressable style={styles.rightIconContainer} onPress={onRightIconPress} hitSlop={8}>
+                {rightIcon}
+              </Pressable>
+            ) : (
+              <View style={styles.rightIconContainer}>{rightIcon}</View>
+            ))}
+        </View>
+        {error && <Text style={styles.errorText}>{error}</Text>}
       </View>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-};
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: {

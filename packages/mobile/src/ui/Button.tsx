@@ -1,4 +1,15 @@
-import { ArrowLeft, Camera, Check, ChevronRight, Gift, LayoutGrid, Library, Send, UserPlus } from 'lucide-react-native';
+import {
+  ArrowLeft,
+  Camera,
+  Check,
+  ChevronRight,
+  Gift,
+  LayoutGrid,
+  Library,
+  Send,
+  UserPlus,
+  X,
+} from 'lucide-react-native';
 import type React from 'react';
 import { StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native';
 import { Spinner } from './Spinner';
@@ -10,7 +21,17 @@ export interface ButtonProps {
   children?: React.ReactNode;
   variant?: ButtonVariant;
   layout?: ButtonLayout;
-  icon?: 'ChevronRight' | 'ArrowLeft' | 'Check' | 'Send' | 'UserPlus' | 'Gift' | 'Library' | 'LayoutGrid' | 'Camera';
+  icon?:
+    | 'ChevronRight'
+    | 'ArrowLeft'
+    | 'Check'
+    | 'Send'
+    | 'UserPlus'
+    | 'Gift'
+    | 'Library'
+    | 'LayoutGrid'
+    | 'Camera'
+    | 'X';
   onPress?: () => void;
   disabled?: boolean;
   status?: 'idle' | 'loading' | 'disabled';
@@ -28,7 +49,7 @@ const VARIANTS: Record<ButtonVariant, string> = {
   transparent: 'transparent',
 };
 
-const BUTTON_SIZE = 42; // Matches TMA BUTTON_SIZE
+const BUTTON_SIZE = 48; // Match Input height
 
 const ICON_MAP = {
   ChevronRight,
@@ -40,6 +61,7 @@ const ICON_MAP = {
   Library,
   LayoutGrid,
   Camera,
+  X,
 };
 
 export const Button: React.FC<ButtonProps> = ({

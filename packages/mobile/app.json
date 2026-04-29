@@ -28,6 +28,13 @@
     },
     "plugins": [
       "expo-router",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow UnBoGi to access your camera to scan gift QR codes.",
+          "barcodeScannerEnabled": true
+        }
+      ],
       "@react-native-firebase/app",
       "@react-native-firebase/auth",
       [

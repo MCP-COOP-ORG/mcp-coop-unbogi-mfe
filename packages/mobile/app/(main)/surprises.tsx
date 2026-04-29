@@ -1,6 +1,11 @@
 import React from 'react';
-import { EmptyState } from '@/ui';
+import { View } from 'react-native';
+import { GiftCarousel, surprisesStrategy } from '@/ui/gifts';
 
 export default function SurprisesScreen() {
-  return <EmptyState label="SURPRISES" />;
+  return (
+    <View style={{ flex: 1 }}>
+      <GiftCarousel strategy={surprisesStrategy} />
+    </View>
+  );
 }
