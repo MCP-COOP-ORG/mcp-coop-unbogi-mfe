@@ -141,3 +141,7 @@ vite.config.ts.timestamp-*
 # Vitest HTML Reports
 html/
 integration-rep/
+
+# Firebase credentials
+packages/mobile/google-services.json
+packages/mobile/GoogleService-Info.plist

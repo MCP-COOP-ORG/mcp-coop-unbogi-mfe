@@ -24,7 +24,8 @@
         "backgroundColor": "#FAF6EE"
       },
       "edgeToEdgeEnabled": true,
-      "package": "com.unbogi.app"
+      "package": "com.unbogi.app",
+      "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router",
