@@ -17,13 +17,14 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
 import { logger } from '@/shared/lib/logger';
+import { colors } from '@/theme';
 
 const BRUSH_SIZE = 50;
 const CLEAR_THRESHOLD = 0.6;
 const HOLD_DELAY_MS = 150;
 const BLUR_RADIUS = 8;
 const LOGO_SIZE = 160;
-const BG_COLOR = '#FAF6EE';
+const BG_COLOR = colors.warmBg;
 const FROST_TINT = 'rgba(250, 246, 238, 0.3)';
 
 const fontFamily = Platform.select({ ios: 'Helvetica Neue', default: 'sans-serif' });

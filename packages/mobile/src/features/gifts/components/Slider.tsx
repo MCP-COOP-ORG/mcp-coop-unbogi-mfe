@@ -8,6 +8,7 @@ import {
   View,
 } from 'react-native';
 import Animated, { useAnimatedStyle, withTiming } from 'react-native-reanimated';
+import { colors, spacing } from '@/theme';
 
 interface SliderProps<T> {
   items: T[];
@@ -55,7 +56,7 @@ export function Slider<T>({ items, renderItem, getKey }: SliderProps<T>) {
         windowSize={5}
         initialNumToRender={1}
       />
-      <View style={styles.pagination}>
+      <View style={styles.paginationContainer}>
         {items.map((item, i) => (
           <PaginationDot key={getKey(item)} isActive={i === activeIndex} />
         ))}
@@ -78,6 +79,6 @@ function PaginationDot({ isActive }: { isActive: boolean }) {
 const styles = StyleSheet.create({
   container: { flex: 1, paddingBottom: 24 },
   slideContainer: { height: '100%', paddingHorizontal: 20 },
-  pagination: { flexDirection: 'row', justifyContent: 'center', marginTop: 16, gap: 6 },
-  dot: { height: 7, borderRadius: 3.5, backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#000000' },
+  paginationContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: spacing.md, gap: 8 },
+  dot: { height: 7, borderRadius: 3.5, backgroundColor: colors.white, borderWidth: 1, borderColor: colors.ink },
 });

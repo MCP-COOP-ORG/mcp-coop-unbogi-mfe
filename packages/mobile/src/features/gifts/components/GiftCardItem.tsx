@@ -8,9 +8,11 @@ import { FlipFlap } from './FlipFlap';
 import { LockOverlay } from './LockOverlay';
 import { ScratchCanvas } from './ScratchCanvas';
 
-const BG_COLOR = '#FAF6EE';
-const BORDER_COLOR = '#000000';
-const TEXT_DARK = '#1A1A1A';
+import { colors } from '@/theme';
+
+const BG_COLOR = colors.warmBg;
+const BORDER_COLOR = colors.ink;
+const TEXT_DARK = colors.ink;
 
 interface GiftCardItemProps {
   gift: GiftRecord;
@@ -115,8 +117,8 @@ export const GiftCardItem = React.memo(
                   <QRCode
                     value={gift.scratchCode.value ?? 'NO CODE'}
                     size={152}
-                    backgroundColor="#ffffff"
-                    color="#1A1A1A"
+                    backgroundColor={colors.white}
+                    color={colors.ink}
                   />
                 </View>
                 <Text style={styles.scanText}>SCAN TO ACTIVATE</Text>
@@ -168,7 +170,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: BORDER_COLOR,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: colors.ink,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
     shadowRadius: 6,
@@ -181,13 +183,13 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.fieldBg,
     borderWidth: 1,
     borderColor: BORDER_COLOR,
     position: 'relative',
     overflow: 'hidden',
   },
-  photoPlaceholder: { flex: 1, backgroundColor: '#f3f4f6' },
+  photoPlaceholder: { flex: 1, backgroundColor: colors.fieldBg },
   bottomLabelContainer: {
     position: 'absolute',
     bottom: 4,
@@ -196,7 +198,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bottomLabelText: { fontSize: 10, color: '#52525b', fontWeight: '500', letterSpacing: -0.2 },
+  bottomLabelText: { fontSize: 10, color: colors.muted, fontWeight: '500', letterSpacing: -0.2 },
   cardBack: {
     width: '100%',
     height: '100%',
@@ -250,7 +252,7 @@ const styles = StyleSheet.create({
   },
   qrContainer: { alignItems: 'center', gap: 12 },
   qrWrapper: {
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
     padding: 12,
     borderRadius: 16,
     borderWidth: 1,
@@ -280,7 +282,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     fontFamily: 'Courier',
   },
-  copiedText: { color: '#7AB648' },
+  copiedText: { color: colors.successGreen },
   tapToCopyText: {
     fontSize: 10,
     color: 'rgba(26, 26, 26, 0.4)',

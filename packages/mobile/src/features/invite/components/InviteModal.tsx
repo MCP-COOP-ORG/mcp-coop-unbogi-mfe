@@ -60,7 +60,7 @@ export function InviteModal() {
 
             {submitStatus === 'success' ? (
               <Animated.View entering={ZoomIn} style={styles.successContainer}>
-                <CheckCircle color="#10b981" size={40} strokeWidth={1.5} style={styles.successIcon} />
+                <CheckCircle color={colors.successGreenBright} size={40} strokeWidth={1.5} style={styles.successIcon} />
                 <Text style={styles.successText}>{t.success}</Text>
               </Animated.View>
             ) : (

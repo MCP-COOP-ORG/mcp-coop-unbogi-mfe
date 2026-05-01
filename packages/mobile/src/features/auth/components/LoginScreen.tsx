@@ -34,7 +34,7 @@ export function LoginScreen() {
                       keyboardType="email-address"
                       autoCapitalize="none"
                       editable={!loading}
-                      leftIcon={<Mail color="#1a1a1a" size={20} strokeWidth={2.5} />}
+                      leftIcon={<Mail color={colors.ink} size={20} strokeWidth={2.5} />}
                       onSubmitEditing={handleSendEmail}
                       returnKeyType="go"
                     />

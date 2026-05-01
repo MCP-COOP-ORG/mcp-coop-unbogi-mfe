@@ -2,7 +2,7 @@ import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/d
 import { CalendarDays } from 'lucide-react-native';
 import { Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Input } from '@/shared/ui';
-import { colors } from '@/theme';
+import { colors, spacing } from '@/theme';
 
 interface DatePickerFieldProps {
   value: string; // ISO string or ''
@@ -91,13 +91,12 @@ const styles = StyleSheet.create({
   iosPickerHeader: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    padding: 12,
+    padding: spacing.md,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#ccc',
+    borderBottomColor: colors.datePickerDivider,
   },
   doneText: {
-    color: '#007AFF',
-    fontSize: 17,
+    color: colors.datePickerAction,
     fontWeight: '600',
   },
 });

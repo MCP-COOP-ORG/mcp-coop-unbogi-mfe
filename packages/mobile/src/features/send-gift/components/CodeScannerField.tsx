@@ -46,11 +46,11 @@ export function CodeScannerField({
       </View>
       {hasScannedCode && (
         <Animated.View entering={FadeInDown.duration(300)} style={styles.qrPreview}>
-          <QrCode color="#7ab648" size={20} strokeWidth={2.5} />
+          <QrCode color={colors.successGreen} size={20} strokeWidth={2.5} />
           <Text style={styles.qrPreviewText} numberOfLines={1}>
             {value}
           </Text>
-          <Check color="#7ab648" size={16} strokeWidth={3} />
+          <Check color={colors.successGreen} size={16} strokeWidth={3} />
         </Animated.View>
       )}
     </View>

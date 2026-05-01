@@ -57,6 +57,9 @@
       "eas": {
         "projectId": ""
       }
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

@@ -6,7 +6,12 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "plugins": [
+      {
+        "name": "expo-router/typescript"
+      }
+    ]
   },
   "include": [
     "**/*.ts",

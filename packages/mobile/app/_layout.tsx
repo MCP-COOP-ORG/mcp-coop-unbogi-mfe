@@ -4,8 +4,6 @@ import { StatusBar } from 'expo-status-bar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { useProtectedRoute } from '@/features/auth';
-import { InviteModal } from '@/features/invite';
-import { SendFormModal } from '@/features/send-gift';
 import { GlobalBackground, SplashScreen } from '@/shared/ui';
 import { colors } from '@/theme';
 
@@ -37,8 +35,6 @@ export default function RootLayout() {
             <Stack.Screen name="(main)" options={{ animation: 'fade' }} />
           </Stack>
         )}
-        <InviteModal />
-        <SendFormModal />
       </GestureHandlerRootView>
     </SafeAreaProvider>
   );
