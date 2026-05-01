@@ -16,6 +16,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
+import { logger } from '@/shared/lib/logger';
 
 const BRUSH_SIZE = 50;
 const CLEAR_THRESHOLD = 0.6;
@@ -32,22 +33,22 @@ const labelFont = matchFont({ fontFamily, fontSize: 20, fontWeight: 'bold' } as 
 function useRemoteSkImage(url: string | undefined): SkImage | null {
   const [image, setImage] = useState<SkImage | null>(null);
   useEffect(() => {
-    console.log('[ScratchCanvas] useRemoteSkImage called, url:', url ? `${url.substring(0, 80)}...` : 'undefined');
+    logger.debug('[ScratchCanvas] useRemoteSkImage called, url:', url ? `${url.substring(0, 80)}...` : 'undefined');
     if (!url) return;
     let cancelled = false;
-    console.log('[ScratchCanvas] Starting fetch...');
+    logger.debug('[ScratchCanvas] Starting fetch...');
     fetch(url)
       .then((res) => {
-        console.log('[ScratchCanvas] fetch response status:', res.status, 'ok:', res.ok);
+        logger.debug('[ScratchCanvas] fetch response status:', res.status, 'ok:', res.ok);
         return res.arrayBuffer();
       })
       .then((buf) => {
-        console.log('[ScratchCanvas] arrayBuffer received, size:', buf.byteLength);
+        logger.debug('[ScratchCanvas] arrayBuffer received, size:', buf.byteLength);
         if (cancelled) return;
         const data = Skia.Data.fromBytes(new Uint8Array(buf));
-        console.log('[ScratchCanvas] Skia.Data created:', !!data);
+        logger.debug('[ScratchCanvas] Skia.Data created:', !!data);
         const img = Skia.Image.MakeImageFromEncoded(data);
-        console.log(
+        logger.debug(
           '[ScratchCanvas] MakeImageFromEncoded result:',
           !!img,
           img ? `${img.width()}x${img.height()}` : 'null',
@@ -55,7 +56,7 @@ function useRemoteSkImage(url: string | undefined): SkImage | null {
         if (img) setImage(img);
       })
       .catch((err) => {
-        console.error('[ScratchCanvas] fetch error:', err);
+        logger.error('[ScratchCanvas] fetch error:', err);
       });
     return () => {
       cancelled = true;
@@ -79,7 +80,7 @@ export function ScratchCanvas({ onReveal, isRevealed, isLocked, imageUrl }: Scra
   const postcardImage = useRemoteSkImage(imageUrl);
   const layerPaint = useMemo(() => Skia.Paint(), []);
 
-  console.log(
+  logger.debug(
     '[ScratchCanvas] render — imageUrl:',
     imageUrl ? 'YES' : 'NO',
     'postcardImage:',
@@ -104,6 +105,7 @@ export function ScratchCanvas({ onReveal, isRevealed, isLocked, imageUrl }: Scra
     }
   }, [onReveal, hasRevealed]);
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: useSharedValue refs do not need to be in the dependency array
   const gesture = useMemo(
     () =>
       Gesture.Pan()
@@ -135,7 +137,7 @@ export function ScratchCanvas({ onReveal, isRevealed, isLocked, imageUrl }: Scra
             runOnJS(fireReveal)();
           }
         }),
-    [width, height, isRevealed, isLocked, fireReveal, scratchPath, totalLength, lastPt, hasRevealed],
+    [isRevealed, isLocked, fireReveal, width, height],
   );
 
   if (isRevealed) return null;

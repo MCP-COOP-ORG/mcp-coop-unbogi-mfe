@@ -10,7 +10,8 @@ import { useEffect } from 'react';
 export function useProtectedRoute() {
   const segments = useSegments();
   const router = useRouter();
-  const { status, initialize } = useAuthStore();
+  const status = useAuthStore((s) => s.status);
+  const initialize = useAuthStore((s) => s.initialize);
 
   useEffect(() => {
     // Initialize without initData for Mobile app

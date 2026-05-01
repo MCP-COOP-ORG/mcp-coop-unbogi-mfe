@@ -21,132 +21,143 @@ interface GiftCardItemProps {
   resolveHoliday: (id: string) => string;
 }
 
-export function GiftCardItem({
-  gift,
-  strategy,
-  isUnlocked,
-  isScratched,
-  onScratched,
-  resolveHoliday,
-}: GiftCardItemProps) {
-  const [isFlippedManually, setIsFlippedManually] = React.useState(false);
-  const [copied, setCopied] = React.useState(false);
+export const GiftCardItem = React.memo(
+  function GiftCardItem({ gift, strategy, isUnlocked, isScratched, onScratched, resolveHoliday }: GiftCardItemProps) {
+    const [isFlippedManually, setIsFlippedManually] = React.useState(false);
+    const [copied, setCopied] = React.useState(false);
+    const timerRef = React.useRef<NodeJS.Timeout | null>(null);
 
-  const handleCopy = () => {
-    Clipboard.setString(gift.scratchCode.value ?? '');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
+    const handleCopy = () => {
+      Clipboard.setString(gift.scratchCode.value ?? '');
+      setCopied(true);
+      if (timerRef.current) clearTimeout(timerRef.current);
+      timerRef.current = setTimeout(() => setCopied(false), 2000);
+    };
 
-  const isSurprises = strategy.name === 'surprises';
-  const isLocked = isSurprises && !isUnlocked;
+    React.useEffect(() => {
+      return () => {
+        if (timerRef.current) clearTimeout(timerRef.current);
+      };
+    }, []);
 
-  const fullyRevealed = strategy.name === 'collection' || (isUnlocked && isScratched);
-  const showBack = fullyRevealed && isFlippedManually;
+    const isSurprises = strategy.name === 'surprises';
+    const isLocked = isSurprises && !isUnlocked;
 
-  const formattedDate = new Date(gift.unpackDate).toLocaleDateString(undefined, {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-  });
+    const fullyRevealed = strategy.name === 'collection' || (isUnlocked && isScratched);
+    const showBack = fullyRevealed && isFlippedManually;
 
-  const front = (
-    <View style={styles.cardFront}>
-      <View style={styles.imageContainer}>
-        {gift.imageUrl ? (
-          <Image source={{ uri: gift.imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
-        ) : (
-          <View style={styles.photoPlaceholder} />
-        )}
+    const formattedDate = new Date(gift.unpackDate).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
 
-        {isSurprises && !isScratched && (
-          <View style={[StyleSheet.absoluteFill, { overflow: 'hidden', zIndex: 10 }]}>
-            <ScratchCanvas
-              isRevealed={isScratched}
-              onReveal={() => onScratched(gift.id)}
-              imageUrl={gift.imageUrl}
-              isLocked={isLocked}
-            />
-          </View>
-        )}
-      </View>
-
-      <View style={styles.bottomLabelContainer}>
-        <Text style={styles.bottomLabelText}>
-          {gift.senderName && `from ${gift.senderName}`}
-          {gift.senderName && formattedDate && ' • '}
-          {formattedDate}
-        </Text>
-      </View>
-
-      {isLocked && (
-        <View style={StyleSheet.absoluteFill}>
-          <LockOverlay unpackDate={gift.unpackDate} senderName={gift.senderName} />
-        </View>
-      )}
-    </View>
-  );
-
-  const back = (
-    <View style={styles.cardBack}>
-      <View style={styles.cardBackInner}>
-        <View style={styles.holidayHeading}>
-          <Text style={styles.holidayText}>{resolveHoliday(gift.holidayId)}</Text>
-        </View>
-
-        <View style={styles.greetingBubble}>
-          <Text style={styles.greetingText}>{gift.greeting || "You've got a gift!"}</Text>
-          <View style={styles.authorContainer}>
-            <Text style={styles.senderText}>{gift.senderName}</Text>
-            <Text style={styles.dateText}>{formattedDate}</Text>
-          </View>
-        </View>
-
-        <View style={styles.codeSection}>
-          <View style={styles.codeLabelContainer}>
-            <Text style={styles.codeLabelText}>ACTIVATION CODE</Text>
-          </View>
-
-          {gift.scratchCode.format === 'qr-code' ? (
-            <View style={styles.qrContainer}>
-              <View style={styles.qrWrapper}>
-                <QRCode
-                  value={gift.scratchCode.value ?? 'NO CODE'}
-                  size={152}
-                  backgroundColor="#ffffff"
-                  color="#1A1A1A"
-                />
-              </View>
-              <Text style={styles.scanText}>SCAN TO ACTIVATE</Text>
-            </View>
+    const front = (
+      <View style={styles.cardFront}>
+        <View style={styles.imageContainer}>
+          {gift.imageUrl ? (
+            <Image source={{ uri: gift.imageUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
           ) : (
-            <View style={styles.copyContainer}>
-              <Pressable
-                style={({ pressed }) => [styles.codeButton, pressed && { transform: [{ scale: 0.95 }] }]}
-                onPress={handleCopy}
-              >
-                <Text style={[styles.codeButtonText, copied && styles.copiedText]}>
-                  {copied ? 'COPIED!' : gift.scratchCode.value || 'NO CODE'}
-                </Text>
-              </Pressable>
-              <Text style={styles.tapToCopyText}>TAP TO COPY</Text>
+            <View style={styles.photoPlaceholder} />
+          )}
+
+          {isSurprises && !isScratched && (
+            <View style={[StyleSheet.absoluteFill, { overflow: 'hidden', zIndex: 10 }]}>
+              <ScratchCanvas
+                isRevealed={isScratched}
+                onReveal={() => onScratched(gift.id)}
+                imageUrl={gift.imageUrl}
+                isLocked={isLocked}
+              />
             </View>
           )}
         </View>
-      </View>
-    </View>
-  );
 
-  return (
-    <Pressable
-      style={styles.container}
-      onPress={() => fullyRevealed && setIsFlippedManually(!isFlippedManually)}
-      disabled={!fullyRevealed}
-    >
-      <FlipFlap front={front} back={back} isFlipped={showBack} />
-    </Pressable>
-  );
-}
+        <View style={styles.bottomLabelContainer}>
+          <Text style={styles.bottomLabelText}>
+            {gift.senderName && `from ${gift.senderName}`}
+            {gift.senderName && formattedDate && ' • '}
+            {formattedDate}
+          </Text>
+        </View>
+
+        {isLocked && (
+          <View style={StyleSheet.absoluteFill}>
+            <LockOverlay unpackDate={gift.unpackDate} senderName={gift.senderName} />
+          </View>
+        )}
+      </View>
+    );
+
+    const back = (
+      <View style={styles.cardBack}>
+        <View style={styles.cardBackInner}>
+          <View style={styles.holidayHeading}>
+            <Text style={styles.holidayText}>{resolveHoliday(gift.holidayId)}</Text>
+          </View>
+
+          <View style={styles.greetingBubble}>
+            <Text style={styles.greetingText}>{gift.greeting || "You've got a gift!"}</Text>
+            <View style={styles.authorContainer}>
+              <Text style={styles.senderText}>{gift.senderName}</Text>
+              <Text style={styles.dateText}>{formattedDate}</Text>
+            </View>
+          </View>
+
+          <View style={styles.codeSection}>
+            <View style={styles.codeLabelContainer}>
+              <Text style={styles.codeLabelText}>ACTIVATION CODE</Text>
+            </View>
+
+            {gift.scratchCode.format === 'qr-code' ? (
+              <View style={styles.qrContainer}>
+                <View style={styles.qrWrapper}>
+                  <QRCode
+                    value={gift.scratchCode.value ?? 'NO CODE'}
+                    size={152}
+                    backgroundColor="#ffffff"
+                    color="#1A1A1A"
+                  />
+                </View>
+                <Text style={styles.scanText}>SCAN TO ACTIVATE</Text>
+              </View>
+            ) : (
+              <View style={styles.copyContainer}>
+                <Pressable
+                  style={({ pressed }) => [styles.codeButton, pressed && { transform: [{ scale: 0.95 }] }]}
+                  onPress={handleCopy}
+                >
+                  <Text style={[styles.codeButtonText, copied && styles.copiedText]}>
+                    {copied ? 'COPIED!' : gift.scratchCode.value || 'NO CODE'}
+                  </Text>
+                </Pressable>
+                <Text style={styles.tapToCopyText}>TAP TO COPY</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      </View>
+    );
+
+    return (
+      <Pressable
+        style={styles.container}
+        onPress={() => fullyRevealed && setIsFlippedManually(!isFlippedManually)}
+        disabled={!fullyRevealed}
+      >
+        <FlipFlap front={front} back={back} isFlipped={showBack} />
+      </Pressable>
+    );
+  },
+  (prev, next) => {
+    return (
+      prev.gift.id === next.gift.id &&
+      prev.isUnlocked === next.isUnlocked &&
+      prev.isScratched === next.isScratched &&
+      prev.strategy.name === next.strategy.name
+    );
+  },
+);
 
 const styles = StyleSheet.create({
   container: { flex: 1, width: '100%', height: '100%' },
