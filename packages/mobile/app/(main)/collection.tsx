@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { collectionStrategy, GiftCarousel } from '@/ui/gifts';
+import { collectionStrategy, GiftCarousel } from '@/features/gifts';
 
 export default function CollectionScreen() {
   return (

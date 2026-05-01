@@ -40,7 +40,13 @@
       "!**/*.json",
       "!**/coverage",
       "!**/.firebase",
-      "!**/integration-rep"
+      "!**/integration-rep",
+      "!**/.expo",
+      "!**/android",
+      "!**/ios",
+      "!**/.gradle",
+      "!**/build",
+      "!**/.cache"
     ]
   }
 }

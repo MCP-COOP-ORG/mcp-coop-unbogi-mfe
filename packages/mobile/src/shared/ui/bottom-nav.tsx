@@ -4,8 +4,8 @@ import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useModalStore } from '@/store';
 import { colors, iconDefaults, spacing } from '@/theme';
-import { useInviteModalStore, useSendModalStore } from '../../store';
 import { Button } from './button';
 
 // ── Config ──────────────────────────────────────────────────────────────────────
@@ -24,8 +24,7 @@ const TAB_CONFIG: Record<string, { color: string; icon: React.ElementType }> = {
 // ── Component ───────────────────────────────────────────────────────────────────
 
 function BottomNavComponent({ state, navigation }: BottomTabBarProps) {
-  const { openInviteModal } = useInviteModalStore();
-  const { openSendModal } = useSendModalStore();
+  const open = useModalStore((s) => s.open);
   const insets = useSafeAreaInsets();
 
   const tabs = state.routes.filter((route) => route.name in TAB_CONFIG);
@@ -55,7 +54,7 @@ function BottomNavComponent({ state, navigation }: BottomTabBarProps) {
     <View style={[styles.container, { bottom: insets.bottom + spacing.md }]} pointerEvents="box-none">
       {/* Left — invite */}
       <View>
-        <Button variant="orange" icon={UserPlus} onPress={openInviteModal} layout="circle" />
+        <Button variant="orange" icon={UserPlus} onPress={() => open('invite')} layout="circle" />
       </View>
 
       {/* Center — pill with sliding active button */}
@@ -101,7 +100,7 @@ function BottomNavComponent({ state, navigation }: BottomTabBarProps) {
 
       {/* Right — send gift */}
       <View>
-        <Button variant="cyan" icon={Send} onPress={openSendModal} layout="circle" />
+        <Button variant="cyan" icon={Send} onPress={() => open('send')} layout="circle" />
       </View>
     </View>
   );

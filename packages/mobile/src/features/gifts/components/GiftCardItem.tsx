@@ -3,10 +3,10 @@ import type { GiftRecord } from '@unbogi/shared';
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
-import { FlipFlap } from './flip-flap';
-import { LockOverlay } from './lock-overlay';
-import { ScratchCanvas } from './scratch-canvas';
-import type { GiftScreenStrategy } from './strategies';
+import type { GiftStrategy } from '../types';
+import { FlipFlap } from './FlipFlap';
+import { LockOverlay } from './LockOverlay';
+import { ScratchCanvas } from './ScratchCanvas';
 
 const BG_COLOR = '#FAF6EE';
 const BORDER_COLOR = '#000000';
@@ -14,7 +14,7 @@ const TEXT_DARK = '#1A1A1A';
 
 interface GiftCardItemProps {
   gift: GiftRecord;
-  strategy: GiftScreenStrategy;
+  strategy: GiftStrategy;
   isUnlocked: boolean;
   isScratched: boolean;
   onScratched: (id: string) => void;
@@ -149,11 +149,7 @@ export function GiftCardItem({
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
+  container: { flex: 1, width: '100%', height: '100%' },
   cardFront: {
     width: '100%',
     height: '100%',
@@ -180,10 +176,7 @@ const styles = StyleSheet.create({
     position: 'relative',
     overflow: 'hidden',
   },
-  photoPlaceholder: {
-    flex: 1,
-    backgroundColor: '#f3f4f6',
-  },
+  photoPlaceholder: { flex: 1, backgroundColor: '#f3f4f6' },
   bottomLabelContainer: {
     position: 'absolute',
     bottom: 4,
@@ -192,12 +185,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  bottomLabelText: {
-    fontSize: 10,
-    color: '#52525b',
-    fontWeight: '500',
-    letterSpacing: -0.2,
-  },
+  bottomLabelText: { fontSize: 10, color: '#52525b', fontWeight: '500', letterSpacing: -0.2 },
   cardBack: {
     width: '100%',
     height: '100%',
@@ -206,28 +194,10 @@ const styles = StyleSheet.create({
     borderColor: BORDER_COLOR,
     overflow: 'hidden',
   },
-  cardBackInner: {
-    flex: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
-  holidayHeading: {
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
-    zIndex: 10,
-  },
-  holidayText: {
-    color: TEXT_DARK,
-    fontSize: 24,
-    fontWeight: 'bold',
-    letterSpacing: 0.5,
-  },
-  greetingBubble: {
-    flex: 1,
-    width: '100%',
-    paddingHorizontal: 4,
-  },
+  cardBackInner: { flex: 1, padding: 20, alignItems: 'center' },
+  holidayHeading: { width: '100%', alignItems: 'center', marginBottom: 10, zIndex: 10 },
+  holidayText: { color: TEXT_DARK, fontSize: 24, fontWeight: 'bold', letterSpacing: 0.5 },
+  greetingBubble: { flex: 1, width: '100%', paddingHorizontal: 4 },
   greetingText: {
     fontSize: 15,
     color: 'rgba(26, 26, 26, 0.8)',
@@ -236,10 +206,7 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     textAlign: 'left',
   },
-  authorContainer: {
-    marginTop: 10,
-    alignItems: 'flex-end',
-  },
+  authorContainer: { marginTop: 10, alignItems: 'flex-end' },
   senderText: {
     fontSize: 13,
     fontWeight: '600',
@@ -254,11 +221,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     textAlign: 'right',
   },
-  codeSection: {
-    width: '100%',
-    alignItems: 'center',
-    paddingBottom: 32,
-  },
+  codeSection: { width: '100%', alignItems: 'center', paddingBottom: 32 },
   codeLabelContainer: {
     borderWidth: 1,
     borderColor: 'rgba(0,0,0,0.3)',
@@ -274,11 +237,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1.5,
     textTransform: 'uppercase',
   },
-  // QR code
-  qrContainer: {
-    alignItems: 'center',
-    gap: 12,
-  },
+  qrContainer: { alignItems: 'center', gap: 12 },
   qrWrapper: {
     backgroundColor: '#ffffff',
     padding: 12,
@@ -292,12 +251,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 1.5,
   },
-  // Copy code
-  copyContainer: {
-    width: '100%',
-    alignItems: 'center',
-    gap: 8,
-  },
+  copyContainer: { width: '100%', alignItems: 'center', gap: 8 },
   codeButton: {
     backgroundColor: TEXT_DARK,
     paddingHorizontal: 20,
@@ -315,9 +269,7 @@ const styles = StyleSheet.create({
     letterSpacing: 2,
     fontFamily: 'Courier',
   },
-  copiedText: {
-    color: '#7AB648',
-  },
+  copiedText: { color: '#7AB648' },
   tapToCopyText: {
     fontSize: 10,
     color: 'rgba(26, 26, 26, 0.4)',

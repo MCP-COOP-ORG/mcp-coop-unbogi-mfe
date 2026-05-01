@@ -1,5 +1,5 @@
 import { View } from 'react-native';
-import { GiftCarousel, surprisesStrategy } from '@/ui/gifts';
+import { GiftCarousel, surprisesStrategy } from '@/features/gifts';
 
 export default function SurprisesScreen() {
   return (

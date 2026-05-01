@@ -1,14 +1,12 @@
-import { invitesApi, isValidEmail } from '@unbogi/shared';
 import { CheckCircle, Mail } from 'lucide-react-native';
-import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { Button, Input } from '@/shared/ui';
-import { useInviteModalStore } from '../store';
+import { useModalStore } from '@/store';
+import { colors, neoBrut, radii, spacing } from '@/theme';
+import { useInviteForm } from '../hooks/useInviteForm';
 
-const BIRD_IMAGE = require('../../assets/bird.png');
-
-type SubmitStatus = 'idle' | 'loading' | 'success' | 'error';
+const BIRD_IMAGE = require('../../../../assets/bird.png');
 
 const t = {
   title: 'Invite a Friend',
@@ -20,68 +18,37 @@ const t = {
   close: 'Close',
   cancel: 'Cancel',
   send: 'Send',
-  errorGeneric: 'Failed to send invite',
 };
 
 export function InviteModal() {
-  const { isInviteModalOpen, closeInviteModal } = useInviteModalStore();
-  const [email, setEmail] = useState('');
-  const [submitStatus, setSubmitStatus] = useState<SubmitStatus>('idle');
-  const [errorMessage, setErrorMessage] = useState('');
-  const [isTouched, setIsTouched] = useState(false);
+  const activeModal = useModalStore((s) => s.activeModal);
+  const isOpen = activeModal === 'invite';
 
-  const isEmailValid = isValidEmail(email);
+  const {
+    email,
+    submitStatus,
+    isTouched,
+    isEmailValid,
+    isLoading,
+    setEmail,
+    handleSubmit,
+    handleClose,
+    setSubmitStatusIdle,
+    markTouched,
+  } = useInviteForm();
+
   const showEmailError = isTouched && !isEmailValid;
   const currentError =
     submitStatus === 'error'
-      ? errorMessage
+      ? 'Failed to send invite'
       : showEmailError
         ? email.length === 0
           ? t.emailRequired
           : t.emailInvalid
         : undefined;
 
-  const handleSubmit = async () => {
-    setIsTouched(true);
-    if (!email || !isEmailValid) return;
-
-    setSubmitStatus('loading');
-    try {
-      await invitesApi.sendEmailInvite(email);
-      setSubmitStatus('success');
-      setTimeout(() => {
-        closeInviteModal();
-        setTimeout(() => {
-          setSubmitStatus('idle');
-          setEmail('');
-        }, 300);
-      }, 2000);
-    } catch (err: unknown) {
-      setSubmitStatus('error');
-      setErrorMessage(err instanceof Error ? err.message : t.errorGeneric);
-    }
-  };
-
-  const handleClose = () => {
-    closeInviteModal();
-    setTimeout(() => {
-      setSubmitStatus('idle');
-      setEmail('');
-      setErrorMessage('');
-      setIsTouched(false);
-    }, 300);
-  };
-
-  const isLoading = submitStatus === 'loading';
-
   return (
-    <Modal
-      visible={isInviteModalOpen}
-      transparent
-      animationType="fade"
-      onRequestClose={handleClose}
-      statusBarTranslucent
-    >
+    <Modal visible={isOpen} transparent animationType="fade" onRequestClose={handleClose} statusBarTranslucent>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={handleClose} />
 
@@ -100,13 +67,13 @@ export function InviteModal() {
               <View style={styles.formContainer}>
                 <Input
                   keyboardType="email-address"
-                  leftIcon={<Mail color="#1a1a1a" size={20} strokeWidth={2.5} />}
+                  leftIcon={<Mail color={colors.ink} size={20} strokeWidth={2.5} />}
                   value={email}
                   onChangeText={(val) => {
                     setEmail(val);
-                    if (submitStatus === 'error') setSubmitStatus('idle');
+                    if (submitStatus === 'error') setSubmitStatusIdle();
                   }}
-                  onBlur={() => setIsTouched(true)}
+                  onBlur={markTouched}
                   placeholder={t.emailPlaceholder}
                   editable={!isLoading}
                   error={currentError}
@@ -164,63 +131,56 @@ const styles = StyleSheet.create({
   modalContainer: {
     width: '90%',
     maxWidth: 400,
-    backgroundColor: '#FFF5E1',
-    borderRadius: 32,
     overflow: 'hidden',
-    // Neo-Brutalism Shadow
-    borderWidth: 2,
-    borderColor: '#1a1a1a',
-    shadowColor: '#1a1a1a',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 1,
-    shadowRadius: 0,
-    elevation: 8,
+    ...neoBrut.card,
+    backgroundColor: colors.warmBg,
+    borderRadius: radii.modal,
   },
   content: {
-    paddingTop: 24,
-    paddingHorizontal: 20,
+    paddingTop: spacing.md,
+    paddingHorizontal: spacing.md,
     alignItems: 'center',
   },
   birdImage: {
     width: 80,
     height: 80,
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#4A3A35',
-    marginBottom: 8,
+    color: colors.textBrown,
+    marginBottom: spacing.xs,
   },
   subtitle: {
     fontSize: 14,
     color: 'rgba(74, 58, 53, 0.7)',
     textAlign: 'center',
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    marginBottom: spacing.md,
+    paddingHorizontal: spacing.md,
   },
   successContainer: {
     alignItems: 'center',
-    paddingVertical: 16,
-    height: 80, // roughly same height as form to avoid jumping
+    paddingVertical: spacing.md,
+    height: 80,
   },
   successIcon: {
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   successText: {
-    color: '#4A3A35',
+    color: colors.textBrown,
     fontWeight: '500',
     fontSize: 16,
   },
   formContainer: {
     width: '100%',
     marginTop: 4,
-    marginBottom: 8,
+    marginBottom: spacing.xs,
   },
   footer: {
     flexDirection: 'row',
     gap: 12,
-    padding: 20,
+    padding: spacing.md,
   },
   flex1: {
     flex: 1,

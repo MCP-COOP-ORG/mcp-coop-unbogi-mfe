@@ -80,6 +80,10 @@ export const colors = {
 
   // ── Tab navigation ──
   tabInactive: '#5AABDE',
+
+  // ── Semantic aliases ──
+  textBrown: '#4A3A35',
+  danger: '#EB2D2D',
 } as const;
 
 // ── Radii ───────────────────────────────────────────────────────────────────────
