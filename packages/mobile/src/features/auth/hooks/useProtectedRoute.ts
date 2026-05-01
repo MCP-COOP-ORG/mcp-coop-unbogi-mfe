@@ -27,7 +27,7 @@ export function useProtectedRoute() {
     if (status === AUTH_STATUS.UNAUTHENTICATED && !inAuthGroup) {
       router.replace('/login');
     } else if (status === AUTH_STATUS.AUTHENTICATED && inAuthGroup) {
-      router.replace('/(main)');
+      router.replace('/surprises');
     }
   }, [status, segments, router]);
 

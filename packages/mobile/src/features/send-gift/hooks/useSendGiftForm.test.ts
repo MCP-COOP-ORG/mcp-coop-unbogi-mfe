@@ -7,29 +7,37 @@ const mockHolidays = [{ id: 'h1', name: 'Birthday', defaultGreeting: 'Happy Birt
 jest.mock('@unbogi/shared', () => ({
   GIFT_CONFIG: { CONTACT_SEARCH_MIN_CHARS: 2, CONTACT_SEARCH_MAX_RESULTS: 10 },
   sendFormSchema: {
-    safeParse: jest.fn().mockReturnValue({ success: true, data: { payload: {} } })
+    safeParse: jest.fn().mockReturnValue({ success: true, data: { payload: {} } }),
   },
-  useContactsStore: jest.fn((selector) => selector({
-    contacts: mockContacts,
-    loadContacts: jest.fn(),
-    isLoaded: true,
-    isLoading: false,
-  })),
-  useHolidaysStore: jest.fn((selector) => selector({
-    holidays: mockHolidays,
-    loadHolidays: jest.fn(),
-    isLoaded: true,
-    isLoading: false,
-  })),
-  useGiftsStore: jest.fn((selector) => selector({
-    sendGift: jest.fn().mockResolvedValue({}),
-  })),
+  useContactsStore: jest.fn((selector) =>
+    selector({
+      contacts: mockContacts,
+      loadContacts: jest.fn(),
+      isLoaded: true,
+      isLoading: false,
+    }),
+  ),
+  useHolidaysStore: jest.fn((selector) =>
+    selector({
+      holidays: mockHolidays,
+      loadHolidays: jest.fn(),
+      isLoaded: true,
+      isLoading: false,
+    }),
+  ),
+  useGiftsStore: jest.fn((selector) =>
+    selector({
+      sendGift: jest.fn().mockResolvedValue({}),
+    }),
+  ),
 }));
 
 jest.mock('@/store', () => ({
-  useModalStore: jest.fn((selector) => selector({
-    close: jest.fn(),
-  })),
+  useModalStore: jest.fn((selector) =>
+    selector({
+      close: jest.fn(),
+    }),
+  ),
 }));
 
 jest.mock('expo-crypto', () => ({

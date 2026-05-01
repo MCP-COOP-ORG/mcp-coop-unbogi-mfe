@@ -19,4 +19,10 @@ config.resolver.nodeModulesPaths = [
 // 3. Prevent duplicate React — handled by node-linker=hoisted in .npmrc
 // config.resolver.disableHierarchicalLookup = true;
 
+// 4. Exclude test files from bundling to prevent Node standard library errors
+config.resolver.blockList = [
+  /\/__tests__\/.*/,
+  /.*\.(test|spec)\.(js|jsx|ts|tsx)$/,
+];
+
 module.exports = config;

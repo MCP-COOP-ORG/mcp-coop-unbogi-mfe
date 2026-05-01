@@ -1,4 +1,5 @@
 import { act, renderHook } from '@testing-library/react-native';
+import type { GiftRecord } from '@unbogi/shared';
 import { useGiftTimer } from './useGiftTimer';
 
 describe('useGiftTimer', () => {
@@ -15,7 +16,7 @@ describe('useGiftTimer', () => {
     const gifts = [
       { id: '1', unpackDate: new Date(Date.now() - 1000).toISOString() },
       { id: '2', unpackDate: new Date(Date.now() + 10000).toISOString() },
-    ] as any;
+    ] as unknown as GiftRecord[];
 
     const { result } = renderHook(() => useGiftTimer(gifts, true));
 
@@ -24,9 +25,7 @@ describe('useGiftTimer', () => {
   });
 
   it('unlocks gifts when their unpackDate arrives', () => {
-    const gifts = [
-      { id: '1', unpackDate: new Date(Date.now() + 1000).toISOString() },
-    ] as any;
+    const gifts = [{ id: '1', unpackDate: new Date(Date.now() + 1000).toISOString() }] as unknown as GiftRecord[];
 
     const { result } = renderHook(() => useGiftTimer(gifts, true));
 
@@ -40,9 +39,7 @@ describe('useGiftTimer', () => {
   });
 
   it('does nothing if disabled', () => {
-    const gifts = [
-      { id: '1', unpackDate: new Date(Date.now() - 1000).toISOString() },
-    ] as any;
+    const gifts = [{ id: '1', unpackDate: new Date(Date.now() - 1000).toISOString() }] as unknown as GiftRecord[];
 
     const { result } = renderHook(() => useGiftTimer(gifts, false));
 

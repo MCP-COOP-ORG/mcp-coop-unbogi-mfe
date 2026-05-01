@@ -46,4 +46,4 @@ try {
   global.Request;
   global.Response;
   global.__ExpoImportMetaRegistry;
-} catch (e) {}
+} catch (_e) {}
