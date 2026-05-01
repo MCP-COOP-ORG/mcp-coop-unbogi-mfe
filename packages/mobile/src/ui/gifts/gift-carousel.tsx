@@ -1,5 +1,5 @@
 import { useGiftsStore, useHolidaysStore } from '@unbogi/shared';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { EmptyState } from '@/ui/empty-state';
 import { GiftCardItem } from './gift-card-item';

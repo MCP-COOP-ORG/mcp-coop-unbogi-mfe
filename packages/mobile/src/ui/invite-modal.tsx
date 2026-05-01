@@ -1,6 +1,6 @@
 import { invitesApi, isValidEmail } from '@unbogi/shared';
 import { CheckCircle, Mail } from 'lucide-react-native';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { useInviteModalStore } from '../store';

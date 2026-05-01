@@ -23,12 +23,12 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FAF6EE"
       },
-      "edgeToEdgeEnabled": true,
       "package": "com.unbogi.app",
       "googleServicesFile": "./google-services.json"
     },
     "plugins": [
       "expo-router",
+      "@react-native-google-signin/google-signin",
       [
         "expo-camera",
         {

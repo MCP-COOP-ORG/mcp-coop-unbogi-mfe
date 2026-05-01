@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { ImageBackground, StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Svg, { Circle, Defs, Pattern, RadialGradient, Rect, Stop } from 'react-native-svg';
 import { colors } from '@/theme';
 import { InviteModal, SendFormModal } from '@/ui';
@@ -85,21 +86,23 @@ function useProtectedRoute() {
 export default function RootLayout() {
   useProtectedRoute();
   return (
-    <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.warmBg }}>
-      <GlobalBackground />
-      <StatusBar style="dark" />
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          contentStyle: { backgroundColor: 'transparent' },
-          animation: 'slide_from_right',
-        }}
-      >
-        <Stack.Screen name="login" options={{ animation: 'fade' }} />
-        <Stack.Screen name="(main)" options={{ animation: 'fade' }} />
-      </Stack>
-      <InviteModal />
-      <SendFormModal />
-    </GestureHandlerRootView>
+    <SafeAreaProvider>
+      <GestureHandlerRootView style={{ flex: 1, backgroundColor: colors.warmBg }}>
+        <GlobalBackground />
+        <StatusBar style="dark" />
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: 'transparent' },
+            animation: 'slide_from_right',
+          }}
+        >
+          <Stack.Screen name="login" options={{ animation: 'fade' }} />
+          <Stack.Screen name="(main)" options={{ animation: 'fade' }} />
+        </Stack>
+        <InviteModal />
+        <SendFormModal />
+      </GestureHandlerRootView>
+    </SafeAreaProvider>
   );
 }

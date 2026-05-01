@@ -1,21 +1,23 @@
-import DateTimePicker from '@react-native-community/datetimepicker';
+import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import * as Crypto from 'expo-crypto';
 import { CalendarDays, Check, ChevronDown, Gift, QrCode, ScanLine, Search, X } from 'lucide-react-native';
-import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
+  BackHandler,
   KeyboardAvoidingView,
   Modal,
   Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   type TextInput,
   View,
 } from 'react-native';
-import Animated, { FadeIn, FadeInDown, SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useSendModalStore } from '../store';
 import { Button } from './Button';
 import { Input } from './Input';
@@ -179,6 +181,7 @@ export function SendFormModal() {
 
   /* ── submit ── */
   const handleSubmit = async () => {
+    console.log('[SendForm] handleSubmit called, isFormValid=', isFormValid, 'state=', JSON.stringify(state));
     setErrors({});
     const parsed = sendFormSchema.safeParse({
       receiverId: state.receiverId,
@@ -199,50 +202,67 @@ export function SendFormModal() {
     }
 
     setSubmitting(true);
+
+    const payload = {
+      idempotencyKey: Crypto.randomUUID(),
+      receiverId: parsed.data.receiverId,
+      holidayId: parsed.data.holidayId,
+      greeting: parsed.data.greeting,
+      unpackDate: state.unpackDate ? new Date(state.unpackDate).toISOString() : '',
+      scratchCode: { value: parsed.data.payload.content, format: parsed.data.payload.format },
+    };
+    console.log('[SendForm] sending payload:', JSON.stringify(payload, null, 2));
     try {
-      await sendGift({
-        idempotencyKey: crypto.randomUUID(),
-        receiverId: parsed.data.receiverId,
-        holidayId: parsed.data.holidayId,
-        greeting: parsed.data.greeting,
-        unpackDate: state.unpackDate ? new Date(state.unpackDate).toISOString() : '',
-        scratchCode: { value: parsed.data.payload.content, format: parsed.data.payload.format },
-      });
+      await sendGift(payload);
+      console.log('[SendForm] ✅ success');
       handleClose();
-    } catch {
+    } catch (err) {
+      console.error('[SendForm] ❌ error:', err);
       setErrors({ submit: t.errorSubmit });
     } finally {
       setSubmitting(false);
     }
   };
 
+  useEffect(() => {
+    if (!isSendModalOpen) return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      handleClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [isSendModalOpen, handleClose]);
+
   /* ── loading ── */
   const isLoading = (!contactsLoaded && contactsLoading) || (!holidaysLoaded && holidaysLoading);
 
+  const insets = useSafeAreaInsets();
+
+  if (!isSendModalOpen) return null;
+
   return (
-    <Modal visible={isSendModalOpen} transparent animationType="fade" onRequestClose={handleClose} statusBarTranslucent>
-      <View style={styles.overlay}>
+    <View style={[StyleSheet.absoluteFill, { zIndex: 99999, elevation: 99999 }]}>
+      <Animated.View entering={FadeIn.duration(200)} style={styles.overlay}>
         <Pressable style={styles.backdrop} onPress={handleClose} />
 
         <Animated.View
           entering={SlideInDown.springify().damping(25).stiffness(200)}
-          exiting={SlideOutDown.duration(200)}
-          style={styles.modalContainer}
+          style={[styles.modalContainer, { paddingTop: insets.top }]}
         >
           {isLoading ? (
             <View style={styles.loadingContainer}>
               <Spinner size={32} />
             </View>
           ) : (
-            <SafeAreaView style={styles.flex1}>
-              <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.flex1}>
+            <View style={styles.flex1}>
+              <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={styles.flex1}>
                 <ScrollView
                   style={styles.scrollView}
                   contentContainerStyle={styles.scrollContent}
                   keyboardShouldPersistTaps="handled"
                 >
                   {/* ── Contact Search ── */}
-                  <View style={[styles.fieldContainer, { zIndex: 20 }]}>
+                  <View style={[styles.fieldContainer, showDropdown ? { zIndex: 20, elevation: 20 } : undefined]}>
                     <Input
                       ref={contactInputRef}
                       leftIcon={<Search color="#1A1A1A" size={24} strokeWidth={2.5} />}
@@ -291,7 +311,9 @@ export function SendFormModal() {
                   </View>
 
                   {/* ── Holiday Search ── */}
-                  <View style={[styles.fieldContainer, { zIndex: 10 }]}>
+                  <View
+                    style={[styles.fieldContainer, showHolidayDropdown ? { zIndex: 10, elevation: 10 } : undefined]}
+                  >
                     <Input
                       ref={holidayInputRef}
                       leftIcon={<Gift color="#1A1A1A" size={24} strokeWidth={2.5} />}
@@ -347,7 +369,7 @@ export function SendFormModal() {
                   </View>
 
                   {/* ── Greeting ── */}
-                  <View style={[styles.fieldContainer, { zIndex: -2 }]}>
+                  <View style={styles.fieldContainer}>
                     <Textarea
                       placeholder={t.greetingPlaceholder}
                       value={state.greeting}
@@ -360,8 +382,35 @@ export function SendFormModal() {
                   </View>
 
                   {/* ── Unpack Date ── */}
-                  <View style={[styles.fieldContainer, { zIndex: -3 }]}>
-                    <Pressable onPress={() => setShowDatePicker(true)}>
+                  <View style={styles.fieldContainer}>
+                    <Pressable
+                      onPress={() => {
+                        if (Platform.OS === 'android') {
+                          // Android: no 'datetime' mode — chain date → time imperatively
+                          const initial = state.unpackDate ? new Date(state.unpackDate) : new Date();
+                          DateTimePickerAndroid.open({
+                            value: initial,
+                            mode: 'date',
+                            is24Hour: true,
+                            onChange: (_evt, selectedDate) => {
+                              if (!selectedDate) return;
+                              // Step 2: pick time
+                              DateTimePickerAndroid.open({
+                                value: selectedDate,
+                                mode: 'time',
+                                is24Hour: true,
+                                onChange: (_evt2, selectedTime) => {
+                                  if (!selectedTime) return;
+                                  dispatch({ type: 'SET_UNPACK_DATE', payload: selectedTime.toISOString() });
+                                },
+                              });
+                            },
+                          });
+                        } else {
+                          setShowDatePicker(true);
+                        }
+                      }}
+                    >
                       <View pointerEvents="none">
                         <Input
                           leftIcon={<CalendarDays color="#1A1A1A" size={24} strokeWidth={2.5} />}
@@ -371,18 +420,6 @@ export function SendFormModal() {
                         />
                       </View>
                     </Pressable>
-
-                    {showDatePicker && Platform.OS === 'android' && (
-                      <DateTimePicker
-                        value={state.unpackDate ? new Date(state.unpackDate) : new Date()}
-                        mode="datetime"
-                        display="default"
-                        onValueChange={(_event, date) => {
-                          setShowDatePicker(false);
-                          if (date) dispatch({ type: 'SET_UNPACK_DATE', payload: date.toISOString() });
-                        }}
-                      />
-                    )}
 
                     {showDatePicker && Platform.OS === 'ios' && (
                       <Modal transparent animationType="slide">
@@ -409,14 +446,16 @@ export function SendFormModal() {
                                 <Text style={{ color: '#007AFF', fontSize: 17, fontWeight: '600' }}>Done</Text>
                               </Pressable>
                             </View>
-                            <DateTimePicker
-                              value={state.unpackDate ? new Date(state.unpackDate) : new Date()}
-                              mode="datetime"
-                              display="spinner"
-                              onValueChange={(_event, date) => {
-                                if (date) dispatch({ type: 'SET_UNPACK_DATE', payload: date.toISOString() });
-                              }}
-                            />
+                            {Platform.OS === 'ios' && (
+                              <DateTimePicker
+                                value={state.unpackDate ? new Date(state.unpackDate) : new Date()}
+                                mode="datetime"
+                                display="spinner"
+                                onChange={(_event, date) => {
+                                  if (date) dispatch({ type: 'SET_UNPACK_DATE', payload: date.toISOString() });
+                                }}
+                              />
+                            )}
                           </View>
                         </View>
                       </Modal>
@@ -424,7 +463,7 @@ export function SendFormModal() {
                   </View>
 
                   {/* ── Gift Code ── */}
-                  <View style={[styles.fieldContainer, { zIndex: -4 }]}>
+                  <View style={styles.fieldContainer}>
                     <View style={styles.rowContainer}>
                       <View style={styles.flex1}>
                         <Input
@@ -468,37 +507,50 @@ export function SendFormModal() {
                       {errors.submit}
                     </Animated.Text>
                   )}
+
+                  {/* ── Footer ── */}
+                  <View style={[styles.footer, { paddingBottom: Math.max(insets.bottom, 20) }]}>
+                    <Button
+                      layout="rectangle"
+                      variant="transparent"
+                      onPress={() => {
+                        console.log('[SendForm] CANCEL button pressed');
+                        handleClose();
+                      }}
+                      style={styles.flex1}
+                    >
+                      {t.cancel}
+                    </Button>
+                    <Button
+                      layout="rectangle"
+                      variant="lime"
+                      disabled={!isFormValid}
+                      status={submitting ? 'loading' : 'idle'}
+                      onPress={() => {
+                        console.log('[SendForm] SEND button pressed');
+                        console.log('[SendForm] Current State:', JSON.stringify(state));
+                        console.log('[SendForm] isFormValid=', isFormValid);
+                        handleSubmit();
+                      }}
+                      style={styles.flex1}
+                    >
+                      {t.send}
+                    </Button>
+                  </View>
                 </ScrollView>
               </KeyboardAvoidingView>
-
-              {/* ── Pinned footer — outside KAV so keyboard doesn't push it ── */}
-              <View style={styles.footer}>
-                <Button layout="rectangle" variant="transparent" onPress={handleClose} style={styles.flex1}>
-                  {t.cancel}
-                </Button>
-                <Button
-                  layout="rectangle"
-                  variant="lime"
-                  disabled={!isFormValid}
-                  status={submitting ? 'loading' : 'idle'}
-                  onPress={handleSubmit}
-                  style={styles.flex1}
-                >
-                  {t.send}
-                </Button>
-              </View>
-            </SafeAreaView>
+            </View>
           )}
         </Animated.View>
-      </View>
-    </Modal>
+      </Animated.View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.4)',
   },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -523,7 +575,8 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 20,
     gap: 16,
-    paddingBottom: 40,
+    paddingBottom: 0,
+    flexGrow: 1,
   },
   fieldContainer: {
     position: 'relative',
@@ -584,9 +637,6 @@ const styles = StyleSheet.create({
   footer: {
     flexDirection: 'row',
     gap: 12,
-    paddingHorizontal: 40,
-    paddingBottom: 0,
-    paddingTop: 20,
-    backgroundColor: '#FFF5E1',
+    marginTop: 'auto',
   },
 });

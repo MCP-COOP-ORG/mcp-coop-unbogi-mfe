@@ -1,4 +1,3 @@
-import React from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
 const LOGO = require('../../assets/logo-7.png');

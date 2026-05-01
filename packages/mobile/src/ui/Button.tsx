@@ -11,7 +11,7 @@ import {
   X,
 } from 'lucide-react-native';
 import type React from 'react';
-import { StyleSheet, Text, type TextStyle, TouchableOpacity, View, type ViewStyle } from 'react-native';
+import { StyleSheet, Text, type TextStyle, TouchableOpacity, type ViewStyle } from 'react-native';
 import { Spinner } from './Spinner';
 
 export type ButtonVariant = 'orange' | 'red' | 'cyan' | 'lime' | 'transparent';

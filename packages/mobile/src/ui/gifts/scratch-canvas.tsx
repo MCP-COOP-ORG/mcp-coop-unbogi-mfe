@@ -12,7 +12,7 @@ import {
   type SkPath,
   useImage,
 } from '@shopify/react-native-skia';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, StyleSheet, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { runOnJS, useSharedValue } from 'react-native-reanimated';
@@ -32,7 +32,7 @@ const labelFont = matchFont({ fontFamily, fontSize: 20, fontWeight: 'bold' } as 
 function useRemoteSkImage(url: string | undefined): SkImage | null {
   const [image, setImage] = useState<SkImage | null>(null);
   useEffect(() => {
-    console.log('[ScratchCanvas] useRemoteSkImage called, url:', url ? url.substring(0, 80) + '...' : 'undefined');
+    console.log('[ScratchCanvas] useRemoteSkImage called, url:', url ? `${url.substring(0, 80)}...` : 'undefined');
     if (!url) return;
     let cancelled = false;
     console.log('[ScratchCanvas] Starting fetch...');
