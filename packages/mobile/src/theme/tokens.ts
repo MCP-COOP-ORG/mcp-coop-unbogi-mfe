@@ -89,6 +89,7 @@ export const radii = {
   lg: 26,
   full: 9999,
   field: 14,
+  pill: 24,
   button: 28,
   modal: 32,
 } as const;
@@ -97,6 +98,10 @@ export const radii = {
 export const sizing = {
   buttonHeight: 42,
   fieldHeight: 42,
+  inputHeight: 48,
+  textareaMinHeight: 120,
+  textareaInputMinHeight: 88,
+  emptyStateLogo: 172,
   bottomNavHeight: 64,
   screenPaddingH: 16,
   logoSize: 240,

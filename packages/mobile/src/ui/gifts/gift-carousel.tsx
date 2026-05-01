@@ -1,7 +1,7 @@
 import { useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
-import { EmptyState } from '@/ui/empty-state';
+import { StyleSheet, View } from 'react-native';
+import { EmptyState, SplashScreen } from '@/shared/ui';
 import { GiftCardItem } from './gift-card-item';
 import { Slider } from './slider';
 import type { GiftScreenStrategy } from './strategies';
@@ -54,11 +54,7 @@ export function GiftCarousel({ strategy }: GiftCarouselProps) {
   const resolveHoliday = useCallback((id: string) => holidayMap.get(id) ?? id, [holidayMap]);
 
   if (!isLoaded || isLoading) {
-    return (
-      <View style={styles.center}>
-        <Text>Loading...</Text>
-      </View>
-    );
+    return <SplashScreen />;
   }
 
   if (gifts.length === 0) {
@@ -91,10 +87,5 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 80,
     paddingBottom: 80,
-  },
-  center: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

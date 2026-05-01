@@ -1,10 +1,9 @@
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 import { authApi } from '@unbogi/shared';
-import { Mail } from 'lucide-react-native';
+import { ArrowLeft, Check, ChevronRight, Mail } from 'lucide-react-native';
 import { useEffect, useState } from 'react';
 import {
-  ActivityIndicator,
   Alert,
   Image,
   KeyboardAvoidingView,
@@ -17,8 +16,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
+import { Button, Input, Spinner } from '@/shared/ui';
 import { colors, radii, shadows, sizing, spacing } from '@/theme';
-import { Button, Input } from '@/ui';
 
 const LOGO = require('../assets/logo-7.png');
 
@@ -147,7 +146,7 @@ export default function LoginScreen() {
                     <Button
                       layout="circle"
                       variant="cyan"
-                      icon="ChevronRight"
+                      icon={ChevronRight}
                       onPress={handleSendEmail}
                       status={loading ? 'loading' : !email.includes('@') ? 'disabled' : 'idle'}
                     />
@@ -171,7 +170,7 @@ export default function LoginScreen() {
                     <Button
                       layout="circle"
                       variant={code.length >= 6 ? 'lime' : 'red'}
-                      icon={code.length >= 6 ? 'Check' : 'ArrowLeft'}
+                      icon={code.length >= 6 ? Check : ArrowLeft}
                       onPress={code.length >= 6 ? handleVerify : () => setStep('email')}
                       status={loading ? 'loading' : 'idle'}
                     />
@@ -196,7 +195,7 @@ export default function LoginScreen() {
                 onPress={handleGoogleSignIn}
                 disabled={googleLoading || loading}
               >
-                {googleLoading ? <ActivityIndicator size="small" color={colors.ink} /> : <GoogleLogo size={20} />}
+                {googleLoading ? <Spinner size={20} color={colors.ink} /> : <GoogleLogo size={20} />}
                 <Text style={styles.googleButtonText}>Sign in with Google</Text>
               </Pressable>
             )}

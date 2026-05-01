@@ -3,9 +3,8 @@ import { CheckCircle, Mail } from 'lucide-react-native';
 import { useState } from 'react';
 import { Image, KeyboardAvoidingView, Modal, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import Animated, { ZoomIn } from 'react-native-reanimated';
+import { Button, Input } from '@/shared/ui';
 import { useInviteModalStore } from '../store';
-import { Button } from './Button';
-import { Input } from './Input';
 
 const BIRD_IMAGE = require('../../assets/bird.png');
 

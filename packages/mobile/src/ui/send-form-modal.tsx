@@ -2,7 +2,7 @@ import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/d
 import { GIFT_CONFIG, sendFormSchema, useContactsStore, useGiftsStore, useHolidaysStore } from '@unbogi/shared';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import * as Crypto from 'expo-crypto';
-import { CalendarDays, Check, ChevronDown, Gift, QrCode, ScanLine, Search, X } from 'lucide-react-native';
+import { CalendarDays, Camera, Check, ChevronDown, Gift, QrCode, ScanLine, Search, X } from 'lucide-react-native';
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import {
   BackHandler,
@@ -18,12 +18,9 @@ import {
 } from 'react-native';
 import Animated, { FadeIn, FadeInDown, SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Button, Input, Spinner, Textarea } from '@/shared/ui';
 import { useSendModalStore } from '../store';
-import { Button } from './Button';
-import { Input } from './Input';
-import { Spinner } from './Spinner';
 import { formReducer, initialState, type SendFormErrorKey } from './send-form-model';
-import { Textarea } from './Textarea';
 
 const t = {
   title: 'SEND A GIFT',
@@ -484,9 +481,9 @@ export function SendFormModal() {
                       </View>
                       <View>
                         {hasScannedCode ? (
-                          <Button layout="circle" variant="red" icon="X" onPress={handleClearScannedCode} />
+                          <Button layout="circle" variant="red" icon={X} onPress={handleClearScannedCode} />
                         ) : (
-                          <Button layout="circle" variant="orange" icon="Camera" onPress={handleScanQr} />
+                          <Button layout="circle" variant="orange" icon={Camera} onPress={handleScanQr} />
                         )}
                       </View>
                     </View>

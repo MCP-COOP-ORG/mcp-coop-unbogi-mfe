@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { BottomNav } from '@/ui';
+import { BottomNav } from '@/shared/ui';
 
 export default function MainLayout() {
   return (
