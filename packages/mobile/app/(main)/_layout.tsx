@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { BottomNav } from '@/shared/ui';
 import { InviteModal } from '@/features/invite';
 import { SendFormModal } from '@/features/send-gift';
+import { BottomNav } from '@/shared/ui';
 
 export default function MainLayout() {
   return (

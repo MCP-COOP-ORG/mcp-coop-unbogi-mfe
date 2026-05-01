@@ -39,7 +39,7 @@ export function LockOverlay({ unpackDate, senderName }: LockOverlayProps) {
 
   return (
     <View style={styles.container} pointerEvents="box-none">
-      <Image source={require('../../../assets/logo-7.png')} style={styles.logo} resizeMode="contain" />
+      <Image source={require('../../../../assets/logo-7.png')} style={styles.logo} resizeMode="contain" />
 
       <Text style={styles.unlockDateText}>
         {senderName ? (

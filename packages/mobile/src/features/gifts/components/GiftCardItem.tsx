@@ -3,12 +3,11 @@ import type { GiftRecord } from '@unbogi/shared';
 import React from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import { colors } from '@/theme';
 import type { GiftStrategy } from '../types';
 import { FlipFlap } from './FlipFlap';
 import { LockOverlay } from './LockOverlay';
 import { ScratchCanvas } from './ScratchCanvas';
-
-import { colors } from '@/theme';
 
 const BG_COLOR = colors.warmBg;
 const BORDER_COLOR = colors.ink;
@@ -128,6 +127,9 @@ export const GiftCardItem = React.memo(
                 <Pressable
                   style={({ pressed }) => [styles.codeButton, pressed && { transform: [{ scale: 0.95 }] }]}
                   onPress={handleCopy}
+                  testID={`copy-code-${gift.id}`}
+                  accessibilityLabel="Copy activation code"
+                  accessibilityRole="button"
                 >
                   <Text style={[styles.codeButtonText, copied && styles.copiedText]}>
                     {copied ? 'COPIED!' : gift.scratchCode.value || 'NO CODE'}
@@ -146,6 +148,9 @@ export const GiftCardItem = React.memo(
         style={styles.container}
         onPress={() => fullyRevealed && setIsFlippedManually(!isFlippedManually)}
         disabled={!fullyRevealed}
+        testID={`gift-card-${gift.id}`}
+        accessibilityLabel={`Gift from ${gift.senderName || 'someone'}`}
+        accessibilityRole="button"
       >
         <FlipFlap front={front} back={back} isFlipped={showBack} />
       </Pressable>

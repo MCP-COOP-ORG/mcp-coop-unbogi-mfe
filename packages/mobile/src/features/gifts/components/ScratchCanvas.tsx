@@ -77,7 +77,7 @@ export function ScratchCanvas({ onReveal, isRevealed, isLocked, imageUrl }: Scra
   const [layout, setLayout] = useState({ width: 300, height: 400 });
   const { width, height } = layout;
 
-  const logoImage = useImage(require('../../../assets/logo-7.png'));
+  const logoImage = useImage(require('../../../../assets/logo-7.png'));
   const postcardImage = useRemoteSkImage(imageUrl);
   const layerPaint = useMemo(() => Skia.Paint(), []);
 

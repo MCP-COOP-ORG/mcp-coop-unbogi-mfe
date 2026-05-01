@@ -7,6 +7,9 @@ import { useProtectedRoute } from '@/features/auth';
 import { GlobalBackground, SplashScreen } from '@/shared/ui';
 import { colors } from '@/theme';
 
+// Catch any errors thrown by the Layout component.
+export { ErrorBoundary } from 'expo-router';
+
 /**
  * Root layout — wraps the entire app.
  * Providers: SafeAreaProvider, GestureHandler (required for reanimated/gesture-handler).
