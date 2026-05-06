@@ -2,7 +2,7 @@ import { ArrowLeft, Check, ChevronRight, Mail } from 'lucide-react-native';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Input, Spinner } from '@/shared/ui';
-import { colors, radii, shadows, sizing, spacing } from '@/theme';
+import { colors, radii, sizing, spacing } from '@/theme';
 import { useEmailOtp } from '../hooks/useEmailOtp';
 import { useGoogleSignIn } from '../hooks/useGoogleSignIn';
 import { GoogleLogo } from './GoogleLogo';
@@ -182,12 +182,9 @@ const styles = StyleSheet.create({
     borderWidth: 2.5,
     borderColor: colors.ink,
     borderRadius: radii.field,
-    ...shadows.button,
   },
   googleButtonPressed: {
-    transform: [{ translateX: 3 }, { translateY: 3 }],
-    shadowOffset: { width: 0, height: 0 },
-    elevation: 0,
+    opacity: 0.7,
   },
   googleButtonText: {
     fontSize: 15,

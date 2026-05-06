@@ -51,7 +51,7 @@ function BottomNavComponent({ state, navigation }: BottomTabBarProps) {
   const activeColor = TAB_CONFIG[activeTabName]?.color ?? colors.buttonRed;
 
   return (
-    <View style={[styles.container, { bottom: insets.bottom + spacing.md }]} pointerEvents="box-none">
+    <View style={[styles.container, { bottom: insets.bottom + (spacing.md - 20) }]} pointerEvents="box-none">
       {/* Left — invite */}
       <View>
         <Button variant="orange" icon={UserPlus} onPress={() => open('invite')} layout="circle" />
@@ -113,8 +113,8 @@ export const BottomNav = React.memo(BottomNavComponent);
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    left: spacing.lg - 4,
-    right: spacing.lg - 4,
+    left: spacing.lg + 6,
+    right: spacing.lg + 6,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',

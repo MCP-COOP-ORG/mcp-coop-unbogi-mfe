@@ -25,12 +25,14 @@ export interface UseSendGiftFormResult {
   /* contact dropdown */
   filteredContacts: Contact[];
   showDropdown: boolean;
+  setShowDropdown: (v: boolean) => void;
   contactInputRef: React.RefObject<TextInput | null>;
   handleSearchChange: (val: string) => void;
   handleSelectContact: (id: string, name: string) => void;
   /* holiday dropdown */
   filteredHolidays: Holiday[];
   showHolidayDropdown: boolean;
+  setShowHolidayDropdown: (v: boolean) => void;
   holidaySearch: string;
   holidayInputRef: React.RefObject<TextInput | null>;
   handleHolidaySearchChange: (val: string) => void;
@@ -259,11 +261,13 @@ export function useSendGiftForm(): UseSendGiftFormResult {
     isFormValid,
     filteredContacts,
     showDropdown,
+    setShowDropdown,
     contactInputRef,
     handleSearchChange,
     handleSelectContact,
     filteredHolidays,
     showHolidayDropdown,
+    setShowHolidayDropdown,
     holidaySearch,
     holidayInputRef,
     handleHolidaySearchChange,

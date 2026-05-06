@@ -1,6 +1,6 @@
 import React from 'react';
 import { Pressable, StyleSheet, Text, type TextStyle, type ViewStyle } from 'react-native';
-import { colors, fontSizes, iconDefaults, neoBrut, shadows, spacing } from '@/theme';
+import { colors, fontSizes, iconDefaults, neoBrut, spacing } from '@/theme';
 import { Spinner } from './spinner';
 
 // ── Types ───────────────────────────────────────────────────────────────────────
@@ -131,7 +131,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     borderWidth: 2,
     borderColor: colors.ink,
-    ...shadows.button,
   },
   rectangleContainer: {
     height: BUTTON_SIZE,
@@ -147,7 +146,6 @@ const styles = StyleSheet.create({
   transparentContainer: {
     borderWidth: 0,
     backgroundColor: 'transparent',
-    ...shadows.none,
   },
   tabContainer: {
     width: BUTTON_SIZE,
@@ -165,7 +163,6 @@ const styles = StyleSheet.create({
   },
   transparentText: {
     color: colors.textMuted80,
-    ...neoBrut.textShadow,
   },
   disabled: {
     opacity: 0.5,

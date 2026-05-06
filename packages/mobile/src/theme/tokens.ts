@@ -115,11 +115,11 @@ export const sizing = {
 // RN shadow for iOS + elevation for Android
 export const shadows = {
   button: {
-    shadowColor: colors.ink,
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 1,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
     shadowRadius: 0,
-    elevation: 5,
+    elevation: 0,
   },
   card: {
     shadowColor: colors.ink,
@@ -129,11 +129,11 @@ export const shadows = {
     elevation: 8,
   },
   subtle: {
-    shadowColor: colors.ink,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.3,
+    shadowColor: 'transparent',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0,
     shadowRadius: 0,
-    elevation: 3,
+    elevation: 0,
   },
   none: {
     shadowColor: 'transparent',

@@ -58,8 +58,7 @@ export const neoBrut = StyleSheet.create({
 
   // ── Button pressed state (Neo-Brutalism push effect) ──
   buttonPressed: {
-    transform: [{ translateX: 3 }, { translateY: 3 }],
-    ...shadows.none,
+    opacity: 0.8,
   },
 
   // ── Success field (code preview, validated inputs) ──

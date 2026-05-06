@@ -1,3 +1,4 @@
+import { Gift, Search } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { BackHandler, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 import Animated, { FadeIn, SlideInDown } from 'react-native-reanimated';
@@ -7,9 +8,8 @@ import { useModalStore } from '@/store';
 import { colors } from '@/theme';
 import { useSendGiftForm } from '../hooks/useSendGiftForm';
 import { CodeScannerField } from './CodeScannerField';
-import { ContactDropdown } from './ContactDropdown';
 import { DatePickerField } from './DatePickerField';
-import { HolidayDropdown } from './HolidayDropdown';
+import { SearchSelect } from './SearchSelect';
 
 const t = {
   title: 'SEND A GIFT',
@@ -30,11 +30,13 @@ export function SendFormModal() {
     isFormValid,
     filteredContacts,
     showDropdown,
+    setShowDropdown,
     contactInputRef,
     handleSearchChange,
     handleSelectContact,
     filteredHolidays,
     showHolidayDropdown,
+    setShowHolidayDropdown,
     holidaySearch,
     holidayInputRef,
     handleHolidaySearchChange,
@@ -86,32 +88,29 @@ export function SendFormModal() {
                   keyboardShouldPersistTaps="handled"
                 >
                   {/* Contact Search */}
-                  <ContactDropdown
+                  <SearchSelect
                     inputRef={contactInputRef}
                     value={state.searchQuery}
                     onChangeText={handleSearchChange}
                     onFocus={() => {
-                      /* handled in handleSearchChange */
-                    }}
-                    onBlur={() => {
-                      /* managed by showDropdown flag */
-                    }}
-                    onRightIconPress={() => {
-                      if (showDropdown) {
-                        contactInputRef.current?.blur();
-                      } else {
-                        contactInputRef.current?.focus();
+                      if (state.receiverId) {
+                        handleSearchChange('');
                       }
                     }}
                     showDropdown={showDropdown}
-                    contacts={filteredContacts}
-                    hasSelected={Boolean(state.receiverId)}
-                    onSelect={handleSelectContact}
+                    setShowDropdown={setShowDropdown}
+                    data={filteredContacts}
+                    displayKey="displayName"
+                    onSelect={(c) => handleSelectContact(c.id, c.displayName)}
+                    leftIcon={<Search color={colors.ink} size={24} strokeWidth={2.5} />}
+                    placeholder="Search friend..."
                     error={errors.receiverId}
+                    containerStyle={{ zIndex: 20 }}
+                    dropdownVisible={!state.receiverId}
                   />
 
                   {/* Holiday Search */}
-                  <HolidayDropdown
+                  <SearchSelect
                     inputRef={holidayInputRef}
                     value={holidaySearch}
                     onChangeText={handleHolidaySearchChange}
@@ -120,20 +119,15 @@ export function SendFormModal() {
                         handleHolidaySearchChange('');
                       }
                     }}
-                    onBlur={() => {
-                      /* managed by showHolidayDropdown flag */
-                    }}
-                    onRightIconPress={() => {
-                      if (showHolidayDropdown) {
-                        holidayInputRef.current?.blur();
-                      } else {
-                        holidayInputRef.current?.focus();
-                      }
-                    }}
                     showDropdown={showHolidayDropdown}
-                    holidays={filteredHolidays}
-                    onSelect={handleSelectHoliday}
+                    setShowDropdown={setShowHolidayDropdown}
+                    data={filteredHolidays}
+                    displayKey="name"
+                    onSelect={(h) => handleSelectHoliday(h.id, h.name)}
+                    leftIcon={<Gift color={colors.ink} size={24} strokeWidth={2.5} />}
+                    placeholder="Select holiday"
                     error={errors.holidayId}
+                    containerStyle={{ zIndex: 10 }}
                   />
 
                   {/* Greeting */}
